@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <title>FITTRACK</title>
+  <meta name="description" content="Sistema personal de seguimiento del entrenamiento">
+  
+  <!-- PWA Manifest -->
+  <link rel="manifest" href="manifest.webmanifest">
+  
+  <!-- Theme Color (updated dynamically by JS) -->
+  <meta name="theme-color" content="#0B0D0F">
+  
+  <!-- Icons -->
+  <link rel="icon" href="assets/icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="assets/icons/icon-192.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Firebase SDKs (Compat versions) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore-compat.js"></script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body>
+
+  <!-- LOADING SCREEN — Premium Gym Splash -->
+  <div id="loading-screen">
+
+    <!-- Green accent line -->
+    <div class="loading-accent-line"></div>
+
+    <!-- Main headline -->
+    <div class="loading-headline">
+      <span class="loading-headline-line1">Tu progreso</span>
+      <span class="loading-headline-line2">empieza hoy</span>
+    </div>
+    <p class="loading-tagline">Entrená. Registrá. Progresá.</p>
+
+    <!-- Flexible spacer -->
+    <div class="loading-spacer"></div>
+
+    <!-- Progress bar section -->
+    <div class="loading-progress-container">
+      <div class="loading-progress-label" id="loading-status">Cargando...</div>
+      <div class="loading-bar-row">
+        <div class="loading-bar-track">
+          <div id="loading-bar-fill" class="loading-bar-fill"></div>
+        </div>
+        <span class="loading-percent" id="loading-percent">0%</span>
+      </div>
+    </div>
+
+    <!-- Footer: dumbbell + slogan -->
+    <div class="loading-footer">
+      <div class="loading-footer-icon">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M3 9.5v5"/><path d="M21 9.5v5"/><path d="M3 9.5a2 2 0 0 1 2-2h1.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/><path d="M15.5 9.5a2 2 0 0 1 2-2H19a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1.5a2 2 0 0 1-2-2v-5z"/></svg>
+      </div>
+      <div class="loading-footer-divider"></div>
+      <div class="loading-footer-text">DISCIPLINA<br>HOY, RESULTADOS<br>MAÑANA.</div>
+    </div>
+
+  </div>
+
+  <!-- APP CONTAINER -->
+  <div id="app-container" class="app-container d-none">
+    
+    <!-- Header -->
+    <header id="app-header" class="app-header">
+      <div id="header-title" class="header-title">FITTRACK</div>
+      <div class="header-actions">
+        <button class="btn-icon" id="btn-profile" aria-label="Perfil">
+          <i data-lucide="user"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content Area (Views rendered here) -->
+    <main id="main-content" class="main-content">
+      <!-- Views will be injected by router -->
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav id="bottom-nav" class="bottom-nav">
+      <a href="#/" class="nav-item active" data-route="/">
+        <i data-lucide="home"></i>
+        <span>Inicio</span>
+      </a>
+      <a href="#/workout" class="nav-item" data-route="/workout">
+        <i data-lucide="dumbbell"></i>
+        <span>Entrenar</span>
+      </a>
+      <a href="#/routines" class="nav-item" data-route="/routines">
+        <i data-lucide="clipboard-list"></i>
+        <span>Rutinas</span>
+      </a>
+      <a href="#/history" class="nav-item" data-route="/history">
+        <i data-lucide="clock"></i>
+        <span>Historial</span>
+      </a>
+      <a href="#/progress" class="nav-item" data-route="/progress">
+        <i data-lucide="trending-up"></i>
+        <span>Progreso</span>
+      </a>
+    </nav>
+    
+  </div> <!-- /APP CONTAINER -->
+
+  <!-- LOGIN SCREEN (Hidden by default) -->
+  <div id="login-screen" class="d-none">
+    <h1 class="login-brand">FITTRACK</h1>
+    <p class="login-description">Controla, analiza y mejora tu entrenamiento.</p>
+    
+    <button id="btn-login-google" class="btn btn-google">
+      <!-- Simple Google G icon SVG -->
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/><path d="M1 1h22v22H1z" fill="none"/></svg>
+      Continuar con Google
+    </button>
+  </div>
+
+  <!-- Scripts (Sequential to avoid CORS when opening file:// directly) -->
+  <script src="js/firebase-config.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/db/profiles.js"></script>
+  <script src="js/db/routines.js"></script>
+  <script src="js/db/workouts.js"></script>
+  <script src="js/screens/dashboard.js"></script>
+  <script src="js/screens/routines.js"></script>
+  <script src="js/screens/workout.js"></script>
+  <script src="js/screens/history.js"></script>
+  <script src="js/screens/progress.js"></script>
+  <script src="js/screens/profile.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+</html>

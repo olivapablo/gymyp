@@ -1,0 +1,232 @@
+/* ============================================
+   FITTRACK — Base Styles
+   ============================================ */
+
+/* CSS Reset & Box Sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: var(--line-height-normal);
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  /* Do NOT add html-level padding — safe areas handled per-element */
+}
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text-1);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100dvh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+  overscroll-behavior-y: none; /* Prevents pull-to-refresh on mobile */
+  transition: background-color var(--transition-base), color var(--transition-base);
+}
+
+/* Typography Base */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--font-weight-bold);
+  line-height: var(--line-height-tight);
+  color: var(--color-text-1);
+}
+
+h1 { font-size: var(--font-size-3xl); }
+h2 { font-size: var(--font-size-2xl); }
+h3 { font-size: var(--font-size-xl); }
+h4 { font-size: var(--font-size-lg); }
+
+p {
+  color: var(--color-text-2);
+  margin-bottom: 0;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Lists */
+ul, ol {
+  list-style: none;
+}
+
+/* Media */
+img, picture, video, canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+svg {
+  display: block;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-3);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) var(--color-surface);
+}
+
+/* Forms Base */
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+  border: none;
+  background: none;
+  outline: none;
+}
+
+/* Remove number input arrows / spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+button {
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* ── Utility Classes ── */
+
+/* Font sizes */
+.text-xs   { font-size: var(--font-size-xs); }
+.text-sm   { font-size: var(--font-size-sm); }
+.text-base { font-size: var(--font-size-base); }
+.text-lg   { font-size: var(--font-size-lg); }
+.text-xl   { font-size: var(--font-size-xl); }
+.text-2xl  { font-size: var(--font-size-2xl); }
+.text-3xl  { font-size: var(--font-size-3xl); }
+
+/* Font weights */
+.font-light    { font-weight: var(--font-weight-light); }
+.font-regular  { font-weight: var(--font-weight-regular); }
+.font-medium   { font-weight: var(--font-weight-medium); }
+.font-semibold { font-weight: var(--font-weight-semibold); }
+.font-bold     { font-weight: var(--font-weight-bold); }
+
+/* Text colors */
+.text-color-1 { color: var(--color-text-1); }
+.text-color-2 { color: var(--color-text-2); }
+.text-color-3 { color: var(--color-text-3); }
+.text-primary { color: var(--color-primary); }
+.text-info    { color: var(--color-info); }
+.text-bg      { color: var(--color-bg); }
+.text-warning { color: var(--color-warning); }
+.text-success { color: var(--color-success); }
+.text-error   { color: var(--color-error); }
+
+/* Text alignment */
+.text-center { text-align: center; }
+.text-right  { text-align: right; }
+
+/* Margins */
+.mt-0 { margin-top: 0; }
+.mt-2 { margin-top: var(--space-2); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+.mt-8 { margin-top: var(--space-8); }
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: var(--space-1); }
+.mb-2 { margin-bottom: var(--space-2); }
+.mb-3 { margin-bottom: var(--space-3); }
+.mb-4 { margin-bottom: var(--space-4); }
+.mb-6 { margin-bottom: var(--space-6); }
+.mb-8 { margin-bottom: var(--space-8); }
+.pl-10 { padding-left: var(--space-10); }
+
+/* Gaps */
+.gap-1  { gap: var(--space-1); }
+.gap-2  { gap: var(--space-2); }
+.gap-3  { gap: var(--space-3); }
+.gap-4  { gap: var(--space-4); }
+.gap-6  { gap: var(--space-6); }
+
+/* Flex helpers */
+.items-start   { align-items: flex-start; }
+.items-end     { align-items: flex-end; }
+.flex-wrap     { flex-wrap: wrap; }
+.flex-1        { flex: 1; }
+.w-full        { width: 100%; }
+.w-8           { width: 2rem; }
+.w-10          { width: 2.5rem; }
+.p-2           { padding: var(--space-2); }
+.p-4           { padding: var(--space-4); }
+.py-4          { padding-top: var(--space-4); padding-bottom: var(--space-4); }
+.py-8          { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+.py-12         { padding-top: var(--space-12); padding-bottom: var(--space-12); }
+.px-2          { padding-left: var(--space-2); padding-right: var(--space-2); }
+.truncate      { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.opacity-50    { opacity: 0.5; }
+
+/* Background utilities */
+.bg-success    { background-color: var(--color-success) !important; }
+.bg-surface-2  { background-color: var(--color-surface-2) !important; }
+.bg-primary-dim { background-color: var(--color-primary-dim) !important; }
+.bg-error-dim  { background-color: var(--color-error-dim) !important; }
+.border-primary { border-color: var(--color-primary) !important; }
+.border-error  { border-color: var(--color-error) !important; }
+.border-b      { border-bottom: 1px solid var(--color-border); }
+.border-color-border { border-color: var(--color-border); }
+
+/* Z-index */
+.z-10 { z-index: 10; }
+
+/* Misc */
+.tracking-wider { letter-spacing: var(--letter-spacing-wider); }
+.letter-spacing-wide { letter-spacing: var(--letter-spacing-wide); }
+.font-mono { font-family: 'Courier New', monospace; }
+
+/* Buttons extra */
+.btn-sm { padding: var(--space-2) var(--space-3) !important; font-size: var(--font-size-sm) !important; }
+.btn-block { width: 100%; }
+.justify-center { justify-content: center; }
+
+/* Sticky helper */
+.sticky { position: sticky; }
+.top-0  { top: 0; }
+.bg-bg  { background-color: var(--color-bg); }
+
+/* Display */
+.d-none    { display: none !important; }
+.v-hidden  { visibility: hidden !important; }

@@ -1,0 +1,170 @@
+/* ============================================
+   FITTRACK — Design Tokens
+   ============================================ */
+
+:root {
+  /* Typography */
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  --font-size-xs: 0.6875rem;
+  --font-size-sm: 0.75rem;
+  --font-size-base: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.75rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-display: 3rem;
+
+  --font-weight-light: 300;
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+
+  --letter-spacing-tight: -0.02em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.05em;
+  --letter-spacing-wider: 0.1em;
+  --letter-spacing-widest: 0.2em;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Border Radius */
+  --radius-sm: 0.25rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-2xl: 1.5rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-fast: 150ms ease;
+  --transition-base: 250ms ease;
+  --transition-slow: 400ms ease;
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Z-index */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-overlay: 300;
+  --z-modal: 400;
+  --z-toast: 500;
+  --z-timer: 600;
+  --z-loading: 1000;
+
+  /* Layout */
+  --nav-height: 3.75rem;
+  --sidebar-width: 15rem;
+  --content-max-width: 48rem;
+  --header-height: 3.5rem;
+}
+
+/* ============================================
+   Dark Theme (default)
+   ============================================ */
+[data-theme="dark"] {
+  --color-bg: #0B0D0F;
+  --color-surface: #13171A;
+  --color-surface-2: #1A1F23;
+  --color-surface-3: #222830;
+  --color-border: #2A3035;
+  --color-border-subtle: #1E2328;
+
+  --color-primary: #B7F34A;
+  --color-primary-hover: #C5F76B;
+  --color-primary-active: #A3DC3A;
+  --color-primary-dim: rgba(183, 243, 74, 0.08);
+  --color-primary-text: #0B0D0F;
+
+  --color-info: #5BA7FF;
+  --color-info-dim: rgba(91, 167, 255, 0.1);
+  --color-warning: #FFC857;
+  --color-warning-dim: rgba(255, 200, 87, 0.1);
+  --color-error: #FF5C5C;
+  --color-error-dim: rgba(255, 92, 92, 0.1);
+  --color-success: #4ADE80;
+  --color-success-dim: rgba(74, 222, 128, 0.1);
+
+  --color-text-1: #F4F6F7;
+  --color-text-2: #A7AFB5;
+  --color-text-3: #737C83;
+
+  --color-input-bg: #1A1F23;
+  --color-input-border: #2A3035;
+  --color-input-focus: var(--color-primary);
+
+  --color-nav-bg: rgba(11, 13, 15, 0.92);
+  --color-nav-border: rgba(42, 48, 53, 0.6);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(183, 243, 74, 0.15);
+
+  color-scheme: dark;
+}
+
+/* ============================================
+   Light Theme
+   ============================================ */
+[data-theme="light"] {
+  --color-bg: #F5F6F4;
+  --color-surface: #FFFFFF;
+  --color-surface-2: #EEF0ED;
+  --color-surface-3: #E5E8E3;
+  --color-border: #D9DDD8;
+  --color-border-subtle: #E5E8E3;
+
+  --color-primary: #79A91F;
+  --color-primary-hover: #6B961A;
+  --color-primary-active: #5E8516;
+  --color-primary-dim: rgba(121, 169, 31, 0.06);
+  --color-primary-text: #FFFFFF;
+
+  --color-info: #3B82F6;
+  --color-info-dim: rgba(59, 130, 246, 0.08);
+  --color-warning: #D97706;
+  --color-warning-dim: rgba(217, 119, 6, 0.08);
+  --color-error: #DC2626;
+  --color-error-dim: rgba(220, 38, 38, 0.08);
+  --color-success: #16A34A;
+  --color-success-dim: rgba(22, 163, 74, 0.08);
+
+  --color-text-1: #151817;
+  --color-text-2: #59615C;
+  --color-text-3: #8B9189;
+
+  --color-input-bg: #FFFFFF;
+  --color-input-border: #D9DDD8;
+  --color-input-focus: var(--color-primary);
+
+  --color-nav-bg: rgba(245, 246, 244, 0.92);
+  --color-nav-border: rgba(217, 221, 216, 0.6);
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
+  --shadow-glow: 0 0 20px rgba(121, 169, 31, 0.1);
+
+  color-scheme: light;
+}

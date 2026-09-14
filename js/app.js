@@ -66,19 +66,36 @@ function initRoutes() {
   window.FITTRACK.router.add('/profile', window.FITTRACK.screens.renderProfile);
 }
 
+async function updateSidebarUserInfo(user) {
+  try {
+    const profile = await window.FITTRACK.getProfile();
+    const nameEl = document.getElementById('sidebar-user-name');
+    const avatarEl = document.getElementById('sidebar-user-avatar');
+    if (nameEl) {
+      nameEl.textContent = profile.displayName || user.displayName || 'Usuario';
+    }
+    if (avatarEl && (profile.photoURL || user.photoURL)) {
+      avatarEl.innerHTML = `<img src="${profile.photoURL || user.photoURL}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    }
+  } catch(e) {
+    console.warn('[App] Could not update sidebar user info:', e);
+  }
+}
+
 async function bootstrap() {
   updateLoadingProgress(20, 'Cargando preferencias...');
   window.FITTRACK.initTheme();
   
   updateLoadingProgress(50, 'Verificando sesión...');
   
-  window.FITTRACK.onAuthStateChanged((user) => {
+  window.FITTRACK.onAuthStateChanged(async (user) => {
     updateLoadingProgress(90, 'Preparando entorno...');
     
     if (user) {
       console.log('[App] User signed in:', user.email);
       initRoutes();
       showApp();
+      updateSidebarUserInfo(user);
     } else {
       console.log('[App] No user signed in');
       showLogin();

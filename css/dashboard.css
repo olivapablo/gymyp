@@ -41,22 +41,43 @@
   letter-spacing: -0.02em;
 }
 
-/* ── CTA button ── */
+/* ── CTA button (Hyper-realistic green pill) ── */
 .dash-cta {
-  border-radius: var(--radius-lg);
-  padding: 0.9rem 1.25rem;
-  font-size: 1rem;
+  border-radius: var(--radius-full);
+  padding: 1rem 1.5rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   letter-spacing: -0.01em;
+  background: var(--grad-btn-primary-realism, linear-gradient(180deg, #C7F859 0%, #A5E435 100%));
+  color: #0B0D0F;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.25) inset,
+    0 8px 24px rgba(183, 243, 74, 0.45),
+    0 2px 6px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.dash-cta:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 12px 30px rgba(183, 243, 74, 0.6),
+    0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dash-cta:active {
+  transform: translateY(1px) scale(0.98);
 }
 
 /* ── Section label ── */
 .dash-section-label {
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.14em;
   color: var(--color-text-3);
 }
 
@@ -64,24 +85,36 @@
 .dash-stat-card {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  padding: 1rem;
-  transition: border-color var(--transition-fast), transform var(--transition-fast);
+  gap: 0.6rem;
+  padding: 1.15rem;
+  background: var(--grad-card-realism, #181C20);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-realism-card);
+  transition: all var(--transition-fast);
 }
 
-.dash-stat-card:active { transform: scale(0.97); }
+.dash-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: var(--shadow-realism-card-hover);
+}
+
+.dash-stat-card:active { transform: translateY(0) scale(0.98); }
 
 .dash-stat-icon {
-  width: 34px;
-  height: 34px;
-  border-radius: 9px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .dash-stat-value {
-  font-size: 1.25rem;
+  font-size: 1.35rem;
   font-weight: 800;
   color: var(--color-text-1);
   line-height: 1;
@@ -91,19 +124,23 @@
 .dash-stat-label {
   font-size: 0.7rem;
   color: var(--color-text-3);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 /* ── Streak bar ── */
 .dash-streak-card {
-  padding: 1rem;
+  padding: 1.25rem;
+  background: var(--grad-card-realism, #181C20);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-realism-card);
 }
 
 .streak-bar-container {
   display: flex;
-  gap: 5px;
+  gap: 6px;
 }
 
 .streak-day-wrap {
@@ -111,26 +148,31 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
 }
 
 .streak-day {
   width: 100%;
-  height: 32px;
-  border-radius: 6px;
-  background-color: var(--color-surface-2);
-  transition: background-color 300ms ease;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--grad-btn-realism, #20262B);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.5) inset;
+  transition: all 300ms ease;
 }
 
 .streak-day.done {
-  background-color: var(--color-primary);
-  opacity: 0.8;
+  background: var(--grad-btn-primary-realism, #B7F34A);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.4) inset, 0 0 12px rgba(183, 243, 74, 0.35);
+  opacity: 0.95;
 }
 
 .streak-day.today {
-  background-color: var(--color-primary);
+  background: var(--grad-btn-primary-realism, #B7F34A);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   opacity: 1;
-  box-shadow: 0 0 10px rgba(183, 243, 74, 0.4);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.7) inset, 0 0 18px rgba(183, 243, 74, 0.65);
 }
 
 .streak-day-label {

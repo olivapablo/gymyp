@@ -50,10 +50,33 @@ window.FITTRACK.getRoutines = async function() {
       }
     }
 
+    // Helper function to extract Day number or number from title if exists (e.g. "Día 1", "Dia 2", etc.)
+    function extractDayNumber(name) {
+      if (!name) return null;
+      const match = name.match(/d[ií]a\s*(\d+)/i) || name.match(/(\d+)/);
+      return match ? parseInt(match[1], 10) : null;
+    }
+
     allRoutines.sort((a, b) => {
+      const dayA = extractDayNumber(a.name);
+      const dayB = extractDayNumber(b.name);
+      
+      // If both have day/numbers in name, sort ascending (Día 1 -> Día 2 -> Día 3...)
+      if (dayA !== null && dayB !== null && dayA !== dayB) {
+        return dayA - dayB;
+      }
+      
+      // If one has day and the other doesn't
+      if (dayA !== null && dayB === null) return -1;
+      if (dayA === null && dayB !== null) return 1;
+
+      // Otherwise, sort alphabetically or by creation date ascending
+      const nameComp = (a.name || '').localeCompare(b.name || '', undefined, { numeric: true, sensitivity: 'base' });
+      if (nameComp !== 0) return nameComp;
+
       const tA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
       const tB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-      return tB - tA;
+      return tA - tB;
     });
 
     return allRoutines;

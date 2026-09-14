@@ -13,49 +13,85 @@ button, .btn, .btn-icon, .nav-item, .card-interactive {
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  padding: var(--space-3) var(--space-6);
-  border-radius: var(--radius-md);
+  padding: 0.8rem 1.4rem;
+  border-radius: var(--radius-xl);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-base);
-  transition: transform 0.05s ease, background-color var(--transition-fast), opacity var(--transition-fast);
+  letter-spacing: -0.01em;
+  transition: transform 0.1s ease, box-shadow var(--transition-fast), background var(--transition-fast), border-color var(--transition-fast);
   white-space: nowrap;
   user-select: none;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
 }
 
+/* Realism Primary Pill Button (Luminous & tactile) */
 .btn-primary {
-  background-color: var(--color-primary);
-  color: var(--color-primary-text);
+  background: var(--grad-btn-primary-realism, linear-gradient(180deg, #C7F859 0%, #A5E435 100%));
+  color: #0B0D0F;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.6) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.25) inset,
+    0 4px 14px rgba(183, 243, 74, 0.4),
+    0 10px 24px rgba(0, 0, 0, 0.35);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .btn-primary:hover {
-  background-color: var(--color-primary-hover);
+  background: linear-gradient(180deg, #D4FA6E 0%, #B1EE42 100%);
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.7) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.2) inset,
+    0 6px 20px rgba(183, 243, 74, 0.55),
+    0 12px 28px rgba(0, 0, 0, 0.4);
+  transform: translateY(-1px);
 }
 
 .btn-primary:active {
-  background-color: var(--color-primary-active);
-  transform: scale(0.98);
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.3) inset,
+    0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+/* Realism Secondary Pill Button (Like the reference "Realism" button) */
 .btn-secondary {
-  background-color: var(--color-surface-2);
+  background: var(--grad-btn-realism, linear-gradient(180deg, #2D343B 0%, #171A1E 100%));
   color: var(--color-text-1);
-  border: 1px solid var(--color-border);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: var(--shadow-realism-btn);
 }
 
 .btn-secondary:hover {
-  background-color: var(--color-surface-3);
+  background: var(--grad-btn-realism-hover, linear-gradient(180deg, #373F48 0%, #1E2227 100%));
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 
+    0 1px 0 rgba(255, 255, 255, 0.4) inset,
+    0 6px 16px rgba(0, 0, 0, 0.45),
+    0 12px 28px rgba(0, 0, 0, 0.4),
+    0 0 12px rgba(91, 167, 255, 0.25); /* Subtle blue edge glow like reference image */
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: var(--shadow-realism-btn-active);
 }
 
 .btn-ghost {
   background-color: transparent;
   color: var(--color-text-2);
+  border: 1px solid transparent;
 }
 
 .btn-ghost:hover {
   color: var(--color-text-1);
-  background-color: var(--color-surface-2);
+  background: var(--grad-btn-realism);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn-icon {
@@ -67,14 +103,15 @@ button, .btn, .btn-icon, .nav-item, .card-interactive {
   width: 100%;
 }
 
-/* Cards */
+/* Cards (Tactile embossed glass with rim lighting) */
 .card {
-  background-color: var(--color-surface);
+  background: var(--grad-card-realism, #181C20);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-4);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow var(--transition-base), border-color var(--transition-base);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-realism-card);
+  transition: box-shadow var(--transition-base), border-color var(--transition-base), transform var(--transition-base);
+  position: relative;
 }
 
 .card-interactive {
@@ -82,8 +119,13 @@ button, .btn, .btn-icon, .nav-item, .card-interactive {
 }
 
 .card-interactive:hover {
-  border-color: var(--color-primary);
-  box-shadow: var(--shadow-md);
+  border-color: rgba(183, 243, 74, 0.45);
+  box-shadow: var(--shadow-realism-card-hover);
+  transform: translateY(-2px);
+}
+
+.card-interactive:active {
+  transform: translateY(0) scale(0.99);
 }
 
 /* Inputs */
@@ -104,15 +146,19 @@ button, .btn, .btn-icon, .nav-item, .card-interactive {
   background-color: var(--color-input-bg);
   border: 1px solid var(--color-input-border);
   color: var(--color-text-1);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-md);
+  padding: 0.8rem 1rem;
+  border-radius: var(--radius-lg);
   font-size: var(--font-size-base);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4) inset;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .input-control:focus {
   border-color: var(--color-input-focus);
-  box-shadow: 0 0 0 2px var(--color-primary-dim);
+  box-shadow: 
+    0 2px 4px rgba(0, 0, 0, 0.4) inset,
+    0 0 0 3px var(--color-primary-dim),
+    0 0 12px rgba(183, 243, 74, 0.2);
 }
 
 .input-control::placeholder {
@@ -121,33 +167,38 @@ button, .btn, .btn-icon, .nav-item, .card-interactive {
 
 /* Loader / Spinner */
 .spinner {
-  width: 24px;
-  height: 24px;
-  border: 2px solid var(--color-border);
+  width: 26px;
+  height: 26px;
+  border: 3px solid rgba(255, 255, 255, 0.08);
   border-top-color: var(--color-primary);
   border-radius: 50%;
-  animation: spin 1s linear infinite;
+  animation: spin 0.8s linear infinite;
+  box-shadow: 0 0 12px rgba(183, 243, 74, 0.2);
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-/* Badges / Tags */
+/* Badges / Tags (Realism Capsule) */
 .badge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 4px 10px;
   border-radius: var(--radius-full);
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-semibold);
-  background-color: var(--color-surface-2);
+  background: var(--grad-btn-realism, #20262B);
   color: var(--color-text-2);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 2px 6px rgba(0, 0, 0, 0.25);
 }
 
 .badge-primary {
-  background-color: var(--color-primary-dim);
+  background: rgba(183, 243, 74, 0.12);
   color: var(--color-primary);
+  border-color: rgba(183, 243, 74, 0.25);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 0 10px rgba(183, 243, 74, 0.15);
 }
 
 /* Divider */

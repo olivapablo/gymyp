@@ -68,14 +68,15 @@
   left: 0;
   right: 0;
   height: calc(var(--nav-height) + env(safe-area-inset-bottom));
-  background-color: var(--color-nav-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-top: 1px solid var(--color-nav-border);
+  background: var(--color-nav-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
   z-index: var(--z-sticky);
   display: flex;
   justify-content: space-around;
-  align-items: flex-start; /* Align top, padding bottom for safe area */
+  align-items: flex-start;
   padding-top: var(--space-2);
   padding-bottom: env(safe-area-inset-bottom);
 }
@@ -90,27 +91,30 @@
   text-decoration: none;
   font-size: var(--font-size-xs);
   font-weight: var(--font-weight-medium);
-  transition: color var(--transition-fast);
-  padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
 }
 
 .nav-item i {
-  /* Using lucide icons, typically 24px */
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
+  transition: transform var(--transition-fast);
 }
 
 .nav-item.active {
   color: var(--color-primary);
+  background: rgba(183, 243, 74, 0.1);
+  border: 1px solid rgba(183, 243, 74, 0.2);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 0 12px rgba(183, 243, 74, 0.15);
+}
+
+.nav-item.active i {
+  transform: scale(1.08);
 }
 
 .nav-item:hover {
   color: var(--color-text-1);
-}
-
-.nav-item.active:hover {
-  color: var(--color-primary-hover);
 }
 
 /* Sidebar hidden on mobile by default */
@@ -122,20 +126,19 @@
 @media (min-width: 768px) {
   .app-container {
     flex-direction: row;
-    max-width: 100%; /* Use full width, restrict inner content */
+    max-width: 100%;
     padding-left: var(--sidebar-width);
   }
 
   .bottom-nav {
-    display: none; /* Hide bottom nav */
+    display: none; /* Hide bottom nav on desktop */
   }
 
+  /* In desktop, hide duplicate top header so top stays clean */
   .app-header {
-    left: var(--sidebar-width);
-    /* Adjust for sidebar */
+    display: none;
   }
 
-  /* We would add sidebar styles here, but for now focusing on mobile-first */
   .sidebar {
     display: flex;
     flex-direction: column;
@@ -147,14 +150,161 @@
     background-color: var(--color-surface);
     border-right: 1px solid var(--color-border);
     z-index: var(--z-sticky);
-    padding: var(--space-6) 0;
+    padding: var(--space-6) var(--space-4);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25);
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 var(--space-2) var(--space-6) var(--space-2);
+    border-bottom: 1px solid var(--color-border-subtle);
+    margin-bottom: var(--space-4);
+  }
+
+  .sidebar-logo-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: var(--color-primary-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sidebar-logo-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sidebar-brand-text {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--letter-spacing-wider);
+    color: var(--color-text-1);
+  }
+
+  .sidebar-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .sidebar-item {
+    display: flex;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    padding: 0.75rem 1rem;
+    border-radius: var(--radius-xl);
+    color: var(--color-text-2);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+  }
+
+  .sidebar-item i {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .sidebar-item:hover {
+    background: var(--grad-btn-realism);
+    color: var(--color-text-1);
+    border-color: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateX(2px);
+  }
+
+  .sidebar-item.active {
+    background: var(--grad-btn-realism);
+    color: var(--color-primary);
+    font-weight: var(--font-weight-semibold);
+    border-color: rgba(183, 243, 74, 0.35);
+    box-shadow: 
+      0 1px 0 rgba(255, 255, 255, 0.25) inset,
+      0 4px 14px rgba(0, 0, 0, 0.35),
+      0 0 14px rgba(183, 243, 74, 0.18); /* Realism glow */
+  }
+
+  .sidebar-footer {
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-subtle);
+    margin-top: auto;
+  }
+
+  .sidebar-user-chip {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0.6rem 0.8rem;
+    border-radius: var(--radius-xl);
+    text-decoration: none;
+    background: var(--grad-btn-realism);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-fast);
+  }
+
+  .sidebar-user-chip:hover {
+    border-color: rgba(255, 255, 255, 0.18);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.25) inset, 0 4px 12px rgba(0, 0, 0, 0.35);
+    transform: translateY(-1px);
+  }
+
+  .sidebar-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background-color: var(--color-surface-3);
+    border: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    flex-shrink: 0;
+    color: var(--color-text-2);
+  }
+
+  .sidebar-avatar i {
+    width: 20px;
+    height: 20px;
+  }
+
+  .sidebar-user-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sidebar-user-name {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-1);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sidebar-user-sub {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-3);
   }
   
   .main-content {
     margin-left: auto;
-    padding-bottom: var(--space-8); /* Remove bottom nav padding */
-    max-width: var(--content-max-width);
     margin-right: auto;
+    padding-top: var(--space-8); /* Clean top padding since header is hidden */
+    padding-bottom: var(--space-8);
+    max-width: var(--content-max-width);
     width: 100%;
   }
 }

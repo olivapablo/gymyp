@@ -368,7 +368,7 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
               await window.FITTRACK.deleteRoutine(routineId);
               window.FITTRACK.screens.renderRoutines(container);
             } catch(err) {
-              alert('Error al eliminar rutina: ' + err.message);
+              await window.FITTRACK.alert('Error al eliminar rutina: ' + err.message, 'Error');
             }
           }
         });
@@ -383,10 +383,10 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
           btn.innerHTML = '<div class="spinner"></div>';
           try {
             await window.FITTRACK.importSharedRoutine(sharedId);
-            alert('¡Rutina importada con éxito a tus rutinas!');
+            await window.FITTRACK.alert('¡Rutina importada con éxito a tus rutinas!', 'Importar Rutina');
             window.FITTRACK.screens.renderRoutines(container);
           } catch(err) {
-            alert('Error al importar: ' + err.message);
+            await window.FITTRACK.alert('Error al importar: ' + err.message, 'Error');
             btn.disabled = false;
             btn.innerHTML = '<i data-lucide="download" style="width:12px;height:12px;"></i> Importar';
           }
@@ -531,7 +531,7 @@ window.FITTRACK.screens.renderRoutineForm = async function(container, isEditing 
       }
       window.location.hash = '#/routines';
     } catch (err) {
-      alert('Error al guardar: ' + err.message);
+      await window.FITTRACK.alert('Error al guardar: ' + err.message, 'Error');
       btn.disabled = false;
       btn.innerHTML = 'Guardar';
     }

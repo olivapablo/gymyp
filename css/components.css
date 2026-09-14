@@ -30,7 +30,7 @@ button, .btn, .btn-icon, .nav-item, .card-interactive {
 /* Realism Primary Pill Button (Luminous & tactile) */
 .btn-primary {
   background: var(--grad-btn-primary-realism, linear-gradient(180deg, #C7F859 0%, #A5E435 100%));
-  color: #0B0D0F;
+  color: var(--color-primary-text, #0B0D0F);
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 
     0 1px 0 rgba(255, 255, 255, 0.6) inset,
@@ -105,7 +105,7 @@ button, .btn, .btn-icon, .nav-item, .card-interactive {
 
 /* Cards (Tactile embossed glass with rim lighting) */
 .card {
-  background: var(--grad-card-realism, #181C20);
+  background: var(--grad-card-realism);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   padding: var(--space-5);

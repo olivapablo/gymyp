@@ -50,7 +50,7 @@
   margin-bottom: 1.5rem;
   letter-spacing: -0.01em;
   background: var(--grad-btn-primary-realism, linear-gradient(180deg, #C7F859 0%, #A5E435 100%));
-  color: #0B0D0F;
+  color: var(--color-primary-text, #0B0D0F);
   border: 1px solid rgba(255, 255, 255, 0.4);
   box-shadow: 
     0 1px 0 rgba(255, 255, 255, 0.7) inset,
@@ -87,7 +87,7 @@
   flex-direction: column;
   gap: 0.6rem;
   padding: 1.15rem;
-  background: var(--grad-card-realism, #181C20);
+  background: var(--grad-card-realism);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-realism-card);
@@ -109,8 +109,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 2px 8px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border-subtle);
 }
 
 .dash-stat-value {
@@ -132,7 +132,7 @@
 /* ── Streak bar ── */
 .dash-streak-card {
   padding: 1.25rem;
-  background: var(--grad-card-realism, #181C20);
+  background: var(--grad-card-realism);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-realism-card);

@@ -68,7 +68,7 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId) {
     // Check if there is already an active workout
     const active = await window.FITTRACK.getActiveWorkout();
     if (active) {
-      alert("Ya tienes un entrenamiento en curso. Termínalo antes de empezar otro.");
+      await window.FITTRACK.alert("Ya tienes un entrenamiento en curso. Termínalo antes de empezar otro.", "Entrenamiento en curso");
       window.location.hash = '#/workout/active';
       return;
     }
@@ -79,7 +79,7 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId) {
     
     window.location.hash = '#/workout/active';
   } catch (error) {
-    alert("Error al iniciar: " + error.message);
+    await window.FITTRACK.alert("Error al iniciar: " + error.message, "Error");
   }
 };
 
@@ -254,7 +254,8 @@ function bindWorkoutEvents() {
 
   // Finish button
   document.getElementById('btn-finish-workout').addEventListener('click', async () => {
-    if (confirm('¿Terminaste tu entrenamiento?')) {
+    const ok = await window.FITTRACK.confirm('¿Terminaste tu entrenamiento?', 'Finalizar Sesión', 'Finalizar', 'Continuar');
+    if (ok) {
       if (workoutTimerInterval) clearInterval(workoutTimerInterval);
       
       try {
@@ -262,7 +263,7 @@ function bindWorkoutEvents() {
         activeWorkoutState = null;
         window.location.hash = '#/history';
       } catch (err) {
-        alert("Error al finalizar: " + err.message);
+        await window.FITTRACK.alert("Error al finalizar: " + err.message, "Error");
       }
     }
   });

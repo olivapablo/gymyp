@@ -143,7 +143,7 @@ window.FITTRACK.screens.renderProfile = async function(container) {
       </div>
 
       <!-- Logout -->
-      <button id="btn-logout" class="btn btn-block mb-3" style="background:rgba(255,92,92,0.1);color:var(--color-error);border:1px solid rgba(255,92,92,0.3);padding:0.875rem;border-radius:var(--radius-lg);">
+      <button id="btn-logout" class="btn btn-block mb-3" style="background:var(--grad-btn-realism);color:var(--color-error);border:1px solid rgba(255,92,92,0.25);padding:0.875rem;border-radius:var(--radius-xl);box-shadow:var(--shadow-realism-btn);">
         <i data-lucide="log-out"></i>
         Cerrar Sesión
       </button>

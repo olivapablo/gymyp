@@ -278,15 +278,16 @@
 }
 
 .exercise-modal {
-  background-color: var(--color-surface);
+  background: var(--grad-card-realism);
   border: 1px solid var(--color-border);
-  border-radius: 1.25rem 1.25rem 0 0;
-  padding: 1.5rem 1.25rem;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+  padding: 1.75rem 1.5rem;
   width: 100%;
   max-width: 480px;
   max-height: 90dvh;
   overflow-y: auto;
-  animation: modalSlideUp 280ms cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  animation: modalSlideUp 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes modalSlideUp {
@@ -296,10 +297,10 @@
 
 .exercise-modal-title {
   font-size: 1.375rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--color-text-1);
   margin-bottom: 1.25rem;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
 
 /* Category tabs (Fuerza / Cinta / Aeróbico) */
@@ -316,15 +317,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.3rem;
-  padding: 0.65rem 0.25rem;
-  border-radius: 0.75rem;
-  background-color: var(--color-surface-2);
+  padding: 0.75rem 0.25rem;
+  border-radius: var(--radius-xl);
+  background: var(--grad-btn-realism);
   color: var(--color-text-2);
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   border: 1px solid var(--color-border);
-  transition: all 200ms ease;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
 }
 
 .ex-type-tab i {
@@ -333,45 +335,47 @@
 }
 
 .ex-type-tab.active {
-  background-color: var(--color-primary);
-  color: var(--color-primary-text);
-  border-color: var(--color-primary);
+  background: var(--grad-btn-primary-realism, linear-gradient(180deg, #C7F859 0%, #A5E435 100%));
+  color: #0B0D0F;
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.6) inset, 0 4px 14px rgba(183, 243, 74, 0.35);
 }
 
 .ex-type-tab:not(.active):hover {
-  background-color: var(--color-surface-3);
+  border-color: rgba(255, 255, 255, 0.18);
   color: var(--color-text-1);
 }
 
 /* Form labels inside modal */
 .ex-field-label {
   display: block;
-  font-size: 0.65rem;
+  font-size: 0.68rem;
   font-weight: 700;
   color: var(--color-text-3);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.45rem;
 }
 
 /* Inputs inside modal */
 .ex-input {
   width: 100%;
-  background-color: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: 0.6rem;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-lg);
   color: var(--color-text-1);
-  padding: 0.75rem 0.875rem;
+  padding: 0.8rem 1rem;
   font-size: 0.95rem;
   font-family: var(--font-family);
   outline: none;
-  transition: border-color 150ms ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
   box-sizing: border-box;
 }
 
 .ex-input:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px var(--color-primary-dim);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2) inset, 0 0 0 3px var(--color-primary-dim);
 }
 
 .ex-input::placeholder { color: var(--color-text-3); }
@@ -396,17 +400,18 @@
 /* Selector trigger (dropdown-like, for Modalidad) */
 .ex-select-trigger {
   width: 100%;
-  background-color: var(--color-surface-2);
-  border: 1px solid var(--color-border);
-  border-radius: 0.6rem;
+  background-color: var(--color-input-bg);
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-lg);
   color: var(--color-text-1);
-  padding: 0.75rem 0.875rem;
+  padding: 0.8rem 1rem;
   font-size: 0.875rem;
   font-family: var(--font-family);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: var(--shadow-sm);
   transition: border-color 150ms ease;
   box-sizing: border-box;
 }
@@ -427,11 +432,11 @@
   flex: 1;
   padding: 0.85rem 1.25rem;
   border-radius: var(--radius-full);
-  background: var(--grad-btn-realism, #20262B);
+  background: var(--grad-btn-realism);
   color: var(--color-text-2);
   font-weight: 600;
   font-size: 0.875rem;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--color-border);
   box-shadow: var(--shadow-realism-btn);
   cursor: pointer;
   transition: all var(--transition-fast);
@@ -441,7 +446,6 @@
 .ex-btn-cancel:hover { 
   background: var(--grad-btn-realism-hover); 
   color: var(--color-text-1);
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.3) inset, 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
 .ex-btn-save {
@@ -449,7 +453,7 @@
   padding: 0.85rem 1.25rem;
   border-radius: var(--radius-full);
   background: var(--grad-btn-primary-realism, linear-gradient(180deg, #C7F859 0%, #A5E435 100%));
-  color: #0B0D0F;
+  color: var(--color-primary-text);
   font-weight: 700;
   font-size: 0.875rem;
   border: 1px solid rgba(255, 255, 255, 0.4);
@@ -463,10 +467,6 @@
 }
 
 .ex-btn-save:hover { 
-  background: linear-gradient(180deg, #D4FA6E 0%, #B1EE42 100%);
-  box-shadow: 
-    0 1px 0 rgba(255, 255, 255, 0.7) inset,
-    0 6px 20px rgba(183, 243, 74, 0.55);
   transform: translateY(-1px);
 }
 
@@ -478,7 +478,9 @@
 .bottom-sheet-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   z-index: calc(var(--z-modal) + 10);
   display: flex;
   align-items: flex-end;
@@ -487,14 +489,15 @@
 }
 
 .bottom-sheet {
-  background-color: var(--color-surface);
+  background: var(--grad-card-realism);
   border-top: 1px solid var(--color-border);
-  border-radius: 1.25rem 1.25rem 0 0;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
   width: 100%;
   max-width: 480px;
   padding: 1.25rem 0;
   padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
-  animation: modalSlideUp 250ms cubic-bezier(0.34, 1.2, 0.64, 1) forwards;
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
+  animation: modalSlideUp 250ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 .bottom-sheet-item {
@@ -596,28 +599,3 @@
 
 .measure-delta.positive { color: var(--color-success); }
 .measure-delta.negative { color: var(--color-error); }
-
-/* Consistency ring / streak bar */
-.streak-bar-container {
-  display: flex;
-  gap: 4px;
-}
-
-.streak-day {
-  flex: 1;
-  height: 36px;
-  border-radius: 4px;
-  background-color: var(--color-surface-2);
-  transition: background-color 300ms ease;
-}
-
-.streak-day.done {
-  background-color: var(--color-primary);
-  opacity: 0.85;
-}
-
-.streak-day.today {
-  background-color: var(--color-primary);
-  opacity: 1;
-  box-shadow: 0 0 8px rgba(183, 243, 74, 0.4);
-}

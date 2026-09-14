@@ -1,17 +1,22 @@
 window.FITTRACK = window.FITTRACK || {};
 
-// Custom Modal Dialog System for FITTRACK
+// Custom Modal Dialog System for FITTRACK (Realism Design)
 window.FITTRACK.alert = function(message, title = 'FITTRACK') {
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'bottom-sheet-overlay';
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:1.25rem; animation:overlayIn 180ms ease;';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:1.25rem; animation:overlayIn 180ms ease;';
 
     overlay.innerHTML = `
-      <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-2xl); width:100%; max-width:380px; padding:1.5rem; box-shadow:var(--shadow-lg); animation:modalSlideUp 220ms ease; display:flex; flex-direction:column; gap:1rem;">
-        <div style="font-weight:700; font-size:1.1rem; color:var(--color-text-1);">${title}</div>
-        <div style="font-size:0.9rem; color:var(--color-text-2); line-height:1.4;">${message}</div>
-        <button id="btn-dialog-ok" class="btn btn-primary btn-block" style="margin-top:0.5rem; font-weight:700;">Aceptar</button>
+      <div style="background:var(--grad-card-realism); border:1px solid var(--color-border); border-radius:var(--radius-2xl); width:100%; max-width:390px; padding:1.75rem 1.5rem; box-shadow:var(--shadow-realism-card), 0 20px 40px rgba(0,0,0,0.5); animation:modalSlideUp 240ms cubic-bezier(0.16, 1, 0.3, 1) ease; display:flex; flex-direction:column; gap:1.1rem; text-align:center;">
+        <div style="width:46px; height:46px; margin:0 auto; border-radius:50%; background:rgba(183,243,74,0.12); border:1px solid rgba(183,243,74,0.25); display:flex; align-items:center; justify-content:center; color:var(--color-primary); box-shadow:0 0 16px rgba(183,243,74,0.2);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+        </div>
+        <div>
+          <div style="font-weight:800; font-size:1.2rem; color:var(--color-text-1); letter-spacing:-0.02em; margin-bottom:0.4rem;">${title}</div>
+          <div style="font-size:0.92rem; color:var(--color-text-2); line-height:1.45;">${message}</div>
+        </div>
+        <button id="btn-dialog-ok" class="btn btn-primary btn-block" style="margin-top:0.4rem; font-weight:700;">Entendido</button>
       </div>
     `;
 
@@ -31,13 +36,18 @@ window.FITTRACK.confirm = function(message, title = 'Confirmar', confirmText = '
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'bottom-sheet-overlay';
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:1.25rem; animation:overlayIn 180ms ease;';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:1.25rem; animation:overlayIn 180ms ease;';
 
     overlay.innerHTML = `
-      <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-2xl); width:100%; max-width:380px; padding:1.5rem; box-shadow:var(--shadow-lg); animation:modalSlideUp 220ms ease; display:flex; flex-direction:column; gap:1rem;">
-        <div style="font-weight:700; font-size:1.1rem; color:var(--color-text-1);">${title}</div>
-        <div style="font-size:0.9rem; color:var(--color-text-2); line-height:1.4;">${message}</div>
-        <div style="display:flex; gap:0.75rem; margin-top:0.5rem;">
+      <div style="background:var(--grad-card-realism); border:1px solid var(--color-border); border-radius:var(--radius-2xl); width:100%; max-width:390px; padding:1.75rem 1.5rem; box-shadow:var(--shadow-realism-card), 0 20px 40px rgba(0,0,0,0.5); animation:modalSlideUp 240ms cubic-bezier(0.16, 1, 0.3, 1) ease; display:flex; flex-direction:column; gap:1.1rem; text-align:center;">
+        <div style="width:46px; height:46px; margin:0 auto; border-radius:50%; background:rgba(91,167,255,0.12); border:1px solid rgba(91,167,255,0.25); display:flex; align-items:center; justify-content:center; color:var(--color-info); box-shadow:0 0 16px rgba(91,167,255,0.2);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <div>
+          <div style="font-weight:800; font-size:1.2rem; color:var(--color-text-1); letter-spacing:-0.02em; margin-bottom:0.4rem;">${title}</div>
+          <div style="font-size:0.92rem; color:var(--color-text-2); line-height:1.45;">${message}</div>
+        </div>
+        <div style="display:flex; gap:0.75rem; margin-top:0.4rem;">
           <button id="btn-dialog-cancel" class="btn btn-secondary" style="flex:1;">${cancelText}</button>
           <button id="btn-dialog-confirm" class="btn btn-primary" style="flex:1.2; font-weight:700;">${confirmText}</button>
         </div>
@@ -61,12 +71,14 @@ window.FITTRACK.prompt = function(message, placeholder = '', defaultValue = '', 
   return new Promise((resolve) => {
     const overlay = document.createElement('div');
     overlay.className = 'bottom-sheet-overlay';
-    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:1.25rem; animation:overlayIn 180ms ease;';
+    overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.72); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); z-index:var(--z-modal); display:flex; align-items:center; justify-content:center; padding:1.25rem; animation:overlayIn 180ms ease;';
 
     overlay.innerHTML = `
-      <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-2xl); width:100%; max-width:400px; padding:1.5rem; box-shadow:var(--shadow-lg); animation:modalSlideUp 220ms ease; display:flex; flex-direction:column; gap:1rem;">
-        <div style="font-weight:700; font-size:1.1rem; color:var(--color-text-1);">${title}</div>
-        <div style="font-size:0.9rem; color:var(--color-text-2);">${message}</div>
+      <div style="background:var(--grad-card-realism); border:1px solid var(--color-border); border-radius:var(--radius-2xl); width:100%; max-width:400px; padding:1.75rem 1.5rem; box-shadow:var(--shadow-realism-card), 0 20px 40px rgba(0,0,0,0.5); animation:modalSlideUp 240ms cubic-bezier(0.16, 1, 0.3, 1) ease; display:flex; flex-direction:column; gap:1.1rem;">
+        <div>
+          <div style="font-weight:800; font-size:1.2rem; color:var(--color-text-1); letter-spacing:-0.02em; margin-bottom:0.4rem;">${title}</div>
+          <div style="font-size:0.92rem; color:var(--color-text-2); line-height:1.45;">${message}</div>
+        </div>
         <input type="text" id="dialog-prompt-input" class="input-control" placeholder="${placeholder}" value="${defaultValue}" style="width:100%;">
         <div style="display:flex; gap:0.75rem; margin-top:0.25rem;">
           <button id="btn-prompt-cancel" class="btn btn-secondary" style="flex:1;">Cancelar</button>
@@ -94,26 +106,44 @@ window.FITTRACK.prompt = function(message, placeholder = '', defaultValue = '', 
 // Toast Notification
 window.FITTRACK.toast = function(message, type = 'success') {
   const toast = document.createElement('div');
-  const bg = type === 'error' ? 'var(--color-error)' : type === 'warning' ? 'var(--color-warning)' : 'var(--color-primary)';
-  const fg = type === 'error' || type === 'warning' ? '#FFFFFF' : '#0B0D0F';
+
+  let bgVar, fgVar, shadowExtra;
+  if (type === 'error') {
+    bgVar = 'var(--color-error)';
+    fgVar = '#FFFFFF';
+    shadowExtra = '0 0 14px rgba(255,80,80,0.4)';
+  } else if (type === 'warning') {
+    bgVar = 'var(--color-warning)';
+    fgVar = '#FFFFFF';
+    shadowExtra = '0 0 14px rgba(255,180,0,0.4)';
+  } else {
+    bgVar = 'var(--grad-btn-primary-realism, var(--color-primary))';
+    fgVar = 'var(--color-primary-text, #0B0D0F)';
+    shadowExtra = '0 0 16px rgba(183,243,74,0.4)';
+  }
 
   toast.style.cssText = `
     position: fixed;
     top: calc(var(--header-height) + env(safe-area-inset-top) + 12px);
     left: 50%;
     transform: translateX(-50%);
-    background: ${bg};
-    color: ${fg};
+    background: ${bgVar};
+    color: ${fgVar};
     font-weight: 700;
     font-size: 0.85rem;
-    padding: 0.65rem 1.25rem;
+    padding: 0.65rem 1.35rem;
     border-radius: var(--radius-full);
-    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(255,255,255,0.25);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.5) inset,
+      0 4px 16px rgba(0,0,0,0.3),
+      ${shadowExtra};
     z-index: var(--z-toast);
     opacity: 0;
     transition: opacity 200ms ease, transform 200ms ease;
     pointer-events: none;
     white-space: nowrap;
+    letter-spacing: -0.01em;
   `;
   toast.innerText = message;
 

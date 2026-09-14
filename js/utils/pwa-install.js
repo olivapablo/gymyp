@@ -1,4 +1,4 @@
-window.FITTRACK = window.FITTRACK || {};
+﻿window.FITTRACK = window.FITTRACK || {};
 window.FITTRACK.pwa = window.FITTRACK.pwa || {};
 
 let deferredPrompt = null;
@@ -40,7 +40,7 @@ window.FITTRACK.pwa.promptInstall = async function() {
   } else if (isIOS) {
     window.FITTRACK.pwa.showIOSInstallModal();
   } else {
-    alert('Abre el menú de tu navegador (⋮ o compartir) y selecciona "Añadir a la pantalla de inicio" o "Instalar aplicación".');
+    window.FITTRACK.alert('Abre el menú de tu navegador (⋮ o compartir) y selecciona "Añadir a la pantalla de inicio" o "Instalar aplicación".', 'Instalar App');
   }
 };
 

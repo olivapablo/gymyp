@@ -101,7 +101,7 @@ window.FITTRACK.updateNotificationBadge = function() {
 // Request Browser Push Notification Permission
 window.FITTRACK.requestPushPermission = async function() {
   if (!('Notification' in window)) {
-    alert('Tu navegador no soporta Notificaciones Push.');
+    window.FITTRACK.alert('Tu navegador no soporta Notificaciones Push.', 'Incompatible');
     return false;
   }
   
@@ -110,7 +110,7 @@ window.FITTRACK.requestPushPermission = async function() {
     window.FITTRACK.sendBrowserNotification('¡Notificaciones Activadas!', 'Recibirás recordatorios y avisos de rutinas en tu dispositivo.');
     return true;
   } else if (permission === 'denied') {
-    alert('Las notificaciones están bloqueadas en los permisos de tu navegador.');
+    window.FITTRACK.alert('Las notificaciones están bloqueadas en los permisos de tu navegador.', 'Bloqueadas');
     return false;
   }
   return false;

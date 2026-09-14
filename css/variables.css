@@ -152,46 +152,73 @@
 }
 
 /* ============================================
-   Light Theme
+   Light Theme — Clean Tactile Realism
    ============================================ */
 [data-theme="light"] {
-  --color-bg: #F5F6F4;
+  --color-bg: #F4F6F8;
   --color-surface: #FFFFFF;
-  --color-surface-2: #EEF0ED;
-  --color-surface-3: #E5E8E3;
-  --color-border: #D9DDD8;
-  --color-border-subtle: #E5E8E3;
+  --color-surface-2: #E8ECEF;
+  --color-surface-3: #DDE2E6;
+  --color-border: rgba(0, 0, 0, 0.08);
+  --color-border-subtle: rgba(0, 0, 0, 0.04);
 
-  --color-primary: #79A91F;
-  --color-primary-hover: #6B961A;
-  --color-primary-active: #5E8516;
-  --color-primary-dim: rgba(121, 169, 31, 0.06);
+  --color-primary: #5A8A10;
+  --color-primary-hover: #4D760D;
+  --color-primary-active: #40620A;
+  --color-primary-dim: rgba(90, 138, 16, 0.12);
   --color-primary-text: #FFFFFF;
 
-  --color-info: #3B82F6;
-  --color-info-dim: rgba(59, 130, 246, 0.08);
+  --color-info: #2563EB;
+  --color-info-dim: rgba(37, 99, 235, 0.1);
   --color-warning: #D97706;
-  --color-warning-dim: rgba(217, 119, 6, 0.08);
+  --color-warning-dim: rgba(217, 119, 6, 0.1);
   --color-error: #DC2626;
-  --color-error-dim: rgba(220, 38, 38, 0.08);
+  --color-error-dim: rgba(220, 38, 38, 0.1);
   --color-success: #16A34A;
-  --color-success-dim: rgba(22, 163, 74, 0.08);
+  --color-success-dim: rgba(22, 163, 74, 0.1);
 
-  --color-text-1: #151817;
-  --color-text-2: #59615C;
-  --color-text-3: #8B9189;
+  --color-text-1: #111417;
+  --color-text-2: #4A5560;
+  --color-text-3: #798692;
 
   --color-input-bg: #FFFFFF;
-  --color-input-border: #D9DDD8;
+  --color-input-border: rgba(0, 0, 0, 0.12);
   --color-input-focus: var(--color-primary);
 
-  --color-nav-bg: rgba(245, 246, 244, 0.92);
-  --color-nav-border: rgba(217, 221, 216, 0.6);
+  --color-nav-bg: rgba(244, 246, 248, 0.92);
+  --color-nav-border: rgba(0, 0, 0, 0.08);
 
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.08);
-  --shadow-glow: 0 0 20px rgba(121, 169, 31, 0.1);
+  /* Realistic Tactile Gradients & Lighting (Light Theme) */
+  --grad-btn-realism: linear-gradient(180deg, #FFFFFF 0%, #E8ECEF 100%);
+  --grad-btn-realism-hover: linear-gradient(180deg, #FFFFFF 0%, #DDE2E6 100%);
+  --grad-btn-primary-realism: linear-gradient(180deg, #6B9F16 0%, #527E0E 100%);
+  --grad-card-realism: linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%);
+
+  /* Light Theme Tactile Rim Lighting & Soft Drop Shadows */
+  --shadow-realism-btn: 
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.08) inset,
+    0 2px 8px rgba(0, 0, 0, 0.08),
+    0 6px 16px rgba(0, 0, 0, 0.06);
+
+  --shadow-realism-btn-active:
+    0 1px 3px rgba(0, 0, 0, 0.2) inset,
+    0 1px 3px rgba(0, 0, 0, 0.05);
+
+  --shadow-realism-card:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 4px 16px rgba(0, 0, 0, 0.06),
+    0 1px 3px rgba(0, 0, 0, 0.04);
+
+  --shadow-realism-card-hover:
+    0 1px 0 rgba(255, 255, 255, 1) inset,
+    0 8px 24px rgba(0, 0, 0, 0.1),
+    0 0 16px rgba(90, 138, 16, 0.15);
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 24px rgba(90, 138, 16, 0.2);
 
   color-scheme: light;
 }

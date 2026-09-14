@@ -33,7 +33,7 @@ window.FITTRACK.screens.renderHistory = async function(container) {
             await window.FITTRACK.clearWorkoutHistory();
             window.FITTRACK.screens.renderHistory(container);
           } catch (err) {
-            alert('Error al borrar el historial: ' + err.message);
+            await window.FITTRACK.alert('Error al borrar el historial: ' + err.message, 'Error');
             btnClear.disabled = false;
           }
         }

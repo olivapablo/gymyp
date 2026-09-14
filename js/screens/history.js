@@ -3,15 +3,42 @@ window.FITTRACK.screens = window.FITTRACK.screens || {};
 
 window.FITTRACK.screens.renderHistory = async function(container) {
   container.innerHTML = `
-    <h1 class="text-3xl font-bold mb-6">Historial</h1>
+    <div class="flex-row justify-between items-center mb-6">
+      <h1 class="text-3xl font-bold">Historial</h1>
+      <button id="btn-clear-history" class="btn btn-sm" style="background: rgba(255, 92, 92, 0.15); color: var(--color-error); border: 1px solid rgba(255, 92, 92, 0.4); padding: 0.4rem 0.8rem; font-size: 0.8rem; display: flex; align-items: center; gap: 4px; border-radius: var(--radius-md);">
+        <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i> Borrar historial
+      </button>
+    </div>
     <div id="history-list" class="flex-col gap-4">
       <div class="flex-col items-center py-8"><div class="spinner"></div></div>
     </div>
   `;
 
   try {
-    const history = await window.FITTRACK.getWorkoutHistory(20);
+    const history = await window.FITTRACK.getWorkoutHistory(50);
     const listEl = document.getElementById('history-list');
+    const btnClear = document.getElementById('btn-clear-history');
+
+    if (btnClear) {
+      btnClear.addEventListener('click', async () => {
+        const ok = await window.FITTRACK.confirm(
+          '¿Estás seguro de que deseas borrar todo el historial de entrenamientos? Esta acción no se puede deshacer.',
+          'Borrar historial',
+          'Borrar todo',
+          'Cancelar'
+        );
+        if (ok) {
+          try {
+            btnClear.disabled = true;
+            await window.FITTRACK.clearWorkoutHistory();
+            window.FITTRACK.screens.renderHistory(container);
+          } catch (err) {
+            alert('Error al borrar el historial: ' + err.message);
+            btnClear.disabled = false;
+          }
+        }
+      });
+    }
 
     if (history.length === 0) {
       listEl.innerHTML = `

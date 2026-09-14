@@ -325,7 +325,12 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
               <h3 class="text-lg font-bold">${r.name}</h3>
               ${r.isShared ? `<span class="badge badge-primary" style="font-size:0.68rem; padding: 2px 8px;"><i data-lucide="share-2" style="width:10px;height:10px;margin-right:4px;"></i> Enviada por ${r.senderName || r.senderEmail}</span>` : ''}
             </div>
-            <i data-lucide="chevron-right" class="text-color-3"></i>
+            <div class="flex-row items-center gap-2" onclick="event.stopPropagation();">
+              <button class="btn-icon text-error btn-delete-routine-quick" data-id="${r.id}" title="Eliminar rutina" style="padding:4px;">
+                <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
+              </button>
+              <i data-lucide="chevron-right" class="text-color-3"></i>
+            </div>
           </div>
           <p class="text-color-2 text-sm mb-3">${r.description || 'Sin descripción'}</p>
           <div class="flex-row gap-2 flex-wrap items-center justify-between">
@@ -341,6 +346,23 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
           </div>
         </div>
       `).join('');
+
+      // Add listener to delete quick buttons
+      document.querySelectorAll('.btn-delete-routine-quick').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const routineId = e.currentTarget.getAttribute('data-id');
+          const ok = await window.FITTRACK.confirm('¿Estás seguro de eliminar esta rutina?', 'Eliminar Rutina', 'Eliminar', 'Cancelar');
+          if (ok) {
+            try {
+              await window.FITTRACK.deleteRoutine(routineId);
+              window.FITTRACK.screens.renderRoutines(container);
+            } catch(err) {
+              alert('Error al eliminar rutina: ' + err.message);
+            }
+          }
+        });
+      });
 
       // Add listener to import buttons
       document.querySelectorAll('.btn-import-shared').forEach(btn => {

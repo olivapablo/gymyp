@@ -99,12 +99,14 @@ svg {
 }
 
 /* Forms Base */
-input, button, textarea, select {
+input, button, textarea, select, a {
   font: inherit;
   color: inherit;
   border: none;
   background: none;
   outline: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Remove number input arrows / spinners */
@@ -120,6 +122,12 @@ input[type="number"] {
 
 button {
   cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+  transform: scale(0.97);
 }
 
 button:disabled {

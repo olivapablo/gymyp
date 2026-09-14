@@ -137,7 +137,7 @@ function renderExerciseBlock(ex, exIndex) {
   const targetSetsCount = parseInt(ex.targetSets) || 3;
   if (!ex.sets) ex.sets = [];
   while (ex.sets.length < targetSetsCount) {
-    ex.sets.push({ kg: '', reps: '', rir: '', completed: false });
+    ex.sets.push({ kg: '', reps: '', rir: ex.targetRir !== undefined ? ex.targetRir : '', completed: false });
   }
 
   const setsHtml = ex.sets.map((set, setIndex) => `
@@ -152,8 +152,8 @@ function renderExerciseBlock(ex, exIndex) {
           value="${set.reps || ''}" data-ex="${exIndex}" data-set="${setIndex}" data-field="reps" ${set.completed ? 'disabled' : ''}>
       </div>
       <div class="flex-1">
-        <input type="number" class="input-control text-center set-input w-full py-2 px-1 text-lg font-semibold bg-bg rounded" placeholder="-" 
-          value="${set.rir || ''}" data-ex="${exIndex}" data-set="${setIndex}" data-field="rir" ${set.completed ? 'disabled' : ''}>
+        <input type="number" class="input-control text-center set-input w-full py-2 px-1 text-lg font-semibold bg-bg rounded" placeholder="${ex.targetRir !== undefined && ex.targetRir !== '' ? ex.targetRir : 'RIR'}" 
+          value="${set.rir !== undefined ? set.rir : ''}" data-ex="${exIndex}" data-set="${setIndex}" data-field="rir" ${set.completed ? 'disabled' : ''}>
       </div>
       <button class="btn-check-set flex items-center justify-center rounded-full shadow-sm transition-all ${set.completed ? 'bg-success text-bg' : 'bg-surface text-color-2 border border-color-border'}" 
         style="width: 36px; height: 36px;" data-ex="${exIndex}" data-set="${setIndex}">
@@ -167,7 +167,7 @@ function renderExerciseBlock(ex, exIndex) {
       <div class="flex-row justify-between items-start mb-4">
         <div>
           <h3 class="text-xl font-bold text-color-1 mb-1 leading-tight">${ex.name}</h3>
-          <p class="text-sm font-medium text-primary">Objetivo: ${ex.targetSets}x${ex.targetReps}</p>
+          <p class="text-sm font-medium text-primary">Objetivo: ${ex.targetSets || 3}x${ex.targetReps || '8-12'}${ex.targetRir !== undefined && ex.targetRir !== '' ? ` | RIR: ${ex.targetRir}` : ''}</p>
         </div>
       </div>
       
@@ -215,18 +215,31 @@ function bindWorkoutEvents() {
   // Check buttons
   document.querySelectorAll('.btn-check-set').forEach(btn => {
     btn.addEventListener('click', (e) => {
-      const exIdx = parseInt(e.currentTarget.dataset.ex);
-      const setIdx = parseInt(e.currentTarget.dataset.set);
+      const button = e.currentTarget;
+      const exIdx = parseInt(button.dataset.ex);
+      const setIdx = parseInt(button.dataset.set);
       
       const set = activeWorkoutState.exercises[exIdx].sets[setIdx];
       set.completed = !set.completed;
       
-      // Save and re-render to update UI states
-      saveWorkoutStateDebounced();
+      const row = button.closest('.set-row');
+      if (row) {
+        if (set.completed) {
+          row.classList.add('bg-success-dim', 'opacity-70', 'border', 'border-success');
+          row.classList.remove('bg-surface-2');
+          button.classList.add('bg-success', 'text-bg');
+          button.classList.remove('bg-surface', 'text-color-2', 'border', 'border-color-border');
+          row.querySelectorAll('.set-input').forEach(i => i.disabled = true);
+        } else {
+          row.classList.remove('bg-success-dim', 'opacity-70', 'border', 'border-success');
+          row.classList.add('bg-surface-2');
+          button.classList.remove('bg-success', 'text-bg');
+          button.classList.add('bg-surface', 'text-color-2', 'border', 'border-color-border');
+          row.querySelectorAll('.set-input').forEach(i => i.disabled = false);
+        }
+      }
       
-      // Minimal re-render of just this section would be better for performance, 
-      // but full re-render is fine for this scale
-      window.FITTRACK.screens.renderActiveWorkout(document.getElementById('main-content'));
+      saveWorkoutStateDebounced();
     });
   });
 

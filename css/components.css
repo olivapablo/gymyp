@@ -3,6 +3,11 @@
    ============================================ */
 
 /* Buttons */
+button, .btn, .btn-icon, .nav-item, .card-interactive {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -12,9 +17,11 @@
   border-radius: var(--radius-md);
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-base);
-  transition: all var(--transition-fast);
+  transition: transform 0.05s ease, background-color var(--transition-fast), opacity var(--transition-fast);
   white-space: nowrap;
   user-select: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn-primary {

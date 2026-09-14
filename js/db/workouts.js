@@ -23,6 +23,7 @@ window.FITTRACK.startWorkout = async function(routineData) {
         name: ex.name,
         targetSets: ex.sets,
         targetReps: ex.reps,
+        targetRir: ex.rir || '',
         sets: [] // We will populate this as the user completes sets
       }))
     };
@@ -114,3 +115,23 @@ window.FITTRACK.getWorkoutHistory = async function(limit = 20) {
     throw error;
   }
 };
+
+/**
+ * Clear all workout history
+ */
+window.FITTRACK.clearWorkoutHistory = async function() {
+  try {
+    const historyRef = getHistoryRef();
+    const snapshot = await historyRef.get();
+    const batch = window.FITTRACK.db.batch();
+    snapshot.docs.forEach(doc => {
+      batch.delete(doc.ref);
+    });
+    await batch.commit();
+    return true;
+  } catch (error) {
+    console.error('[DB] Error clearing history:', error);
+    throw error;
+  }
+};
+

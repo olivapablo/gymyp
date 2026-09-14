@@ -22,11 +22,6 @@ window.FITTRACK.getRoutines = async function() {
     // 1. Fetch own routines
     const snapshot = await getRoutinesRef().get();
     const ownRoutines = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data(), isShared: false }));
-    ownRoutines.sort((a, b) => {
-      const tA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
-      const tB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
-      return tB - tA;
-    });
 
     // 2. Fetch shared routines assigned to current user's email
     let sharedRoutines = [];
@@ -45,7 +40,23 @@ window.FITTRACK.getRoutines = async function() {
       }
     }
 
-    return [...ownRoutines, ...sharedRoutines];
+    // Deduplicate by ID
+    const seenIds = new Set();
+    const allRoutines = [];
+    for (const r of [...ownRoutines, ...sharedRoutines]) {
+      if (!seenIds.has(r.id)) {
+        seenIds.add(r.id);
+        allRoutines.push(r);
+      }
+    }
+
+    allRoutines.sort((a, b) => {
+      const tA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : 0;
+      const tB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : 0;
+      return tB - tA;
+    });
+
+    return allRoutines;
   } catch (error) {
     console.error('[DB] Error loading routines:', error);
     throw error;
@@ -150,11 +161,20 @@ window.FITTRACK.importSharedRoutine = async function(sharedRoutineId) {
     if (!sharedDoc.exists) throw new Error('Rutina compartida no existe');
 
     const data = sharedDoc.data();
-    return await window.FITTRACK.createRoutine({
+    const imported = await window.FITTRACK.createRoutine({
       name: `${data.name} (Importada)`,
       description: data.description ? `${data.description} — Enviada por ${data.senderName}` : `Enviada por ${data.senderName}`,
       exercises: data.exercises || []
     });
+
+    // Clean up shared routine record after import to prevent duplicate display
+    try {
+      await window.FITTRACK.db.collection('shared_routines').doc(sharedRoutineId).delete();
+    } catch (e) {
+      console.warn('Could not delete shared routine post-import', e);
+    }
+
+    return imported;
   } catch (error) {
     console.error('[DB] Error importing shared routine:', error);
     throw error;
@@ -191,17 +211,25 @@ window.FITTRACK.deleteRoutine = async function(routineId) {
     const user = window.FITTRACK.getCurrentUser();
     if (!user) throw new Error('Usuario no autenticado');
 
+    let deletedAny = false;
+
     // Try deleting from own routines
     try {
       await getRoutinesRef().doc(routineId).delete();
-    } catch(e) {}
+      deletedAny = true;
+    } catch(e) {
+      console.warn('Own routine delete:', e);
+    }
 
-    // Try deleting from shared_routines if user is owner/target
+    // Try deleting from shared_routines
     try {
       await window.FITTRACK.db.collection('shared_routines').doc(routineId).delete();
-    } catch(e) {}
+      deletedAny = true;
+    } catch(e) {
+      console.warn('Shared routine delete:', e);
+    }
 
-    return true;
+    return deletedAny;
   } catch (error) {
     console.error('[DB] Error deleting routine:', error);
     throw error;

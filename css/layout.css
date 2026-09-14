@@ -113,6 +113,11 @@
   color: var(--color-primary-hover);
 }
 
+/* Sidebar hidden on mobile by default */
+.sidebar {
+  display: none;
+}
+
 /* Desktop Sidebar override (Media Query) */
 @media (min-width: 768px) {
   .app-container {

@@ -98,12 +98,13 @@ window.FITTRACK.createRoutine = async function(routineData) {
     const user = window.FITTRACK.getCurrentUser();
     if (!user) throw new Error('Usuario no autenticado');
 
-    const newRoutine = {
+    const rawRoutine = {
       ...routineData,
       exercises: routineData.exercises || [],
       createdAt: window.FITTRACK.FieldValue.serverTimestamp(),
       updatedAt: window.FITTRACK.FieldValue.serverTimestamp()
     };
+    const newRoutine = window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(rawRoutine) : rawRoutine;
 
     const docRef = await getRoutinesRef().add(newRoutine);
     const created = { id: docRef.id, ...newRoutine };
@@ -133,7 +134,7 @@ window.FITTRACK.shareRoutine = async function(routineIdOrData, targetEmail) {
       routine = await window.FITTRACK.getRoutine(routineIdOrData);
     }
 
-    const sharedData = {
+    const rawSharedData = {
       name: routine.name || 'Rutina compartida',
       description: routine.description || '',
       exercises: routine.exercises || [],
@@ -143,6 +144,7 @@ window.FITTRACK.shareRoutine = async function(routineIdOrData, targetEmail) {
       targetEmail: targetEmail.toLowerCase().trim(),
       createdAt: window.FITTRACK.FieldValue.serverTimestamp()
     };
+    const sharedData = window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(rawSharedData) : rawSharedData;
 
     const docRef = await window.FITTRACK.db.collection('shared_routines').add(sharedData);
     return { id: docRef.id, ...sharedData };
@@ -186,10 +188,11 @@ window.FITTRACK.importSharedRoutine = async function(sharedRoutineId) {
  */
 window.FITTRACK.updateRoutine = async function(routineId, routineData) {
   try {
-    const updateData = {
+    const rawUpdateData = {
       ...routineData,
       updatedAt: window.FITTRACK.FieldValue.serverTimestamp()
     };
+    const updateData = window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(rawUpdateData) : rawUpdateData;
     await getRoutinesRef().doc(routineId).update(updateData);
 
     if (routineData.assignedEmail && routineData.assignedEmail.trim()) {

@@ -28,3 +28,26 @@ window.FITTRACK.db.enablePersistence({ synchronizeTabs: true })
 
 window.FITTRACK.FieldValue = firebase.firestore.FieldValue;
 window.FITTRACK.Timestamp = firebase.firestore.Timestamp;
+
+/**
+ * Utility to strip undefined values recursively so Firestore add/set/update never throws invalid data error
+ */
+window.FITTRACK.cleanUndefined = function(obj) {
+  if (obj === null || obj === undefined) {
+    return null;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(item => window.FITTRACK.cleanUndefined(item));
+  }
+  if (typeof obj === 'object' && !(obj instanceof Date) && typeof obj.toDate !== 'function' && typeof obj.isEqual !== 'function') {
+    const cleaned = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (value !== undefined) {
+        cleaned[key] = window.FITTRACK.cleanUndefined(value);
+      }
+    }
+    return cleaned;
+  }
+  return obj;
+};
+

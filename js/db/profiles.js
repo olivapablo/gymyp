@@ -40,10 +40,12 @@ window.FITTRACK.updateProfile = async function(data) {
   const profileRef = window.FITTRACK.db.collection('users').doc(user.uid).collection('profile').doc('main');
   
   try {
-    await profileRef.set({
+    const rawData = {
       ...data,
       updatedAt: window.FITTRACK.FieldValue.serverTimestamp()
-    }, { merge: true });
+    };
+    const cleanedData = window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(rawData) : rawData;
+    await profileRef.set(cleanedData, { merge: true });
     return true;
   } catch (error) {
     console.error('[DB] Error updating profile:', error);

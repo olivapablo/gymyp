@@ -12,21 +12,42 @@ function getHistoryRef() {
  */
 window.FITTRACK.startWorkout = async function(routineData) {
   try {
-    const workout = {
-      routineId: routineData.id || null,
-      name: routineData.name || 'Entrenamiento Libre',
+    const rawExercises = routineData && Array.isArray(routineData.exercises) ? routineData.exercises : [];
+    
+    const exercises = rawExercises.map((ex, idx) => {
+      const exercise = {
+        id: ex.id || `ex_${idx}_${Date.now()}`,
+        type: ex.type || 'fuerza',
+        name: ex.name || 'Ejercicio',
+        targetSets: ex.sets || ex.targetSets || '3',
+        targetReps: ex.reps || ex.targetReps || '8-12',
+        targetRir: ex.rir !== undefined && ex.rir !== null ? String(ex.rir) : (ex.targetRir !== undefined && ex.targetRir !== null ? String(ex.targetRir) : ''),
+        notes: ex.notes || '',
+        sets: [] // We will populate this as the user completes sets
+      };
+
+      if (ex.muscle !== undefined) exercise.muscle = ex.muscle;
+      if (ex.weight !== undefined) exercise.weight = ex.weight;
+      if (ex.rest !== undefined) exercise.rest = ex.rest;
+      if (ex.time !== undefined) exercise.time = ex.time;
+      if (ex.distance !== undefined) exercise.distance = ex.distance;
+      if (ex.speed !== undefined) exercise.speed = ex.speed;
+      if (ex.incline !== undefined) exercise.incline = ex.incline;
+      if (ex.modality !== undefined) exercise.modality = ex.modality;
+
+      return window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(exercise) : exercise;
+    });
+
+    const rawWorkout = {
+      routineId: (routineData && routineData.id) ? routineData.id : null,
+      name: (routineData && routineData.name) ? routineData.name : 'Entrenamiento Libre',
       startTime: window.FITTRACK.FieldValue.serverTimestamp(),
       endTime: null,
       status: 'in_progress',
-      exercises: routineData.exercises.map(ex => ({
-        id: ex.id,
-        name: ex.name,
-        targetSets: ex.sets,
-        targetReps: ex.reps,
-        targetRir: ex.rir || '',
-        sets: [] // We will populate this as the user completes sets
-      }))
+      exercises: exercises
     };
+
+    const workout = window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(rawWorkout) : rawWorkout;
     
     const docRef = await getHistoryRef().add(workout);
     return docRef.id;
@@ -62,10 +83,12 @@ window.FITTRACK.getActiveWorkout = async function() {
  */
 window.FITTRACK.updateWorkout = async function(workoutId, workoutData) {
   try {
-    await getHistoryRef().doc(workoutId).update({
+    const payload = {
       ...workoutData,
       updatedAt: window.FITTRACK.FieldValue.serverTimestamp()
-    });
+    };
+    const cleanedPayload = window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(payload) : payload;
+    await getHistoryRef().doc(workoutId).update(cleanedPayload);
     return true;
   } catch (error) {
     console.error('[DB] Error updating workout:', error);
@@ -78,12 +101,14 @@ window.FITTRACK.updateWorkout = async function(workoutId, workoutData) {
  */
 window.FITTRACK.finishWorkout = async function(workoutId, workoutData) {
   try {
-    await getHistoryRef().doc(workoutId).update({
-      ...workoutData,
+    const payload = {
+      exercises: workoutData.exercises || [],
       status: 'completed',
       endTime: window.FITTRACK.FieldValue.serverTimestamp(),
       updatedAt: window.FITTRACK.FieldValue.serverTimestamp()
-    });
+    };
+    const cleanedPayload = window.FITTRACK.cleanUndefined ? window.FITTRACK.cleanUndefined(payload) : payload;
+    await getHistoryRef().doc(workoutId).update(cleanedPayload);
     return true;
   } catch (error) {
     console.error('[DB] Error finishing workout:', error);

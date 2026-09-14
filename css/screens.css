@@ -599,3 +599,103 @@
 
 .measure-delta.positive { color: var(--color-success); }
 .measure-delta.negative { color: var(--color-error); }
+/* ============================================
+   Workout Active Screen (Mockup Realism)
+   ============================================ */
+.timer-pill {
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  border-radius: var(--radius-full);
+  padding: 0.4rem 1.1rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-family: monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  background: rgba(183, 243, 74, 0.05);
+  box-shadow: 0 0 16px rgba(183, 243, 74, 0.1);
+  transition: all 0.3s ease;
+}
+
+[data-theme="light"] .timer-pill {
+  background: rgba(90, 138, 16, 0.1);
+  box-shadow: 0 0 12px rgba(90, 138, 16, 0.15);
+}
+
+.exercise-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--color-surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-1);
+  transition: all 0.2s ease;
+  border: 1px solid var(--color-border-subtle);
+}
+.exercise-nav-btn:hover { background: var(--color-surface-3); }
+
+.set-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--color-surface-3);
+  color: var(--color-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+.set-circle.completed {
+  background: var(--color-primary);
+  color: #0B0D0F;
+  box-shadow: 0 0 12px rgba(183, 243, 74, 0.4), inset 0 1px 2px rgba(255,255,255,0.5);
+}
+[data-theme="light"] .set-circle.completed { color: #FFFFFF; }
+
+.set-input-mockup {
+  background: rgba(255, 255, 255, 0.03);
+  border: none;
+  border-bottom: 2px solid var(--color-primary);
+  border-radius: 6px 6px 0 0;
+  color: var(--color-text-1);
+  font-size: 1.1rem;
+  font-weight: 700;
+  padding: 0.6rem 0.8rem;
+  transition: all 0.2s ease;
+}
+.set-input-mockup:focus {
+  background: rgba(255, 255, 255, 0.06);
+  outline: none;
+  border-bottom-color: var(--color-primary-hover);
+}
+[data-theme="light"] .set-input-mockup { background: rgba(0, 0, 0, 0.03); }
+[data-theme="light"] .set-input-mockup:focus { background: rgba(0, 0, 0, 0.05); }
+
+.add-set-dashed {
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 0.75rem 1rem;
+  transition: background 0.2s;
+}
+.add-set-dashed:hover { background: var(--color-surface-2); }
+
+.set-circle-add {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-surface-3);
+  color: var(--color-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#rest-controls {
+  box-shadow: 0 -10px 40px rgba(0,0,0,0.6);
+}

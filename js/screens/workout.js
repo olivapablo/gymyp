@@ -13,6 +13,12 @@ let activeWorkoutState = null;
 let workoutTimerInterval = null;
 let workoutDurationSeconds = 0;
 
+// New globals for single-exercise view and rest
+let currentExIndex = 0;
+let restTimerInterval = null;
+let restRemainingSeconds = 0;
+let saveTimeout = null;
+
 window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
   container.innerHTML = `
     <h1 class="text-3xl font-bold mb-6">Entrenar</h1>
@@ -65,7 +71,6 @@ window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
 
 window.FITTRACK.screens.startRoutineWorkout = async function(routineId) {
   try {
-    // Check if there is already an active workout
     const active = await window.FITTRACK.getActiveWorkout();
     if (active) {
       await window.FITTRACK.alert("Ya tienes un entrenamiento en curso. Termínalo antes de empezar otro.", "Entrenamiento en curso");
@@ -73,10 +78,8 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId) {
       return;
     }
 
-    // Get routine and start
     const routine = await window.FITTRACK.getRoutine(routineId);
     const workoutId = await window.FITTRACK.startWorkout(routine);
-    
     window.location.hash = '#/workout/active';
   } catch (error) {
     await window.FITTRACK.alert("Error al iniciar: " + error.message, "Error");
@@ -96,7 +99,6 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
       return;
     }
 
-    // Calculate duration based on startTime timestamp if it exists, otherwise 0
     if (activeWorkoutState.startTime && activeWorkoutState.startTime.seconds) {
       const startMs = activeWorkoutState.startTime.seconds * 1000;
       workoutDurationSeconds = Math.floor((Date.now() - startMs) / 1000);
@@ -105,171 +107,247 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
       workoutDurationSeconds = 0;
     }
 
-    const renderUI = () => {
-      container.innerHTML = `
-        <div class="active-workout-header mb-6 sticky top-0 bg-bg z-10 pt-2 pb-4 border-b border-color-border">
-          <div class="flex-row justify-between items-center mb-2">
-            <h1 class="text-2xl font-bold truncate">${activeWorkoutState.name}</h1>
-            <div id="workout-timer" class="font-mono text-primary font-bold text-xl">${formatTime(workoutDurationSeconds)}</div>
+    currentExIndex = 0;
+
+    container.innerHTML = `
+      <div id="workout-ui-root" class="pb-24 pt-2">
+        <!-- Header Mockup Style -->
+        <div class="flex-row justify-between items-start px-4 mb-6">
+          <div class="flex-1 pr-4">
+            <div class="flex-row items-center gap-2 mb-1">
+              <button id="btn-back-workout" class="btn-icon bg-surface-2 text-color-1 rounded-full p-2 flex items-center justify-center" style="width:36px;height:36px;">
+                <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
+              </button>
+              <span class="text-color-2 font-bold text-sm tracking-widest uppercase">DÍA ${extractDayFromRoutineName(activeWorkoutState.name)}</span>
+            </div>
+            <h1 class="text-3xl font-black text-color-1 leading-tight tracking-tight mt-1 uppercase">${stripDayFromRoutineName(activeWorkoutState.name)}</h1>
+            <p class="text-xs text-color-3 mt-1 font-medium tracking-wide">Glúteos • Femoral • Cuádriceps</p>
           </div>
-          <button id="btn-finish-workout" class="btn btn-primary btn-block">Finalizar Entrenamiento</button>
+          
+          <div class="timer-pill cursor-pointer flex-shrink-0" id="workout-timer-container">
+            <i data-lucide="timer" style="width:28px;height:28px;" id="timer-icon"></i>
+            <span id="workout-timer">${formatTime(workoutDurationSeconds)}</span>
+          </div>
         </div>
 
-        <div id="exercises-container" class="flex-col gap-8 pb-20">
-          ${activeWorkoutState.exercises.map((ex, exIndex) => renderExerciseBlock(ex, exIndex)).join('')}
+        <!-- Single Exercise Card Container -->
+        <div id="exercise-card-container" class="px-4">
         </div>
-      `;
-      
-      if (window.lucide) lucide.createIcons();
-      bindWorkoutEvents();
-      startTimer();
-    };
+        
+        <!-- Rest Controls Bottom Sheet -->
+        <div id="rest-controls" class="fixed bottom-0 left-0 right-0 p-6 bg-surface border-t border-color-border transform translate-y-full transition-transform duration-300 z-50 rounded-t-3xl">
+          <div class="flex-col items-center">
+            <h3 class="text-color-2 text-xs font-bold uppercase tracking-wider mb-3">Tiempo de descanso</h3>
+            <div class="text-5xl font-mono font-bold text-primary mb-6" id="rest-timer-display">01:30</div>
+            <div class="flex-row gap-4 w-full mb-4">
+              <button class="btn btn-secondary flex-1 py-3 text-lg" id="btn-rest-minus">-30s</button>
+              <button class="btn btn-secondary flex-1 py-3 text-lg" id="btn-rest-plus">+30s</button>
+            </div>
+            <button class="btn btn-primary btn-block py-3 text-lg" id="btn-rest-skip">Saltar Descanso</button>
+          </div>
+        </div>
+        <div id="rest-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-40 d-none backdrop-blur-sm transition-opacity" style="opacity:0;"></div>
+      </div>
+    `;
 
-    renderUI();
+    renderCurrentExercise();
+    startWorkoutTimer();
+    
+    if (window.lucide) lucide.createIcons();
+
+    // Bind Header Events
+    document.getElementById('btn-back-workout').addEventListener('click', () => { window.location.hash = '#/'; });
+    
+    // Rest Modal Events
+    document.getElementById('workout-timer-container').addEventListener('click', () => {
+      if(restRemainingSeconds > 0) openRestControls();
+      else window.FITTRACK.toast('Inicia un descanso completando una serie');
+    });
+    
+    document.getElementById('rest-overlay').addEventListener('click', closeRestControls);
+    document.getElementById('btn-rest-skip').addEventListener('click', skipRest);
+    document.getElementById('btn-rest-plus').addEventListener('click', () => { restRemainingSeconds += 30; updateRestDisplay(); });
+    document.getElementById('btn-rest-minus').addEventListener('click', () => { restRemainingSeconds = Math.max(0, restRemainingSeconds - 30); updateRestDisplay(); });
 
   } catch (e) {
-    container.innerHTML = `<div class="card bg-error-dim border-error text-error">Error cargando sesión.</div>`;
+    container.innerHTML = `<div class="card bg-error-dim border-error text-error m-4">Error cargando sesión: ${e.message}</div>`;
   }
 };
 
-function renderExerciseBlock(ex, exIndex) {
-  // Ensure we have at least as many sets as the target
-  const targetSetsCount = parseInt(ex.targetSets) || 3;
+// Utils for header parsing
+function extractDayFromRoutineName(name) {
+  const match = name.match(/d[íi]a\s*(\d+)/i);
+  return match ? match[1] : '1';
+}
+
+function stripDayFromRoutineName(name) {
+  return name.replace(/d[íi]a\s*\d+\s*-?\s*/i, '').trim() || name;
+}
+
+function renderCurrentExercise() {
+  const container = document.getElementById('exercise-card-container');
+  if (!container || !activeWorkoutState || !activeWorkoutState.exercises.length) return;
+  
+  const ex = activeWorkoutState.exercises[currentExIndex];
+  
+  // Ensure sets
+  const targetSetsCount = parseInt(ex.targetSets) || 4;
   if (!ex.sets) ex.sets = [];
   while (ex.sets.length < targetSetsCount) {
-    ex.sets.push({ kg: '', reps: '', rir: ex.targetRir !== undefined ? ex.targetRir : '', completed: false });
+    ex.sets.push({ kg: '', reps: '', completed: false });
   }
 
-  const setsHtml = ex.sets.map((set, setIndex) => `
-    <div class="flex-row items-center gap-3 mb-3 set-row py-2 px-3 rounded-lg transition-all ${set.completed ? 'bg-success-dim opacity-70 border border-success' : 'bg-surface-2'}">
-      <div class="w-6 text-center font-bold text-color-2">${setIndex + 1}</div>
-      <div class="flex-1">
-        <input type="number" class="input-control text-center set-input w-full py-2 px-1 text-lg font-semibold bg-bg rounded" placeholder="-" 
-          value="${set.kg || ''}" data-ex="${exIndex}" data-set="${setIndex}" data-field="kg" ${set.completed ? 'disabled' : ''}>
+  const hasPrev = currentExIndex > 0;
+  const hasNext = currentExIndex < activeWorkoutState.exercises.length - 1;
+
+  let setsHtml = ex.sets.map((set, setIndex) => `
+    <div class="flex-row items-center gap-4 mb-4 set-row-mockup relative">
+      <div class="set-circle cursor-pointer ${set.completed ? 'completed' : ''}" data-set="${setIndex}" title="Toca para completar">
+        ${setIndex + 1}
       </div>
       <div class="flex-1">
-        <input type="number" class="input-control text-center set-input w-full py-2 px-1 text-lg font-semibold bg-bg rounded" placeholder="-" 
-          value="${set.reps || ''}" data-ex="${exIndex}" data-set="${setIndex}" data-field="reps" ${set.completed ? 'disabled' : ''}>
+        <input type="number" class="set-input-mockup w-full text-left" value="${set.reps || ''}" placeholder="-" data-set="${setIndex}" data-field="reps">
       </div>
       <div class="flex-1">
-        <input type="number" class="input-control text-center set-input w-full py-2 px-1 text-lg font-semibold bg-bg rounded" placeholder="${ex.targetRir !== undefined && ex.targetRir !== '' ? ex.targetRir : 'RIR'}" 
-          value="${set.rir !== undefined ? set.rir : ''}" data-ex="${exIndex}" data-set="${setIndex}" data-field="rir" ${set.completed ? 'disabled' : ''}>
+        <input type="number" class="set-input-mockup w-full text-left" value="${set.kg || ''}" placeholder="-" data-set="${setIndex}" data-field="kg">
       </div>
-      <button class="btn-check-set flex items-center justify-center rounded-full shadow-sm transition-all ${set.completed ? 'bg-success text-bg' : 'bg-surface text-color-2 border border-color-border'}" 
-        style="width: 36px; height: 36px;" data-ex="${exIndex}" data-set="${setIndex}">
-        <i data-lucide="check" style="width: 20px; height: 20px;"></i>
-      </button>
     </div>
   `).join('');
 
-  return `
-    <div class="exercise-block card mb-6 p-5 border-l-4 border-primary shadow-sm bg-surface">
-      <div class="flex-row justify-between items-start mb-4">
-        <div>
-          <h3 class="text-xl font-bold text-color-1 mb-1 leading-tight">${ex.name}</h3>
-          <p class="text-sm font-medium text-primary">Objetivo: ${ex.targetSets || 3}x${ex.targetReps || '8-12'}${ex.targetRir !== undefined && ex.targetRir !== '' ? ` | RIR: ${ex.targetRir}` : ''}</p>
+  container.innerHTML = `
+    <div class="card bg-surface px-5 py-6 rounded-3xl shadow-2xl relative overflow-hidden border border-color-border">
+      
+      <!-- Card Header: Nav + Title -->
+      <div class="flex-row justify-between items-center mb-6">
+        <button class="exercise-nav-btn" id="btn-prev-ex" ${!hasPrev ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
+          <i data-lucide="chevron-left" style="width:24px;height:24px;"></i>
+        </button>
+        
+        <div class="text-center flex-1 px-2">
+          <h2 class="text-xl font-black text-color-1 leading-tight tracking-tight uppercase">${ex.name}</h2>
+          <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 4} × ${ex.targetReps || '10-12'}</span></p>
+        </div>
+        
+        <button class="exercise-nav-btn" id="btn-next-ex" ${!hasNext ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
+          <i data-lucide="chevron-right" style="width:24px;height:24px;"></i>
+        </button>
+      </div>
+
+      <!-- Labels (Aligned with inputs) -->
+      <div class="flex-row items-center gap-4 mb-2" style="padding-left: 50px;">
+        <div class="flex-1 text-xs font-bold text-color-3 uppercase tracking-wider">Reps</div>
+        <div class="flex-1 text-xs font-bold text-color-3 uppercase tracking-wider">Kg</div>
+      </div>
+
+      <!-- Sets List -->
+      <div class="sets-container mb-6">
+        ${setsHtml}
+        
+        <!-- Add set -->
+        <div class="flex-row items-center gap-4 mt-4 add-set-dashed cursor-pointer" id="btn-add-set-mockup">
+          <div class="set-circle-add">
+            <i data-lucide="plus" style="width:16px;height:16px;"></i>
+          </div>
+          <div class="flex-1 text-color-2 text-sm italic font-medium">Agregar serie</div>
+          <div class="flex-1 text-color-3 text-left pl-2">—</div>
+          <div class="flex-1 text-color-3 text-left pl-2">—</div>
         </div>
       </div>
-      
-      <div class="flex-row items-center gap-3 mb-2 px-3">
-        <div class="w-6 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Set</div>
-        <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">KG</div>
-        <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Reps</div>
-        <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">RIR</div>
-        <div style="width: 36px;"></div>
-      </div>
-      
-      <div class="sets-container mb-3">
-        ${setsHtml}
-      </div>
-      
-      <button class="btn btn-outline btn-sm w-full text-center btn-add-set border-dashed border-color-border hover:border-primary text-color-2" data-ex="${exIndex}">
-        <i data-lucide="plus" style="width: 16px; height: 16px; margin-right: 4px; display: inline-block; vertical-align: middle;"></i> Añadir Serie
+
+      <!-- Main Actions -->
+      <button class="btn btn-primary btn-block py-4 rounded-2xl text-lg shadow-glow" id="btn-guardar-serie">
+        <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i> Guardar serie
       </button>
+      
+      ${hasNext ? '' : `
+        <button class="btn btn-secondary btn-block mt-4 py-4 rounded-2xl text-lg" id="btn-finish-workout-final">
+          Finalizar Entrenamiento
+        </button>
+      `}
     </div>
   `;
+  
+  if (window.lucide) lucide.createIcons();
+  bindCurrentExerciseEvents();
 }
 
-function startTimer() {
-  if (workoutTimerInterval) clearInterval(workoutTimerInterval);
-  const timerEl = document.getElementById('workout-timer');
-  workoutTimerInterval = setInterval(() => {
-    workoutDurationSeconds++;
-    if(timerEl) timerEl.textContent = formatTime(workoutDurationSeconds);
-  }, 1000);
-}
+function bindCurrentExerciseEvents() {
+  const ex = activeWorkoutState.exercises[currentExIndex];
 
-function bindWorkoutEvents() {
-  // Input changes (auto-save locally)
-  document.querySelectorAll('.set-input').forEach(input => {
+  // Nav
+  const btnPrev = document.getElementById('btn-prev-ex');
+  if(btnPrev) btnPrev.addEventListener('click', () => { currentExIndex--; renderCurrentExercise(); });
+  
+  const btnNext = document.getElementById('btn-next-ex');
+  if(btnNext) btnNext.addEventListener('click', () => { currentExIndex++; renderCurrentExercise(); });
+
+  // Inputs
+  document.querySelectorAll('.set-input-mockup').forEach(input => {
     input.addEventListener('change', (e) => {
-      const exIdx = parseInt(e.target.dataset.ex);
       const setIdx = parseInt(e.target.dataset.set);
       const field = e.target.dataset.field;
-      
-      activeWorkoutState.exercises[exIdx].sets[setIdx][field] = e.target.value;
+      ex.sets[setIdx][field] = e.target.value;
       saveWorkoutStateDebounced();
     });
   });
 
-  // Check buttons
-  document.querySelectorAll('.btn-check-set').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const button = e.currentTarget;
-      const exIdx = parseInt(button.dataset.ex);
-      const setIdx = parseInt(button.dataset.set);
-      
-      const set = activeWorkoutState.exercises[exIdx].sets[setIdx];
-      set.completed = !set.completed;
-      
-      const row = button.closest('.set-row');
-      if (row) {
-        if (set.completed) {
-          row.classList.add('bg-success-dim', 'opacity-70', 'border', 'border-success');
-          row.classList.remove('bg-surface-2');
-          button.classList.add('bg-success', 'text-bg');
-          button.classList.remove('bg-surface', 'text-color-2', 'border', 'border-color-border');
-          row.querySelectorAll('.set-input').forEach(i => i.disabled = true);
-        } else {
-          row.classList.remove('bg-success-dim', 'opacity-70', 'border', 'border-success');
-          row.classList.add('bg-surface-2');
-          button.classList.remove('bg-success', 'text-bg');
-          button.classList.add('bg-surface', 'text-color-2', 'border', 'border-color-border');
-          row.querySelectorAll('.set-input').forEach(i => i.disabled = false);
-        }
-      }
-      
+  // Circle toggle
+  document.querySelectorAll('.set-circle').forEach(circle => {
+    circle.addEventListener('click', (e) => {
+      const setIdx = parseInt(e.currentTarget.dataset.set);
+      ex.sets[setIdx].completed = !ex.sets[setIdx].completed;
       saveWorkoutStateDebounced();
+      renderCurrentExercise();
     });
   });
 
-  // Add set buttons
-  document.querySelectorAll('.btn-add-set').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const exIdx = parseInt(e.currentTarget.dataset.ex);
-      activeWorkoutState.exercises[exIdx].sets.push({ kg: '', reps: '', completed: false });
-      window.FITTRACK.screens.renderActiveWorkout(document.getElementById('main-content'));
-    });
+  // Add set
+  const btnAdd = document.getElementById('btn-add-set-mockup');
+  if(btnAdd) btnAdd.addEventListener('click', () => {
+    ex.sets.push({ kg: '', reps: '', completed: false });
+    saveWorkoutStateDebounced();
+    renderCurrentExercise();
   });
 
-  // Finish button
-  document.getElementById('btn-finish-workout').addEventListener('click', async () => {
-    const ok = await window.FITTRACK.confirm('¿Terminaste tu entrenamiento?', 'Finalizar Sesión', 'Finalizar', 'Continuar');
-    if (ok) {
-      if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+  // Guardar serie
+  const btnGuardar = document.getElementById('btn-guardar-serie');
+  if(btnGuardar) btnGuardar.addEventListener('click', () => {
+    const setIdx = ex.sets.findIndex(s => !s.completed);
+    if (setIdx !== -1) {
+      ex.sets[setIdx].completed = true;
+      saveWorkoutStateDebounced();
+      renderCurrentExercise();
       
-      try {
-        await window.FITTRACK.finishWorkout(activeWorkoutState.id, activeWorkoutState);
-        activeWorkoutState = null;
-        window.location.hash = '#/history';
-      } catch (err) {
-        await window.FITTRACK.alert("Error al finalizar: " + err.message, "Error");
+      const restTime = parseInt(ex.rest) || 90;
+      startRestTimer(restTime);
+    } else {
+      if (currentExIndex < activeWorkoutState.exercises.length - 1) {
+        currentExIndex++;
+        renderCurrentExercise();
+      } else {
+        window.FITTRACK.toast('¡Todos los ejercicios completados!');
       }
     }
   });
+
+  // Finish Workout
+  const btnFinish = document.getElementById('btn-finish-workout-final');
+  if(btnFinish) btnFinish.addEventListener('click', async () => {
+     const ok = await window.FITTRACK.confirm('¿Terminaste tu entrenamiento?', 'Finalizar Sesión', 'Finalizar', 'Continuar');
+     if (ok) {
+       if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+       if (restTimerInterval) clearInterval(restTimerInterval);
+       try {
+         await window.FITTRACK.finishWorkout(activeWorkoutState.id, activeWorkoutState);
+         activeWorkoutState = null;
+         window.location.hash = '#/history';
+       } catch (err) {
+         window.FITTRACK.alert("Error al finalizar: " + err.message, "Error");
+       }
+     }
+  });
 }
 
-let saveTimeout = null;
 function saveWorkoutStateDebounced() {
   if (saveTimeout) clearTimeout(saveTimeout);
   saveTimeout = setTimeout(async () => {
@@ -283,10 +361,102 @@ function saveWorkoutStateDebounced() {
   }, 1000);
 }
 
-// Cleanup timer when navigating away (handled in router potentially, but we'll manage safely)
+// ------------------------------------
+// Timer & Rest Logic
+// ------------------------------------
+
+function startWorkoutTimer() {
+  if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+  const timerEl = document.getElementById('workout-timer');
+  const timerContainer = document.getElementById('workout-timer-container');
+  const timerIcon = document.getElementById('timer-icon');
+  
+  workoutTimerInterval = setInterval(() => {
+    workoutDurationSeconds++;
+    
+    if (restRemainingSeconds > 0) {
+      timerEl.textContent = formatTime(restRemainingSeconds);
+      timerContainer.style.borderColor = 'var(--color-warning)';
+      timerContainer.style.color = 'var(--color-warning)';
+      timerContainer.style.boxShadow = '0 0 16px rgba(255, 200, 87, 0.2)';
+      if (timerIcon && timerIcon.getAttribute('data-lucide') !== 'bell') {
+        timerIcon.setAttribute('data-lucide', 'bell');
+        if (window.lucide) lucide.createIcons();
+      }
+    } else {
+      timerEl.textContent = formatTime(workoutDurationSeconds);
+      timerContainer.style.borderColor = 'var(--color-primary)';
+      timerContainer.style.color = 'var(--color-primary)';
+      timerContainer.style.boxShadow = '0 0 16px rgba(183, 243, 74, 0.1)';
+      if (timerIcon && timerIcon.getAttribute('data-lucide') !== 'timer') {
+        timerIcon.setAttribute('data-lucide', 'timer');
+        if (window.lucide) lucide.createIcons();
+      }
+    }
+  }, 1000);
+}
+
+function startRestTimer(seconds) {
+  restRemainingSeconds = seconds;
+  openRestControls();
+  if(restTimerInterval) clearInterval(restTimerInterval);
+  
+  updateRestDisplay();
+  
+  restTimerInterval = setInterval(() => {
+    restRemainingSeconds--;
+    if(restRemainingSeconds <= 0) {
+      clearInterval(restTimerInterval);
+      restRemainingSeconds = 0;
+      closeRestControls();
+      if(window.FITTRACK.toast) window.FITTRACK.toast("¡Descanso terminado!");
+      if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
+    } else {
+      updateRestDisplay();
+    }
+  }, 1000);
+}
+
+function updateRestDisplay() {
+  const display = document.getElementById('rest-timer-display');
+  if (display) display.textContent = formatTime(restRemainingSeconds);
+}
+
+function openRestControls() {
+  const controls = document.getElementById('rest-controls');
+  const overlay = document.getElementById('rest-overlay');
+  if(controls && overlay) {
+    overlay.classList.remove('d-none');
+    setTimeout(() => {
+      controls.classList.remove('translate-y-full');
+      overlay.style.opacity = '1';
+    }, 10);
+  }
+}
+
+function closeRestControls() {
+  const controls = document.getElementById('rest-controls');
+  const overlay = document.getElementById('rest-overlay');
+  if(controls && overlay) {
+    controls.classList.add('translate-y-full');
+    overlay.style.opacity = '0';
+    setTimeout(() => {
+      overlay.classList.add('d-none');
+    }, 300);
+  }
+}
+
+function skipRest() {
+  if(restTimerInterval) clearInterval(restTimerInterval);
+  restRemainingSeconds = 0;
+  closeRestControls();
+}
+
 window.addEventListener('hashchange', () => {
-  if (window.location.hash !== '#/workout/active' && workoutTimerInterval) {
-    clearInterval(workoutTimerInterval);
+  if (window.location.hash !== '#/workout/active') {
+    if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+    if (restTimerInterval) clearInterval(restTimerInterval);
     workoutTimerInterval = null;
+    restTimerInterval = null;
   }
 });

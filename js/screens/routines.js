@@ -656,8 +656,12 @@ window.FITTRACK.screens.renderRoutineView = async function(container, routineId)
     document.getElementById('btn-delete-routine').addEventListener('click', async () => {
       const ok = await window.FITTRACK.confirm('¿Estás seguro de eliminar esta rutina?', 'Eliminar Rutina', 'Eliminar', 'Cancelar');
       if (ok) {
-        await window.FITTRACK.deleteRoutine(routineId);
-        window.location.hash = '#/routines';
+        try {
+          await window.FITTRACK.deleteRoutine(routineId);
+          window.location.hash = '#/routines';
+        } catch (err) {
+          await window.FITTRACK.alert('Error al eliminar rutina: ' + err.message, 'Error');
+        }
       }
     });
 

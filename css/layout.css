@@ -118,6 +118,7 @@
   .app-container {
     flex-direction: row;
     max-width: 100%; /* Use full width, restrict inner content */
+    padding-left: var(--sidebar-width);
   }
 
   .bottom-nav {
@@ -145,10 +146,11 @@
   }
   
   .main-content {
-    margin-left: var(--sidebar-width);
+    margin-left: auto;
     padding-bottom: var(--space-8); /* Remove bottom nav padding */
     max-width: var(--content-max-width);
     margin-right: auto;
+    width: 100%;
   }
 }
 

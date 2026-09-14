@@ -81,7 +81,56 @@
   <!-- APP CONTAINER -->
   <div id="app-container" class="app-container d-none">
     
-    <!-- Header -->
+    <!-- Desktop Sidebar (Visible on min-width 768px) -->
+    <aside id="desktop-sidebar" class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 6.5h11"/><path d="M6.5 17.5h11"/><path d="M3 9.5v5"/><path d="M21 9.5v5"/><path d="M3 9.5a2 2 0 0 1 2-2h1.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-5z"/><path d="M15.5 9.5a2 2 0 0 1 2-2H19a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-1.5a2 2 0 0 1-2-2v-5z"/></svg>
+        </div>
+        <span class="sidebar-brand-text">FITTRACK</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="#/" class="nav-item sidebar-item active" data-route="/">
+          <i data-lucide="home"></i>
+          <span>Inicio</span>
+        </a>
+        <a href="#/workout" class="nav-item sidebar-item" data-route="/workout">
+          <i data-lucide="dumbbell"></i>
+          <span>Entrenar</span>
+        </a>
+        <a href="#/routines" class="nav-item sidebar-item" data-route="/routines">
+          <i data-lucide="clipboard-list"></i>
+          <span>Rutinas</span>
+        </a>
+        <a href="#/history" class="nav-item sidebar-item" data-route="/history">
+          <i data-lucide="clock"></i>
+          <span>Historial</span>
+        </a>
+        <a href="#/progress" class="nav-item sidebar-item" data-route="/progress">
+          <i data-lucide="trending-up"></i>
+          <span>Progreso</span>
+        </a>
+        <a href="#/profile" class="nav-item sidebar-item" data-route="/profile">
+          <i data-lucide="user"></i>
+          <span>Perfil</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <a href="#/profile" class="sidebar-user-chip">
+          <div class="sidebar-avatar" id="sidebar-user-avatar">
+            <i data-lucide="user"></i>
+          </div>
+          <div class="sidebar-user-info">
+            <span class="sidebar-user-name" id="sidebar-user-name">Usuario</span>
+            <span class="sidebar-user-sub">Mi Perfil</span>
+          </div>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Header (Mobile) -->
     <header id="app-header" class="app-header">
       <div id="header-title" class="header-title">FITTRACK</div>
       <div class="header-actions">

@@ -318,12 +318,22 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
         </div>
       `;
     } else {
-      routinesListEl.innerHTML = routines.map(r => `
-        <div class="card card-interactive" onclick="window.location.hash='#/routine/view/${r.id}'">
+      routinesListEl.innerHTML = routines.map(r => {
+        const isPartner = r.senderEmail === 'mar.armando1997@gmail.com' || 
+                          (r.description && r.description.includes('mar.armando1997@gmail.com')) || 
+                          r.assignedEmail === 'mar.armando1997@gmail.com' ||
+                          (r.name && r.name.toLowerCase().includes('mar.armando'));
+                          
+        const cardStyle = isPartner ? 'border: 1px solid var(--color-info); background-color: var(--color-info-dim);' : '';
+        const titleColor = isPartner ? 'color: var(--color-info);' : '';
+        
+        return `
+        <div class="card card-interactive" onclick="window.location.hash='#/routine/view/${r.id}'" style="${cardStyle}">
           <div class="flex-row justify-between items-start mb-2">
             <div class="flex-col gap-1">
-              <h3 class="text-lg font-bold">${r.name}</h3>
+              <h3 class="text-lg font-bold" style="${titleColor}">${r.name}</h3>
               ${r.isShared ? `<span class="badge badge-primary" style="font-size:0.68rem; padding: 2px 8px;"><i data-lucide="share-2" style="width:10px;height:10px;margin-right:4px;"></i> Enviada por ${r.senderName || r.senderEmail}</span>` : ''}
+              ${isPartner ? `<span class="badge" style="background-color: var(--color-info); color: #fff; font-size:0.68rem; padding: 2px 8px; margin-top: 4px;"><i data-lucide="user" style="width:10px;height:10px;margin-right:4px;"></i> Rutina de Pareja</span>` : ''}
             </div>
             <div class="flex-row items-center gap-2" onclick="event.stopPropagation();">
               <button class="btn-icon text-error btn-delete-routine-quick" data-id="${r.id}" title="Eliminar rutina" style="padding:4px;">
@@ -345,7 +355,7 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
             ` : ''}
           </div>
         </div>
-      `).join('');
+      `}).join('');
 
       // Add listener to delete quick buttons
       document.querySelectorAll('.btn-delete-routine-quick').forEach(btn => {

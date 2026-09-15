@@ -109,24 +109,42 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
 
     currentExIndex = 0;
 
+    const dayNum = extractDayFromRoutineName(activeWorkoutState.name);
+    const cleanTitle = stripDayFromRoutineName(activeWorkoutState.name);
+
+    // Extract muscles dynamically if available
+    const musclesList = [...new Set((activeWorkoutState.exercises || []).map(ex => ex.muscle).filter(Boolean))];
+    const muscleSubtitle = musclesList.length > 0 ? musclesList.join(' • ') : '';
+
     container.innerHTML = `
       <div id="workout-ui-root" class="pb-24 pt-2">
-        <!-- Header Mockup Style -->
-        <div class="flex-row justify-between items-start px-4 mb-6">
-          <div class="flex-1 pr-4">
-            <div class="flex-row items-center gap-2 mb-1">
-              <button id="btn-back-workout" class="btn-icon bg-surface-2 text-color-1 rounded-full p-2 flex items-center justify-center" style="width:36px;height:36px;">
+        <!-- Clean Professional Header Structure -->
+        <div class="px-4 mb-5">
+          <!-- Top Row: Back Button, Day Badge & Timer -->
+          <div class="flex-row justify-between items-center mb-3">
+            <div class="flex-row items-center gap-2">
+              <button id="btn-back-workout" class="btn-icon bg-surface-2 text-color-1 rounded-full flex items-center justify-center" style="width:38px;height:38px;">
                 <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
               </button>
-              <span class="text-color-2 font-bold text-sm tracking-widest uppercase">DÍA ${extractDayFromRoutineName(activeWorkoutState.name)}</span>
+              ${dayNum ? `
+                <span class="badge badge-primary font-bold text-xs uppercase tracking-wider px-3 py-1">
+                  DÍA ${dayNum}
+                </span>
+              ` : ''}
             </div>
-            <h1 class="text-3xl font-black text-color-1 leading-tight tracking-tight mt-1 uppercase">${stripDayFromRoutineName(activeWorkoutState.name)}</h1>
-            <p class="text-xs text-color-3 mt-1 font-medium tracking-wide">Glúteos • Femoral • Cuádriceps</p>
+            
+            <div class="timer-pill cursor-pointer flex-shrink-0" id="workout-timer-container">
+              <i data-lucide="timer" style="width:24px;height:24px;" id="timer-icon"></i>
+              <span id="workout-timer">${formatTime(workoutDurationSeconds)}</span>
+            </div>
           </div>
-          
-          <div class="timer-pill cursor-pointer flex-shrink-0" id="workout-timer-container">
-            <i data-lucide="timer" style="width:28px;height:28px;" id="timer-icon"></i>
-            <span id="workout-timer">${formatTime(workoutDurationSeconds)}</span>
+
+          <!-- Title & Subtitle Row (Full Width - No horizontal squishing) -->
+          <div class="mt-2">
+            <h1 class="text-2xl font-black text-color-1 leading-snug uppercase tracking-tight" style="word-break: break-word;">
+              ${cleanTitle}
+            </h1>
+            ${muscleSubtitle ? `<p class="text-xs text-color-2 mt-1 font-medium tracking-wide">${muscleSubtitle}</p>` : ''}
           </div>
         </div>
 
@@ -176,12 +194,15 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
 
 // Utils for header parsing
 function extractDayFromRoutineName(name) {
-  const match = name.match(/d[íi]a\s*(\d+)/i);
-  return match ? match[1] : '1';
+  if (!name) return '';
+  const match = name.match(/d[íi]*a\s*(\d+)/i) || name.match(/día\s*(\d+)/i);
+  return match ? match[1] : '';
 }
 
 function stripDayFromRoutineName(name) {
-  return name.replace(/d[íi]a\s*\d+\s*-?\s*/i, '').trim() || name;
+  if (!name) return '';
+  let cleaned = name.replace(/^\s*d[íi]*a\s*\d+\s*[:\-–—]?\s*/i, '').trim();
+  return cleaned || name;
 }
 
 function renderCurrentExercise() {

@@ -37,6 +37,24 @@ body {
   transition: background-color var(--transition-base), color var(--transition-base);
 }
 
+/* GPU Hardware Acceleration & Performance Layer Promotion */
+.view-container, .bottom-nav, .card, .btn, .exercise-modal, .bottom-sheet, .timer-pill {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Enable hardware-accelerated momentum scrolling */
+.main-content, #main-content {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Card rendering containment to prevent full-page layout reflows */
+.card, .dash-stat-card, .dash-streak-card {
+  contain: content;
+}
+
 /* Typography Base */
 h1, h2, h3, h4, h5, h6 {
   font-weight: var(--font-weight-bold);

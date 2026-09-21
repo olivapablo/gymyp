@@ -79,6 +79,7 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     clickedEl.style.pointerEvents = 'none';
   }
 
+  let overlay = null;
   try {
     const active = await window.FITTRACK.getActiveWorkout();
     if (active) {
@@ -89,7 +90,27 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     }
 
     const routine = await window.FITTRACK.getRoutine(routineId);
-    const workoutId = await window.FITTRACK.startWorkout(routine);
+    
+    // Show countdown overlay
+    overlay = document.createElement('div');
+    overlay.id = 'countdown-overlay';
+    overlay.innerHTML = `
+      <div id="countdown-number">5</div>
+      <div id="countdown-text">Prepárate</div>
+    `;
+    document.body.appendChild(overlay);
+
+    // Start network request in parallel
+    let workoutId;
+    const startPromise = window.FITTRACK.startWorkout(routine).then(id => workoutId = id);
+
+    for (let i = 5; i > 0; i--) {
+      const numEl = document.getElementById('countdown-number');
+      if (numEl) numEl.textContent = i;
+      await new Promise(r => setTimeout(r, 1000));
+    }
+    
+    await startPromise; // Ensure it finishes
     
     // Set memory state immediately for instantaneous loading
     activeWorkoutState = {
@@ -118,6 +139,10 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     await window.FITTRACK.alert("Error al iniciar: " + error.message, "Error");
   } finally {
     isStartingWorkout = false;
+    if (overlay) {
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 300);
+    }
   }
 };
 
@@ -325,11 +350,9 @@ function renderCurrentExercise() {
         <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i> Guardar serie
       </button>
       
-      ${hasNext ? '' : `
-        <button class="btn btn-secondary btn-block mt-4 py-4 rounded-2xl text-lg" id="btn-finish-workout-final">
-          Finalizar Entrenamiento
-        </button>
-      `}
+      <button class="btn btn-secondary btn-block mt-4 py-4 rounded-2xl text-lg" id="btn-finish-workout-final">
+        Finalizar Entrenamiento
+      </button>
     </div>
   `;
   

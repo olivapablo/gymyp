@@ -188,8 +188,8 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
         <div id="exercise-card-container" class="px-4">
         </div>
         
-        <!-- Rest Controls Bottom Sheet -->
-        <div id="rest-controls" class="fixed bottom-0 left-0 right-0 p-6 bg-surface border-t border-color-border transform translate-y-full transition-transform duration-300 z-50 rounded-t-3xl">
+        <!-- Rest Controls Bottom Sheet (Initially hidden with d-none) -->
+        <div id="rest-controls" class="fixed bottom-0 left-0 right-0 p-6 bg-surface border-t border-color-border transform translate-y-full transition-transform duration-300 z-50 rounded-t-3xl d-none">
           <div class="flex-col items-center">
             <h3 class="text-color-2 text-xs font-bold uppercase tracking-wider mb-3">Tiempo de descanso</h3>
             <div class="text-5xl font-mono font-bold text-primary mb-6" id="rest-timer-display">01:30</div>
@@ -264,10 +264,10 @@ function renderCurrentExercise() {
         ${set.completed ? '<i data-lucide="check" style="width:16px;height:16px;"></i>' : (setIndex + 1)}
       </div>
       <div class="flex-1">
-        <input type="number" inputmode="decimal" class="set-input-mockup input-control w-full text-center" value="${set.reps || ''}" placeholder="Reps" data-set="${setIndex}" data-field="reps">
+        <input type="number" inputmode="decimal" class="set-input-mockup w-full text-center" value="${set.reps || ''}" placeholder="Reps" data-set="${setIndex}" data-field="reps">
       </div>
       <div class="flex-1">
-        <input type="number" inputmode="decimal" class="set-input-mockup input-control w-full text-center" value="${set.kg || ''}" placeholder="Kg" data-set="${setIndex}" data-field="kg">
+        <input type="number" inputmode="decimal" class="set-input-mockup w-full text-center" value="${set.kg || ''}" placeholder="Kg" data-set="${setIndex}" data-field="kg">
       </div>
     </div>
   `).join('');
@@ -291,20 +291,20 @@ function renderCurrentExercise() {
         </button>
       </div>
 
-      <!-- Exercise Observations / Notes (Only if exists) -->
+      <!-- Exercise Observations / Notes (Clean compact card) -->
       ${ex.notes && ex.notes.trim() ? `
-        <div class="exercise-observation-box mb-4 p-3 rounded-xl border border-color-border" style="background: rgba(183, 243, 74, 0.05); border-left: 3px solid var(--color-primary);">
-          <div class="flex-row items-center gap-2 mb-1">
-            <i data-lucide="file-text" style="width:14px;height:14px;color:var(--color-primary);"></i>
-            <span class="text-xs font-bold uppercase tracking-wider text-color-2">Observaciones</span>
+        <div class="exercise-observation-card mb-4">
+          <div class="observation-header">
+            <i data-lucide="file-text"></i>
+            <span>Observación</span>
           </div>
-          <p class="text-sm text-color-1 leading-snug" style="word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;">${ex.notes.trim()}</p>
+          <div class="observation-body">${ex.notes.trim()}</div>
         </div>
       ` : ''}
 
-      <!-- Labels Header: 1 | Reps | Kg -->
+      <!-- Labels Header: # | Reps | Kg -->
       <div class="sets-header-row flex-row items-center gap-3 mb-2 px-1">
-        <div style="width:38px; text-align:center;" class="text-xs font-bold text-color-3 uppercase tracking-wider">#</div>
+        <div style="width:36px; text-align:center;" class="text-xs font-bold text-color-3 uppercase tracking-wider">#</div>
         <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Reps</div>
         <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Kg</div>
       </div>
@@ -315,8 +315,8 @@ function renderCurrentExercise() {
         
         <!-- Add set button -->
         <button type="button" class="btn-add-set-row flex-row items-center justify-center gap-2 mt-3 w-full p-3 rounded-2xl border border-dashed border-color-border cursor-pointer bg-surface-2 transition-all hover:bg-surface-3" id="btn-add-set-mockup">
-          <i data-lucide="plus" style="width:18px;height:18px;color:var(--color-primary);"></i>
-          <span class="font-semibold text-sm text-primary">+ Agregar serie</span>
+          <i data-lucide="plus" style="width:16px;height:16px;color:var(--color-primary);"></i>
+          <span class="font-semibold text-sm text-primary">Agregar serie</span>
         </button>
       </div>
 

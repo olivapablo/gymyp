@@ -110,6 +110,17 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
       await new Promise(r => setTimeout(r, 1000));
     }
     
+    // Show ¡YA! message
+    const numEl = document.getElementById('countdown-number');
+    const textEl = document.getElementById('countdown-text');
+    if (numEl) {
+      numEl.textContent = '¡YA!';
+      numEl.style.fontSize = '7rem';
+    }
+    if (textEl) textEl.style.display = 'none';
+    
+    await new Promise(r => setTimeout(r, 600)); // Show YA for a brief moment
+    
     await startPromise; // Ensure it finishes
     
     // Set memory state immediately for instantaneous loading

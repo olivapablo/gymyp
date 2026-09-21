@@ -191,9 +191,9 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
     container.innerHTML = `
       <div id="workout-ui-root" class="pb-24 pt-2">
         <!-- Clean Professional Header Structure -->
-        <div class="px-4 mb-5">
+        <div class="px-4 mb-8" style="margin-bottom: 2.5rem;">
           <!-- Top Row: Back Button, Day Badge & Timer -->
-          <div class="flex-row justify-between items-center mb-3">
+          <div class="flex-row justify-between items-center mb-4">
             <div class="flex-row items-center gap-2">
               <button id="btn-back-workout" class="btn-icon bg-surface-2 text-color-1 rounded-full flex items-center justify-center" style="width:38px;height:38px;">
                 <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
@@ -216,7 +216,7 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
             <h1 class="text-2xl font-black text-color-1 leading-snug uppercase tracking-tight" style="word-break: break-word;">
               ${cleanTitle}
             </h1>
-            ${muscleSubtitle ? `<p class="text-xs text-color-2 mt-1 font-medium tracking-wide">${muscleSubtitle}</p>` : ''}
+            ${muscleSubtitle ? `<p class="text-xs text-color-2 mt-2 font-medium tracking-wide leading-relaxed">${muscleSubtitle}</p>` : ''}
           </div>
         </div>
 

@@ -2,6 +2,10 @@
    FITTRACK — Layout Styles
    ============================================ */
 
+body {
+  overflow-x: hidden;
+}
+
 /* App Shell Structure */
 .app-container {
   display: flex;
@@ -11,7 +15,6 @@
   max-width: var(--content-max-width);
   margin: 0 auto;
   position: relative;
-  overflow-x: hidden;
 }
 
 /* Main Content Area */

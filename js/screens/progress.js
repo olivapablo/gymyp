@@ -124,7 +124,6 @@ window.FITTRACK.screens.renderProgress = async function(container) {
       </div>
     `;
 
-    // Populate initial measures from localStorage if present
     let initialMeasuresHtml = `
       <div class="card flex-col items-center text-center py-8 mb-4">
         <i data-lucide="ruler" style="width:36px;height:36px;margin-bottom:0.75rem;color:var(--color-text-3);"></i>
@@ -133,9 +132,34 @@ window.FITTRACK.screens.renderProgress = async function(container) {
     `;
 
     try {
-      const savedRaw = localStorage.getItem('fittrack_latest_measures');
-      if (savedRaw) {
-        const m = JSON.parse(savedRaw);
+      let m = null;
+      // Fetch profile to see if measurements exist in DB
+      try {
+        const profile = await window.FITTRACK.getProfile();
+        if (profile && profile.measurements) {
+          m = profile.measurements;
+        }
+      } catch (e) {
+        console.warn('Could not load profile measurements', e);
+      }
+
+      // Fallback to localStorage if not in DB
+      if (!m) {
+        const savedRaw = localStorage.getItem('fittrack_latest_measures');
+        if (savedRaw) {
+          m = JSON.parse(savedRaw);
+          // Auto-sync it to the cloud so they don't lose it!
+          try {
+            if (window.FITTRACK.updateProfile) {
+              window.FITTRACK.updateProfile({ measurements: m });
+            }
+          } catch(err) {
+            console.warn('Failed to auto-sync measurements', err);
+          }
+        }
+      }
+
+      if (m && (m.weight || m.fat || m.waist || m.hip || m.chest || m.arms || m.thighs)) {
         const d = m.date ? new Date(m.date) : new Date();
         initialMeasuresHtml = `
           <div class="body-measure-grid mb-4" style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));">
@@ -247,6 +271,9 @@ function openMeasureModal() {
     const measureData = { weight, fat, waist, hip, chest, arms, thighs, date: new Date().toISOString() };
     try {
       localStorage.setItem('fittrack_latest_measures', JSON.stringify(measureData));
+      if (window.FITTRACK.updateProfile) {
+        window.FITTRACK.updateProfile({ measurements: measureData });
+      }
     } catch(e) {}
 
     // Show saved data in the measures container

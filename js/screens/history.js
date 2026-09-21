@@ -80,10 +80,15 @@ window.FITTRACK.screens.renderHistory = async function(container) {
         }
 
         return `
-          <div class="card card-interactive">
+          <div class="card card-interactive" id="history-card-${workout.id}">
             <div class="flex-row justify-between items-start mb-2">
-              <h3 class="text-lg font-bold">${workout.name}</h3>
-              <span class="text-sm text-color-3">${dateStr}</span>
+              <div>
+                <h3 class="text-lg font-bold">${workout.name}</h3>
+                <span class="text-sm text-color-3">${dateStr}</span>
+              </div>
+              <button class="btn-icon btn-delete-workout" data-id="${workout.id}" title="Eliminar entrenamiento" style="color: var(--color-error); padding: 6px; border-radius: var(--radius-md); background: rgba(255, 92, 92, 0.1); border: 1px solid rgba(255, 92, 92, 0.2);">
+                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+              </button>
             </div>
             
             <div class="grid-actions" style="grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
@@ -110,6 +115,48 @@ window.FITTRACK.screens.renderHistory = async function(container) {
           </div>
         `;
       }).join('');
+
+      // Add individual delete handlers
+      document.querySelectorAll('.btn-delete-workout').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          const workoutId = btn.getAttribute('data-id');
+          if (!workoutId) return;
+
+          const ok = await window.FITTRACK.confirm(
+            '¿Estás seguro de que deseas eliminar este entrenamiento del historial?',
+            'Eliminar entrenamiento',
+            'Eliminar',
+            'Cancelar'
+          );
+
+          if (ok) {
+            try {
+              btn.disabled = true;
+              await window.FITTRACK.deleteWorkout(workoutId);
+              if (window.FITTRACK.toast) window.FITTRACK.toast('Entrenamiento eliminado');
+              const cardEl = document.getElementById(`history-card-${workoutId}`);
+              if (cardEl) {
+                cardEl.style.transition = 'opacity 200ms ease, transform 200ms ease';
+                cardEl.style.opacity = '0';
+                cardEl.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                  cardEl.remove();
+                  const remainingCards = document.querySelectorAll('#history-list .card-interactive');
+                  if (remainingCards.length === 0) {
+                    window.FITTRACK.screens.renderHistory(container);
+                  }
+                }, 200);
+              } else {
+                window.FITTRACK.screens.renderHistory(container);
+              }
+            } catch (err) {
+              await window.FITTRACK.alert('Error al eliminar el entrenamiento: ' + err.message, 'Error');
+              btn.disabled = false;
+            }
+          }
+        });
+      });
     }
 
     if (window.lucide) lucide.createIcons();

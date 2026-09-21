@@ -602,20 +602,24 @@
 /* ============================================
    Workout Active Screen (Mockup Realism)
    ============================================ */
+/* ============================================
+   Workout Active Screen (Mockup Realism)
+   ============================================ */
 .timer-pill {
   border: 2px solid var(--color-primary);
   color: var(--color-primary);
   border-radius: var(--radius-full);
-  padding: 0.4rem 1.1rem;
-  display: flex;
-  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  display: inline-flex;
+  gap: 0.4rem;
   align-items: center;
   font-family: monospace;
-  font-size: 1.6rem;
+  font-size: 1.25rem;
   font-weight: 700;
   background: rgba(183, 243, 74, 0.05);
-  box-shadow: 0 0 16px rgba(183, 243, 74, 0.1);
+  box-shadow: 0 0 14px rgba(183, 243, 74, 0.1);
   transition: all 0.3s ease;
+  flex-shrink: 0;
 }
 
 [data-theme="light"] .timer-pill {
@@ -624,8 +628,8 @@
 }
 
 .exercise-nav-btn {
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   border-radius: 50%;
   background: var(--color-surface-2);
   display: flex;
@@ -634,8 +638,15 @@
   color: var(--color-text-1);
   transition: all 0.2s ease;
   border: 1px solid var(--color-border-subtle);
+  flex-shrink: 0;
 }
 .exercise-nav-btn:hover { background: var(--color-surface-3); }
+
+.exercise-observation-box {
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
 
 .set-circle {
   width: 36px;
@@ -647,9 +658,10 @@
   align-items: center;
   justify-content: center;
   font-weight: 800;
-  font-size: 1.1rem;
+  font-size: 1rem;
   transition: all 0.3s ease;
   box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+  flex-shrink: 0;
 }
 .set-circle.completed {
   background: var(--color-primary);
@@ -660,19 +672,22 @@
 
 .set-input-mockup {
   background: rgba(255, 255, 255, 0.03);
-  border: none;
+  border: 1px solid var(--color-border);
   border-bottom: 2px solid var(--color-primary);
-  border-radius: 6px 6px 0 0;
+  border-radius: var(--radius-md);
   color: var(--color-text-1);
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   font-weight: 700;
-  padding: 0.6rem 0.8rem;
+  padding: 0.5rem 0.6rem;
   transition: all 0.2s ease;
+  box-sizing: border-box;
+  min-width: 0;
 }
 .set-input-mockup:focus {
   background: rgba(255, 255, 255, 0.06);
   outline: none;
   border-bottom-color: var(--color-primary-hover);
+  box-shadow: 0 0 8px rgba(183, 243, 74, 0.25);
 }
 [data-theme="light"] .set-input-mockup { background: rgba(0, 0, 0, 0.03); }
 [data-theme="light"] .set-input-mockup:focus { background: rgba(0, 0, 0, 0.05); }

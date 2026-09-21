@@ -160,3 +160,17 @@ window.FITTRACK.clearWorkoutHistory = async function() {
   }
 };
 
+/**
+ * Delete an individual workout from history
+ */
+window.FITTRACK.deleteWorkout = async function(workoutId) {
+  try {
+    await getHistoryRef().doc(workoutId).delete();
+    return true;
+  } catch (error) {
+    console.error('[DB] Error deleting workout:', error);
+    throw error;
+  }
+};
+
+

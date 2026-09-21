@@ -13,11 +13,12 @@ let activeWorkoutState = null;
 let workoutTimerInterval = null;
 let workoutDurationSeconds = 0;
 
-// New globals for single-exercise view and rest
+// Globals for single-exercise view and rest
 let currentExIndex = 0;
 let restTimerInterval = null;
 let restRemainingSeconds = 0;
 let saveTimeout = null;
+let isStartingWorkout = false;
 
 window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
   container.innerHTML = `
@@ -54,7 +55,7 @@ window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
       selectionEl.innerHTML = `<p class="text-color-3 text-sm">No tienes rutinas. Ve a "Rutinas" para crear una.</p>`;
     } else {
       selectionEl.innerHTML = routines.map(r => `
-        <div class="card card-interactive flex-row justify-between items-center" onclick="window.FITTRACK.screens.startRoutineWorkout('${r.id}')">
+        <div class="card card-interactive flex-row justify-between items-center" onclick="window.FITTRACK.screens.startRoutineWorkout('${r.id}', this)">
           <div>
             <h4 class="font-semibold text-lg">${r.name}</h4>
             <p class="text-color-2 text-sm">${r.exercises ? r.exercises.length : 0} ejercicios</p>
@@ -69,10 +70,19 @@ window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
   }
 };
 
-window.FITTRACK.screens.startRoutineWorkout = async function(routineId) {
+window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedEl) {
+  if (isStartingWorkout) return;
+  isStartingWorkout = true;
+
+  if (clickedEl) {
+    clickedEl.style.opacity = '0.7';
+    clickedEl.style.pointerEvents = 'none';
+  }
+
   try {
     const active = await window.FITTRACK.getActiveWorkout();
     if (active) {
+      activeWorkoutState = active;
       await window.FITTRACK.alert("Ya tienes un entrenamiento en curso. Termínalo antes de empezar otro.", "Entrenamiento en curso");
       window.location.hash = '#/workout/active';
       return;
@@ -80,20 +90,46 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId) {
 
     const routine = await window.FITTRACK.getRoutine(routineId);
     const workoutId = await window.FITTRACK.startWorkout(routine);
+    
+    // Set memory state immediately for instantaneous loading
+    activeWorkoutState = {
+      id: workoutId,
+      routineId: routine.id,
+      name: routine.name || 'Entrenamiento',
+      startTime: { seconds: Math.floor(Date.now() / 1000) },
+      status: 'in_progress',
+      exercises: (routine.exercises || []).map((ex, idx) => ({
+        id: ex.id || `ex_${idx}_${Date.now()}`,
+        type: ex.type || 'fuerza',
+        name: ex.name || 'Ejercicio',
+        targetSets: ex.sets || ex.targetSets || '3',
+        targetReps: ex.reps || ex.targetReps || '8-12',
+        targetRir: ex.rir !== undefined && ex.rir !== null ? String(ex.rir) : '',
+        notes: ex.notes || ex.observation || ex.observaciones || '',
+        muscle: ex.muscle || '',
+        weight: ex.weight || '',
+        rest: ex.rest || '',
+        sets: []
+      }))
+    };
+
     window.location.hash = '#/workout/active';
   } catch (error) {
     await window.FITTRACK.alert("Error al iniciar: " + error.message, "Error");
+  } finally {
+    isStartingWorkout = false;
   }
 };
 
 window.FITTRACK.screens.renderActiveWorkout = async function(container) {
-  container.innerHTML = `
-    <div class="flex-col items-center py-12"><div class="spinner"></div><p class="mt-4 text-color-2">Cargando entrenamiento...</p></div>
-  `;
+  if (!activeWorkoutState) {
+    container.innerHTML = `
+      <div class="flex-col items-center py-12"><div class="spinner"></div><p class="mt-4 text-color-2">Cargando entrenamiento...</p></div>
+    `;
+    activeWorkoutState = await window.FITTRACK.getActiveWorkout();
+  }
 
   try {
-    activeWorkoutState = await window.FITTRACK.getActiveWorkout();
-    
     if (!activeWorkoutState) {
       window.location.hash = '#/workout';
       return;
@@ -134,12 +170,12 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
             </div>
             
             <div class="timer-pill cursor-pointer flex-shrink-0" id="workout-timer-container">
-              <i data-lucide="timer" style="width:24px;height:24px;" id="timer-icon"></i>
+              <i data-lucide="timer" style="width:20px;height:20px;" id="timer-icon"></i>
               <span id="workout-timer">${formatTime(workoutDurationSeconds)}</span>
             </div>
           </div>
 
-          <!-- Title & Subtitle Row (Full Width - No horizontal squishing) -->
+          <!-- Title & Subtitle Row -->
           <div class="mt-2">
             <h1 class="text-2xl font-black text-color-1 leading-snug uppercase tracking-tight" style="word-break: break-word;">
               ${cleanTitle}
@@ -212,7 +248,7 @@ function renderCurrentExercise() {
   const ex = activeWorkoutState.exercises[currentExIndex];
   
   // Ensure sets
-  const targetSetsCount = parseInt(ex.targetSets) || 4;
+  const targetSetsCount = parseInt(ex.targetSets) || 3;
   if (!ex.sets) ex.sets = [];
   while (ex.sets.length < targetSetsCount) {
     ex.sets.push({ kg: '', reps: '', completed: false });
@@ -221,16 +257,17 @@ function renderCurrentExercise() {
   const hasPrev = currentExIndex > 0;
   const hasNext = currentExIndex < activeWorkoutState.exercises.length - 1;
 
+  // Format sets: 1 | Reps | Kg
   let setsHtml = ex.sets.map((set, setIndex) => `
-    <div class="flex-row items-center gap-4 mb-4 set-row-mockup relative">
-      <div class="set-circle cursor-pointer ${set.completed ? 'completed' : ''}" data-set="${setIndex}" title="Toca para completar">
-        ${setIndex + 1}
+    <div class="set-row flex-row items-center gap-3 p-2 rounded-xl bg-surface-2 border border-color-border mb-2">
+      <div class="set-circle cursor-pointer ${set.completed ? 'completed' : ''}" data-set="${setIndex}" title="Serie ${setIndex + 1}">
+        ${set.completed ? '<i data-lucide="check" style="width:16px;height:16px;"></i>' : (setIndex + 1)}
       </div>
       <div class="flex-1">
-        <input type="number" class="set-input-mockup w-full text-left" value="${set.reps || ''}" placeholder="-" data-set="${setIndex}" data-field="reps">
+        <input type="number" inputmode="decimal" class="set-input-mockup input-control w-full text-center" value="${set.reps || ''}" placeholder="Reps" data-set="${setIndex}" data-field="reps">
       </div>
       <div class="flex-1">
-        <input type="number" class="set-input-mockup w-full text-left" value="${set.kg || ''}" placeholder="-" data-set="${setIndex}" data-field="kg">
+        <input type="number" inputmode="decimal" class="set-input-mockup input-control w-full text-center" value="${set.kg || ''}" placeholder="Kg" data-set="${setIndex}" data-field="kg">
       </div>
     </div>
   `).join('');
@@ -239,14 +276,14 @@ function renderCurrentExercise() {
     <div class="card bg-surface px-5 py-6 rounded-3xl shadow-2xl relative overflow-hidden border border-color-border">
       
       <!-- Card Header: Nav + Title -->
-      <div class="flex-row justify-between items-center mb-6">
+      <div class="flex-row justify-between items-center mb-4">
         <button class="exercise-nav-btn" id="btn-prev-ex" ${!hasPrev ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
           <i data-lucide="chevron-left" style="width:24px;height:24px;"></i>
         </button>
         
         <div class="text-center flex-1 px-2">
           <h2 class="text-xl font-black text-color-1 leading-tight tracking-tight uppercase">${ex.name}</h2>
-          <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 4} × ${ex.targetReps || '10-12'}</span></p>
+          <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 3} × ${ex.targetReps || '8-12'}</span></p>
         </div>
         
         <button class="exercise-nav-btn" id="btn-next-ex" ${!hasNext ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
@@ -254,25 +291,33 @@ function renderCurrentExercise() {
         </button>
       </div>
 
-      <!-- Labels (Aligned with inputs) -->
-      <div class="flex-row items-center gap-4 mb-2" style="padding-left: 50px;">
-        <div class="flex-1 text-xs font-bold text-color-3 uppercase tracking-wider">Reps</div>
-        <div class="flex-1 text-xs font-bold text-color-3 uppercase tracking-wider">Kg</div>
+      <!-- Exercise Observations / Notes (Only if exists) -->
+      ${ex.notes && ex.notes.trim() ? `
+        <div class="exercise-observation-box mb-4 p-3 rounded-xl border border-color-border" style="background: rgba(183, 243, 74, 0.05); border-left: 3px solid var(--color-primary);">
+          <div class="flex-row items-center gap-2 mb-1">
+            <i data-lucide="file-text" style="width:14px;height:14px;color:var(--color-primary);"></i>
+            <span class="text-xs font-bold uppercase tracking-wider text-color-2">Observaciones</span>
+          </div>
+          <p class="text-sm text-color-1 leading-snug" style="word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap;">${ex.notes.trim()}</p>
+        </div>
+      ` : ''}
+
+      <!-- Labels Header: 1 | Reps | Kg -->
+      <div class="sets-header-row flex-row items-center gap-3 mb-2 px-1">
+        <div style="width:38px; text-align:center;" class="text-xs font-bold text-color-3 uppercase tracking-wider">#</div>
+        <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Reps</div>
+        <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Kg</div>
       </div>
 
       <!-- Sets List -->
-      <div class="sets-container mb-6">
+      <div class="sets-container mb-4">
         ${setsHtml}
         
-        <!-- Add set -->
-        <div class="flex-row items-center gap-4 mt-4 add-set-dashed cursor-pointer" id="btn-add-set-mockup">
-          <div class="set-circle-add">
-            <i data-lucide="plus" style="width:16px;height:16px;"></i>
-          </div>
-          <div class="flex-1 text-color-2 text-sm italic font-medium">Agregar serie</div>
-          <div class="flex-1 text-color-3 text-left pl-2">—</div>
-          <div class="flex-1 text-color-3 text-left pl-2">—</div>
-        </div>
+        <!-- Add set button -->
+        <button type="button" class="btn-add-set-row flex-row items-center justify-center gap-2 mt-3 w-full p-3 rounded-2xl border border-dashed border-color-border cursor-pointer bg-surface-2 transition-all hover:bg-surface-3" id="btn-add-set-mockup">
+          <i data-lucide="plus" style="width:18px;height:18px;color:var(--color-primary);"></i>
+          <span class="font-semibold text-sm text-primary">+ Agregar serie</span>
+        </button>
       </div>
 
       <!-- Main Actions -->
@@ -292,6 +337,7 @@ function renderCurrentExercise() {
   bindCurrentExerciseEvents();
 }
 
+
 function bindCurrentExerciseEvents() {
   const ex = activeWorkoutState.exercises[currentExIndex];
 
@@ -304,12 +350,16 @@ function bindCurrentExerciseEvents() {
 
   // Inputs
   document.querySelectorAll('.set-input-mockup').forEach(input => {
-    input.addEventListener('change', (e) => {
+    const handleInput = (e) => {
       const setIdx = parseInt(e.target.dataset.set);
       const field = e.target.dataset.field;
-      ex.sets[setIdx][field] = e.target.value;
-      saveWorkoutStateDebounced();
-    });
+      if (ex.sets[setIdx]) {
+        ex.sets[setIdx][field] = e.target.value;
+        saveWorkoutStateDebounced();
+      }
+    };
+    input.addEventListener('input', handleInput);
+    input.addEventListener('change', handleInput);
   });
 
   // Circle toggle

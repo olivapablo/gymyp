@@ -94,18 +94,22 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     // Show countdown overlay
     overlay = document.createElement('div');
     overlay.id = 'countdown-overlay';
-    const CIRCUMFERENCE = 2 * Math.PI * 90; // r=90
+    const R = 95;
+    const CIRCUMFERENCE = 2 * Math.PI * R;
     overlay.innerHTML = `
-      <div class="countdown-brand">FITTRACK</div>
+      <div class="countdown-badge">
+        <span class="countdown-badge-dot"></span>
+        <span>FITTRACK • PREPARACIÓN</span>
+      </div>
       <div class="countdown-ring-wrap">
-        <svg viewBox="0 0 200 200" width="200" height="200">
-          <circle class="countdown-ring-bg" cx="100" cy="100" r="90"/>
-          <circle class="countdown-ring-fill" id="countdown-ring" cx="100" cy="100" r="90"
+        <svg viewBox="0 0 220 220" width="220" height="220">
+          <circle class="countdown-ring-bg" cx="110" cy="110" r="${R}"/>
+          <circle class="countdown-ring-fill" id="countdown-ring" cx="110" cy="110" r="${R}"
             style="stroke-dasharray:${CIRCUMFERENCE}; stroke-dashoffset:0;"/>
         </svg>
         <div id="countdown-number">5</div>
       </div>
-      <div id="countdown-text">Prepárate</div>
+      <div id="countdown-text">Empieza en breve...</div>
     `;
     document.body.appendChild(overlay);
 
@@ -117,7 +121,11 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     for (let i = totalSeconds; i > 0; i--) {
       const numEl = document.getElementById('countdown-number');
       const ring = document.getElementById('countdown-ring');
-      if (numEl) numEl.textContent = i;
+      if (numEl) {
+        numEl.textContent = i;
+        numEl.style.transform = 'scale(1.15)';
+        setTimeout(() => { if (numEl) numEl.style.transform = 'scale(1)'; }, 150);
+      }
       if (ring) {
         const progress = (totalSeconds - i) / totalSeconds;
         ring.style.strokeDashoffset = CIRCUMFERENCE * progress;
@@ -131,13 +139,22 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     const ring = document.getElementById('countdown-ring');
     if (numEl) {
       numEl.textContent = '¡YA!';
-      numEl.style.fontSize = '3.8rem';
-      numEl.style.letterSpacing = '0.05em';
+      numEl.style.fontSize = '4.2rem';
+      numEl.style.color = '#B7F34A';
+      numEl.style.textShadow = '0 0 45px rgba(183, 243, 74, 0.9)';
+      numEl.style.transform = 'scale(1.1)';
     }
-    if (ring) ring.style.strokeDashoffset = '0';
-    if (textEl) textEl.textContent = '¡A entrenar!';
+    if (ring) {
+      ring.style.strokeDashoffset = '0';
+      ring.style.stroke = '#B7F34A';
+    }
+    if (textEl) {
+      textEl.textContent = '¡A DARLE CON TODO!';
+      textEl.style.color = '#B7F34A';
+      textEl.style.fontWeight = '800';
+    }
     
-    await new Promise(r => setTimeout(r, 700)); // Show YA for a brief moment
+    await new Promise(r => setTimeout(r, 750)); // Show YA for a moment
     
     await startPromise; // Ensure it finishes
     

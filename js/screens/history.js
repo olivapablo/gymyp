@@ -80,37 +80,46 @@ window.FITTRACK.screens.renderHistory = async function(container) {
         }
 
         return `
-          <div class="card card-interactive" id="history-card-${workout.id}">
-            <div class="flex-row justify-between items-start mb-2">
-              <div>
-                <h3 class="text-lg font-bold">${workout.name}</h3>
-                <span class="text-sm text-color-3">${dateStr}</span>
+          <div class="card" id="history-card-${workout.id}" style="padding:0;overflow:hidden;border-radius:var(--radius-2xl);">
+            <!-- Card Header -->
+            <div style="padding:1.1rem 1.25rem 0.85rem;border-bottom:1px solid var(--color-border-subtle);display:flex;justify-content:space-between;align-items:flex-start;">
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:0.6rem;font-weight:700;letter-spacing:0.18em;text-transform:uppercase;color:var(--color-text-3);margin-bottom:0.25rem;">
+                  ${dateStr}${timeStr ? ` · ${timeStr}` : ''}
+                </div>
+                <h3 style="font-size:1rem;font-weight:800;color:var(--color-text-1);letter-spacing:-0.01em;line-height:1.2;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${workout.name}</h3>
               </div>
-              <button class="btn-icon btn-delete-workout" data-id="${workout.id}" title="Eliminar entrenamiento" style="color: var(--color-error); padding: 6px; border-radius: var(--radius-md); background: rgba(255, 92, 92, 0.1); border: 1px solid rgba(255, 92, 92, 0.2);">
-                <i data-lucide="trash-2" style="width: 16px; height: 16px;"></i>
+              <button class="btn-delete-workout" data-id="${workout.id}" title="Eliminar entrenamiento"
+                style="margin-left:0.75rem;flex-shrink:0;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--color-error);background:rgba(255,92,92,0.08);border:1px solid rgba(255,92,92,0.15);transition:all 0.2s ease;">
+                <i data-lucide="trash-2" style="width:14px;height:14px;"></i>
               </button>
             </div>
-            
-            <div class="grid-actions" style="grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px;">
-              <div class="flex-col">
-                <span class="text-xs uppercase text-color-3">Volumen</span>
-                <span class="font-medium text-primary">${totalVolume} kg</span>
+            <!-- Stats row -->
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);padding:0.85rem 1.25rem;gap:0.5rem;">
+              <div style="display:flex;flex-direction:column;gap:0.15rem;">
+                <span style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-3);">Volumen</span>
+                <span style="font-size:1.05rem;font-weight:800;color:var(--color-primary);letter-spacing:-0.01em;">${totalVolume >= 1000 ? (totalVolume/1000).toFixed(1)+'t' : totalVolume+'kg'}</span>
               </div>
-              <div class="flex-col">
-                <span class="text-xs uppercase text-color-3">Series</span>
-                <span class="font-medium">${totalSets}</span>
+              <div style="display:flex;flex-direction:column;gap:0.15rem;border-left:1px solid var(--color-border-subtle);padding-left:0.75rem;">
+                <span style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-3);">Series</span>
+                <span style="font-size:1.05rem;font-weight:800;color:var(--color-text-1);">${totalSets}</span>
               </div>
-              <div class="flex-col">
-                <span class="text-xs uppercase text-color-3">Ejercicios</span>
-                <span class="font-medium">${exercisesCount}</span>
+              <div style="display:flex;flex-direction:column;gap:0.15rem;border-left:1px solid var(--color-border-subtle);padding-left:0.75rem;">
+                <span style="font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-3);">Ejercicios</span>
+                <span style="font-size:1.05rem;font-weight:800;color:var(--color-text-1);">${exercisesCount}</span>
               </div>
             </div>
-            
-            <div class="divider mt-0 mb-3" style="opacity: 0.5;"></div>
-            
-            <div class="flex-col gap-2">
-              ${workout.exercises.slice(0, 3).map(ex => `<div class="text-sm text-color-2 truncate">• ${ex.name}</div>`).join('')}
-              ${workout.exercises.length > 3 ? `<div class="text-xs text-color-3 italic">y ${workout.exercises.length - 3} más...</div>` : ''}
+            <!-- Exercise list -->
+            <div style="padding:0 1.25rem 1rem;display:flex;flex-direction:column;gap:0.3rem;">
+              ${workout.exercises.slice(0, 4).map((ex, i) => `
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                  <span style="width:5px;height:5px;border-radius:50%;background:${i === 0 ? 'var(--color-primary)' : 'var(--color-surface-3)'};flex-shrink:0;"></span>
+                  <span style="font-size:0.78rem;color:var(--color-text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ex.name}</span>
+                </div>
+              `).join('')}
+              ${workout.exercises.length > 4 ? `
+                <div style="font-size:0.72rem;color:var(--color-text-3);padding-left:1rem;font-style:italic;">+${workout.exercises.length - 4} más</div>
+              ` : ''}
             </div>
           </div>
         `;

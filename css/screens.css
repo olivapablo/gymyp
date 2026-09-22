@@ -606,25 +606,36 @@
    Workout Active Screen (Mockup Realism)
    ============================================ */
 .timer-pill {
-  border: 2px solid var(--color-primary);
+  border: 1.5px solid var(--color-primary);
   color: var(--color-primary);
   border-radius: var(--radius-full);
-  padding: 0.35rem 0.85rem;
+  padding: 0.35rem 0.95rem;
   display: inline-flex;
-  gap: 0.4rem;
+  gap: 0.45rem;
   align-items: center;
-  font-family: monospace;
-  font-size: 1.25rem;
-  font-weight: 700;
-  background: rgba(183, 243, 74, 0.05);
-  box-shadow: 0 0 14px rgba(183, 243, 74, 0.1);
-  transition: all 0.3s ease;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 1.15rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
+  background: rgba(183, 243, 74, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 0 20px rgba(183, 243, 74, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   flex-shrink: 0;
+  user-select: none;
+}
+
+.timer-pill:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 24px rgba(183, 243, 74, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 [data-theme="light"] .timer-pill {
-  background: rgba(90, 138, 16, 0.1);
-  box-shadow: 0 0 12px rgba(90, 138, 16, 0.15);
+  background: rgba(90, 138, 16, 0.08);
+  box-shadow: 0 2px 14px rgba(90, 138, 16, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  border-color: var(--color-primary);
 }
 
 .exercise-nav-btn {
@@ -751,44 +762,109 @@
 }
 
 /* ----------------------------------
-   Countdown Overlay
+   Countdown Overlay — Premium
    ---------------------------------- */
 #countdown-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background-color: var(--color-bg);
+  background: radial-gradient(ellipse at center, rgba(183, 243, 74, 0.04) 0%, var(--color-bg) 70%);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  transition: opacity 0.3s ease;
+  gap: 0;
+  transition: opacity 0.4s ease;
+  overflow: hidden;
+}
+
+/* Decorative background rings */
+#countdown-overlay::before {
+  content: '';
+  position: absolute;
+  width: 340px;
+  height: 340px;
+  border-radius: 50%;
+  border: 1px solid rgba(183, 243, 74, 0.08);
+  box-shadow: 0 0 0 60px rgba(183, 243, 74, 0.03), 0 0 0 120px rgba(183, 243, 74, 0.015);
+  animation: ring-pulse 3s ease-in-out infinite;
+}
+
+@keyframes ring-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.7; }
+  50% { transform: scale(1.06); opacity: 1; }
+}
+
+.countdown-brand {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.35em;
+  color: var(--color-text-3);
+  text-transform: uppercase;
+  margin-bottom: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.countdown-ring-wrap {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+  margin-bottom: 2.5rem;
+}
+
+.countdown-ring-wrap svg {
+  position: absolute;
+  inset: 0;
+  transform: rotate(-90deg);
+}
+
+.countdown-ring-bg {
+  fill: none;
+  stroke: rgba(183, 243, 74, 0.1);
+  stroke-width: 3;
+}
+
+.countdown-ring-fill {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 565; /* 2π × r=90 */
+  stroke-dashoffset: 0;
+  filter: drop-shadow(0 0 6px rgba(183, 243, 74, 0.6));
+  transition: stroke-dashoffset 0.9s linear;
 }
 
 #countdown-number {
-  font-size: 8rem;
+  font-size: 5.5rem;
   font-weight: 900;
   color: var(--color-primary);
-  text-shadow: 0 0 40px rgba(183, 243, 74, 0.4);
+  text-shadow: 0 0 40px rgba(183, 243, 74, 0.5);
   font-variant-numeric: tabular-nums;
-  animation: pulse-countdown 1s infinite;
+  line-height: 1;
+  position: relative;
+  z-index: 1;
+  animation: none;
 }
 
 #countdown-text {
-  font-size: 1.5rem;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--color-text-1);
-  margin-top: 1rem;
+  color: var(--color-text-2);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.25em;
+  position: relative;
+  z-index: 1;
 }
 
-@keyframes pulse-countdown {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.1); opacity: 0.8; }
-  100% { transform: scale(1); opacity: 1; }
+[data-theme="light"] #countdown-overlay {
+  background: radial-gradient(ellipse at center, rgba(90, 138, 16, 0.05) 0%, var(--color-bg) 70%);
 }
-
-[data-theme="light"] #countdown-number {
-  text-shadow: 0 0 30px rgba(90, 138, 16, 0.3);
-}
+[data-theme="light"] .countdown-ring-bg { stroke: rgba(90, 138, 16, 0.12); }
+[data-theme="light"] .countdown-ring-fill { stroke: var(--color-primary); filter: drop-shadow(0 0 6px rgba(90, 138, 16, 0.4)); }
+[data-theme="light"] #countdown-number { text-shadow: 0 0 30px rgba(90, 138, 16, 0.4); }

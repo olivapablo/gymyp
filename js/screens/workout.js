@@ -94,8 +94,17 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     // Show countdown overlay
     overlay = document.createElement('div');
     overlay.id = 'countdown-overlay';
+    const CIRCUMFERENCE = 2 * Math.PI * 90; // r=90
     overlay.innerHTML = `
-      <div id="countdown-number">5</div>
+      <div class="countdown-brand">FITTRACK</div>
+      <div class="countdown-ring-wrap">
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          <circle class="countdown-ring-bg" cx="100" cy="100" r="90"/>
+          <circle class="countdown-ring-fill" id="countdown-ring" cx="100" cy="100" r="90"
+            style="stroke-dasharray:${CIRCUMFERENCE}; stroke-dashoffset:0;"/>
+        </svg>
+        <div id="countdown-number">5</div>
+      </div>
       <div id="countdown-text">Prepárate</div>
     `;
     document.body.appendChild(overlay);
@@ -104,22 +113,31 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     let workoutId;
     const startPromise = window.FITTRACK.startWorkout(routine).then(id => workoutId = id);
 
-    for (let i = 5; i > 0; i--) {
+    const totalSeconds = 5;
+    for (let i = totalSeconds; i > 0; i--) {
       const numEl = document.getElementById('countdown-number');
+      const ring = document.getElementById('countdown-ring');
       if (numEl) numEl.textContent = i;
+      if (ring) {
+        const progress = (totalSeconds - i) / totalSeconds;
+        ring.style.strokeDashoffset = CIRCUMFERENCE * progress;
+      }
       await new Promise(r => setTimeout(r, 1000));
     }
     
     // Show ¡YA! message
     const numEl = document.getElementById('countdown-number');
     const textEl = document.getElementById('countdown-text');
+    const ring = document.getElementById('countdown-ring');
     if (numEl) {
       numEl.textContent = '¡YA!';
-      numEl.style.fontSize = '7rem';
+      numEl.style.fontSize = '3.8rem';
+      numEl.style.letterSpacing = '0.05em';
     }
-    if (textEl) textEl.style.display = 'none';
+    if (ring) ring.style.strokeDashoffset = '0';
+    if (textEl) textEl.textContent = '¡A entrenar!';
     
-    await new Promise(r => setTimeout(r, 600)); // Show YA for a brief moment
+    await new Promise(r => setTimeout(r, 700)); // Show YA for a brief moment
     
     await startPromise; // Ensure it finishes
     
@@ -225,15 +243,24 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
         </div>
         
         <!-- Rest Controls Bottom Sheet (Initially hidden with d-none) -->
-        <div id="rest-controls" class="fixed bottom-0 left-0 right-0 p-6 bg-surface border-t border-color-border transform translate-y-full transition-transform duration-300 z-50 rounded-t-3xl d-none">
-          <div class="flex-col items-center">
-            <h3 class="text-color-2 text-xs font-bold uppercase tracking-wider mb-3">Tiempo de descanso</h3>
-            <div class="text-5xl font-mono font-bold text-primary mb-6" id="rest-timer-display">01:30</div>
-            <div class="flex-row gap-4 w-full mb-4">
-              <button class="btn btn-secondary flex-1 py-3 text-lg" id="btn-rest-minus">-30s</button>
-              <button class="btn btn-secondary flex-1 py-3 text-lg" id="btn-rest-plus">+30s</button>
+        <div id="rest-controls" class="fixed bottom-0 left-0 right-0 bg-surface transform translate-y-full transition-transform duration-300 z-50 rounded-t-3xl d-none" style="box-shadow: 0 -20px 60px rgba(0,0,0,0.7); border-top: 1px solid rgba(255,255,255,0.07);">
+          <!-- Handle bar -->
+          <div class="flex justify-center pt-3 pb-1">
+            <div style="width:36px;height:4px;border-radius:2px;background:var(--color-surface-3);"></div>
+          </div>
+          <div class="flex-col items-center px-6 pb-8 pt-2">
+            <h3 class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--color-text-3);letter-spacing:0.2em;">Tiempo de descanso</h3>
+            <div id="rest-timer-display" style="font-size:4.5rem;font-weight:900;font-family:monospace;color:var(--color-primary);text-shadow:0 0 30px rgba(183,243,74,0.4);line-height:1;margin:0.75rem 0 1.5rem;">01:30</div>
+            <div class="flex-row gap-3 w-full mb-4">
+              <button class="flex-1 py-3 rounded-2xl font-bold text-base" id="btn-rest-minus"
+                style="background:var(--color-surface-2);color:var(--color-text-1);border:1px solid var(--color-border);">−30s</button>
+              <button class="flex-1 py-3 rounded-2xl font-bold text-base" id="btn-rest-plus"
+                style="background:var(--color-surface-2);color:var(--color-text-1);border:1px solid var(--color-border);">+30s</button>
             </div>
-            <button class="btn btn-primary btn-block py-3 text-lg" id="btn-rest-skip">Saltar Descanso</button>
+            <button class="btn btn-primary btn-block py-4 rounded-2xl text-base font-bold" id="btn-rest-skip">
+              <i data-lucide="skip-forward" style="width:18px;height:18px;margin-right:6px;"></i>
+              Saltar descanso
+            </button>
           </div>
         </div>
         <div id="rest-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-40 d-none backdrop-blur-sm transition-opacity" style="opacity:0;"></div>

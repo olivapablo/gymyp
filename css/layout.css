@@ -196,6 +196,7 @@ body {
     z-index: var(--z-sticky);
     padding: var(--space-6) var(--space-4);
     box-shadow: 2px 0 12px rgba(0, 0, 0, 0.25);
+    overflow-x: hidden;
   }
 
   .sidebar-brand {
@@ -236,6 +237,11 @@ body {
     gap: var(--space-1);
     flex: 1;
     overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+  }
+  .sidebar-nav::-webkit-scrollbar {
+    display: none;
   }
 
   .sidebar-item {
@@ -265,7 +271,6 @@ body {
     color: var(--color-text-1);
     border-color: rgba(255, 255, 255, 0.08);
     box-shadow: 0 1px 0 rgba(255, 255, 255, 0.15) inset, 0 4px 12px rgba(0, 0, 0, 0.25);
-    transform: translateX(2px);
   }
 
   .sidebar-item.active {
@@ -283,6 +288,7 @@ body {
     padding-top: var(--space-4);
     border-top: 1px solid var(--color-border-subtle);
     margin-top: auto;
+    flex-shrink: 0;
   }
 
   .sidebar-user-chip {

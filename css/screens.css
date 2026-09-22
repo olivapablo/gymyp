@@ -1139,3 +1139,191 @@
   position: relative;
   z-index: 2;
 }
+
+/* ----------------------------------
+   Workout Finished Summary Modal
+   ---------------------------------- */
+.workout-summary-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 12, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.workout-summary-card {
+  width: 100%;
+  max-width: 440px;
+  background: radial-gradient(circle at 50% 0%, rgba(183, 243, 74, 0.08) 0%, #15191E 60%);
+  border: 1px solid rgba(183, 243, 74, 0.3);
+  border-radius: 2rem;
+  padding: 2rem 1.5rem 1.75rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(183, 243, 74, 0.15);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-sizing: border-box;
+  animation: summaryPop 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes summaryPop {
+  0% { transform: scale(0.85) translateY(20px); opacity: 0; }
+  100% { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+.summary-trophy-badge {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(183, 243, 74, 0.25) 0%, rgba(183, 243, 74, 0.05) 70%);
+  border: 2px solid #B7F34A;
+  box-shadow: 0 0 24px rgba(183, 243, 74, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #B7F34A;
+  margin-bottom: 1.25rem;
+}
+
+.summary-headline {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+}
+
+.summary-subtext {
+  font-size: 0.82rem;
+  color: var(--color-text-2);
+  margin-bottom: 1.4rem;
+}
+
+/* 4-Stat Grid */
+.summary-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  width: 100%;
+  margin-bottom: 1.25rem;
+}
+
+.summary-stat-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 1.15rem;
+  padding: 0.85rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.summary-stat-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-3);
+}
+
+.summary-stat-val {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: #FFFFFF;
+  line-height: 1.1;
+  font-family: ui-monospace, monospace;
+}
+
+.summary-stat-val.primary {
+  color: #B7F34A;
+}
+
+/* Summary Exercise Chips */
+.summary-exercises-list {
+  width: 100%;
+  max-height: 120px;
+  overflow-y: auto;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 1rem;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.summary-ex-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.78rem;
+  color: var(--color-text-2);
+}
+
+.summary-ex-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 220px;
+}
+
+.summary-ex-sets {
+  font-weight: 700;
+  color: #B7F34A;
+  font-size: 0.75rem;
+}
+
+/* Light Theme summary card overrides */
+[data-theme="light"] .workout-summary-overlay {
+  background: rgba(15, 20, 25, 0.85);
+}
+
+[data-theme="light"] .workout-summary-card {
+  background: radial-gradient(circle at 50% 0%, rgba(90, 138, 16, 0.1) 0%, #FFFFFF 70%);
+  border-color: rgba(90, 138, 16, 0.35);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3), 0 0 24px rgba(90, 138, 16, 0.15);
+}
+
+[data-theme="light"] .summary-headline {
+  color: #111417;
+}
+
+[data-theme="light"] .summary-stat-box {
+  background: #F4F6F8;
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .summary-stat-val {
+  color: #111417;
+}
+
+[data-theme="light"] .summary-stat-val.primary {
+  color: #5A8A10;
+}
+
+[data-theme="light"] .summary-trophy-badge {
+  background: radial-gradient(circle, rgba(90, 138, 16, 0.2) 0%, rgba(90, 138, 16, 0.04) 70%);
+  border-color: #5A8A10;
+  color: #5A8A10;
+  box-shadow: 0 0 20px rgba(90, 138, 16, 0.3);
+}
+
+[data-theme="light"] .summary-exercises-list {
+  background: #F4F6F8;
+}
+
+[data-theme="light"] .summary-ex-sets {
+  color: #5A8A10;
+}

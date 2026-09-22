@@ -126,6 +126,9 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
         numEl.style.transform = 'scale(1.15)';
         setTimeout(() => { if (numEl) numEl.style.transform = 'scale(1)'; }, 150);
       }
+      if (window.FITTRACK.audio) {
+        window.FITTRACK.audio.playCountdownTick(i === 1 ? 880 : 587.33);
+      }
       if (ring) {
         const progress = (totalSeconds - i) / totalSeconds;
         ring.style.strokeDashoffset = CIRCUMFERENCE * progress;
@@ -137,6 +140,9 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
     const numEl = document.getElementById('countdown-number');
     const textEl = document.getElementById('countdown-text');
     const ring = document.getElementById('countdown-ring');
+    if (window.FITTRACK.audio) {
+      window.FITTRACK.audio.playStartGoSound();
+    }
     if (numEl) {
       numEl.textContent = '¡YA!';
       numEl.style.fontSize = '4.2rem';
@@ -515,13 +521,111 @@ function bindCurrentExerciseEvents() {
      if (ok) {
        if (workoutTimerInterval) clearInterval(workoutTimerInterval);
        try {
+         const finalState = JSON.parse(JSON.stringify(activeWorkoutState));
+         const durationSecs = workoutDurationSeconds;
+         
          await window.FITTRACK.finishWorkout(activeWorkoutState.id, activeWorkoutState);
          activeWorkoutState = null;
-         window.location.hash = '#/history';
+         
+         showWorkoutSummaryModal(finalState, durationSecs);
        } catch (err) {
          window.FITTRACK.alert("Error al finalizar: " + err.message, "Error");
        }
      }
+  });
+}
+
+function showWorkoutSummaryModal(workoutData, durationSeconds) {
+  if (window.FITTRACK.audio) {
+    window.FITTRACK.audio.playFinishWorkoutSound();
+  }
+  if (navigator.vibrate) {
+    navigator.vibrate([200, 100, 300]);
+  }
+
+  let totalVolume = 0;
+  let totalSets = 0;
+  let completedSets = 0;
+  const exercisesList = workoutData.exercises || [];
+
+  exercisesList.forEach(ex => {
+    if (ex.sets) {
+      ex.sets.forEach(set => {
+        totalSets++;
+        if (set.completed) {
+          completedSets++;
+          const w = parseFloat(set.kg) || 0;
+          const r = parseInt(set.reps) || 0;
+          totalVolume += w * r;
+        }
+      });
+    }
+  });
+
+  const modal = document.createElement('div');
+  modal.className = 'workout-summary-overlay';
+  modal.innerHTML = `
+    <div class="workout-summary-card">
+      <div class="summary-trophy-badge">
+        <i data-lucide="trophy" style="width:36px;height:36px;"></i>
+      </div>
+      
+      <h2 class="summary-headline">¡Entrenamiento Finalizado!</h2>
+      <p class="summary-subtext">${workoutData.name || 'Gran sesión completada'}</p>
+      
+      <div class="summary-stats-grid">
+        <div class="summary-stat-box">
+          <span class="summary-stat-label">Tiempo</span>
+          <span class="summary-stat-val primary">${formatTime(durationSeconds)}</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="summary-stat-label">Volumen</span>
+          <span class="summary-stat-val">${totalVolume >= 1000 ? (totalVolume/1000).toFixed(1) + ' t' : totalVolume + ' kg'}</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="summary-stat-label">Series</span>
+          <span class="summary-stat-val">${completedSets} / ${totalSets}</span>
+        </div>
+        <div class="summary-stat-box">
+          <span class="summary-stat-label">Ejercicios</span>
+          <span class="summary-stat-val">${exercisesList.length}</span>
+        </div>
+      </div>
+      
+      <div class="summary-exercises-list">
+        ${exercisesList.map(ex => {
+          const cSets = (ex.sets || []).filter(s => s.completed).length;
+          return `
+            <div class="summary-ex-item">
+              <span class="summary-ex-name">• ${ex.name}</span>
+              <span class="summary-ex-sets">${cSets} series</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+      
+      <div class="flex-col gap-2 w-full">
+        <button class="btn btn-primary btn-block py-3 text-base font-bold" id="btn-summary-history">
+          <i data-lucide="clock" style="width:18px;height:18px;"></i> Ver en Historial
+        </button>
+        <button class="btn btn-secondary btn-block py-3 text-sm font-semibold" id="btn-summary-home">
+          Ir al Inicio
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+  if (window.lucide) lucide.createIcons();
+
+  document.getElementById('btn-summary-history').addEventListener('click', () => {
+    modal.remove();
+    window.location.hash = '#/history';
+  });
+
+  document.getElementById('btn-summary-home').addEventListener('click', () => {
+    modal.remove();
+    window.location.hash = '#/';
   });
 }
 
@@ -604,9 +708,13 @@ function startWorkoutTimer() {
     workoutDurationSeconds++;
     
     if (restRemainingSeconds > 0) {
+      if (restRemainingSeconds <= 5 && restRemainingSeconds >= 1) {
+        if (window.FITTRACK.audio) window.FITTRACK.audio.playRestWarningTick(restRemainingSeconds);
+      }
       restRemainingSeconds--;
       if (restRemainingSeconds <= 0) {
         restRemainingSeconds = 0;
+        if (window.FITTRACK.audio) window.FITTRACK.audio.playRestFinishedSound();
         if (window.FITTRACK.toast) window.FITTRACK.toast("¡Descanso completado! Siguiente serie");
         if (navigator.vibrate) navigator.vibrate([150, 80, 150]);
       }

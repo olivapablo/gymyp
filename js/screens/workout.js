@@ -311,6 +311,19 @@ function renderCurrentExercise() {
   container.innerHTML = `
     <div class="card bg-surface px-5 py-6 rounded-3xl shadow-2xl relative overflow-hidden border border-color-border">
       
+      <!-- Progress indicator -->
+      <div class="flex-row justify-center items-center gap-1 mb-4">
+        ${activeWorkoutState.exercises.map((_, i) => `
+          <div style="
+            width: ${i === currentExIndex ? '20px' : '6px'};
+            height: 6px;
+            border-radius: 3px;
+            background: ${i === currentExIndex ? 'var(--color-primary)' : (i < currentExIndex ? 'rgba(183,243,74,0.35)' : 'var(--color-surface-3)')};
+            transition: all 0.3s ease;
+          "></div>
+        `).join('')}
+      </div>
+
       <!-- Card Header: Nav + Title -->
       <div class="flex-row justify-between items-center mb-4">
         <button class="exercise-nav-btn" id="btn-prev-ex" ${!hasPrev ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
@@ -318,6 +331,7 @@ function renderCurrentExercise() {
         </button>
         
         <div class="text-center flex-1 px-2">
+          <div class="text-xs font-bold text-color-3 uppercase tracking-widest mb-1">${currentExIndex + 1} de ${activeWorkoutState.exercises.length}</div>
           <h2 class="text-xl font-black text-color-1 leading-tight tracking-tight uppercase">${ex.name}</h2>
           <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 3} × ${ex.targetReps || '8-12'}</span></p>
         </div>
@@ -327,14 +341,11 @@ function renderCurrentExercise() {
         </button>
       </div>
 
-      <!-- Exercise Observations / Notes (Clean compact card) -->
+      <!-- Exercise Observations / Notes (Premium compact card) -->
       ${ex.notes && ex.notes.trim() ? `
-        <div class="exercise-observation-card mb-4">
-          <div class="observation-header">
-            <i data-lucide="file-text"></i>
-            <span>Observación</span>
-          </div>
-          <div class="observation-body">${ex.notes.trim()}</div>
+        <div class="exercise-observation-card">
+          <svg class="obs-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span class="obs-body">${ex.notes.trim()}</span>
         </div>
       ` : ''}
 
@@ -358,14 +369,19 @@ function renderCurrentExercise() {
 
       <!-- Main Actions -->
       <button class="btn btn-primary btn-block py-4 rounded-2xl text-lg shadow-glow" id="btn-guardar-serie">
-        <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i> Guardar serie
+        <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i>
+        ${ex.sets.every(s => s.completed) ? 'Siguiente ejercicio' : 'Guardar serie'}
       </button>
       
-      <button class="btn btn-secondary btn-block mt-4 py-4 rounded-2xl text-lg" id="btn-finish-workout-final">
-        Finalizar Entrenamiento
+      <!-- Finish workout — subtle danger button, always visible -->
+      <button class="btn btn-block mt-3 py-3 rounded-2xl text-sm font-semibold" id="btn-finish-workout-final"
+        style="background:transparent; border:1px solid rgba(255,92,92,0.25); color:var(--color-error); letter-spacing:0.03em;">
+        <i data-lucide="flag" style="width:15px;height:15px;margin-right:6px;"></i>
+        Finalizar entrenamiento
       </button>
     </div>
   `;
+
   
   if (window.lucide) lucide.createIcons();
   bindCurrentExerciseEvents();

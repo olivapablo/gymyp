@@ -15,7 +15,7 @@ let workoutDurationSeconds = 0;
 
 // Globals for single-exercise view and rest
 let currentExIndex = 0;
-let restTimerInterval = null;
+let restTotalSeconds = 90;
 let restRemainingSeconds = 0;
 let saveTimeout = null;
 let isStartingWorkout = false;
@@ -226,9 +226,9 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
     container.innerHTML = `
       <div id="workout-ui-root" class="pb-24 pt-2">
         <!-- Clean Professional Header Structure -->
-        <div class="px-4 mb-8" style="margin-bottom: 2.5rem;">
-          <!-- Top Row: Back Button, Day Badge & Timer -->
-          <div class="flex-row justify-between items-center mb-4">
+        <div class="px-4 mb-6">
+          <!-- Top Row: Back Button & Day Badge -->
+          <div class="flex-row justify-between items-center mb-3">
             <div class="flex-row items-center gap-2">
               <button id="btn-back-workout" class="btn-icon bg-surface-2 text-color-1 rounded-full flex items-center justify-center" style="width:38px;height:38px;">
                 <i data-lucide="arrow-left" style="width:20px;height:20px;"></i>
@@ -239,48 +239,20 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
                 </span>
               ` : ''}
             </div>
-            
-            <div class="timer-pill cursor-pointer flex-shrink-0" id="workout-timer-container">
-              <i data-lucide="timer" style="width:20px;height:20px;" id="timer-icon"></i>
-              <span id="workout-timer">${formatTime(workoutDurationSeconds)}</span>
-            </div>
           </div>
 
           <!-- Title & Subtitle Row -->
-          <div class="mt-2">
+          <div class="mt-1">
             <h1 class="text-2xl font-black text-color-1 leading-snug uppercase tracking-tight" style="word-break: break-word;">
               ${cleanTitle}
             </h1>
-            ${muscleSubtitle ? `<p class="text-xs text-color-2 mt-2 font-medium tracking-wide leading-relaxed">${muscleSubtitle}</p>` : ''}
+            ${muscleSubtitle ? `<p class="text-xs text-color-2 mt-1 font-medium tracking-wide leading-relaxed">${muscleSubtitle}</p>` : ''}
           </div>
         </div>
 
         <!-- Single Exercise Card Container -->
         <div id="exercise-card-container" class="px-4">
         </div>
-        
-        <!-- Rest Controls Bottom Sheet (Initially hidden with d-none) -->
-        <div id="rest-controls" class="fixed bottom-0 left-0 right-0 bg-surface transform translate-y-full transition-transform duration-300 z-50 rounded-t-3xl d-none" style="box-shadow: 0 -20px 60px rgba(0,0,0,0.7); border-top: 1px solid rgba(255,255,255,0.07);">
-          <!-- Handle bar -->
-          <div class="flex justify-center pt-3 pb-1">
-            <div style="width:36px;height:4px;border-radius:2px;background:var(--color-surface-3);"></div>
-          </div>
-          <div class="flex-col items-center px-6 pb-8 pt-2">
-            <h3 class="text-xs font-bold uppercase tracking-widest mb-1" style="color:var(--color-text-3);letter-spacing:0.2em;">Tiempo de descanso</h3>
-            <div id="rest-timer-display" style="font-size:4.5rem;font-weight:900;font-family:monospace;color:var(--color-primary);text-shadow:0 0 30px rgba(183,243,74,0.4);line-height:1;margin:0.75rem 0 1.5rem;">01:30</div>
-            <div class="flex-row gap-3 w-full mb-4">
-              <button class="flex-1 py-3 rounded-2xl font-bold text-base" id="btn-rest-minus"
-                style="background:var(--color-surface-2);color:var(--color-text-1);border:1px solid var(--color-border);">−30s</button>
-              <button class="flex-1 py-3 rounded-2xl font-bold text-base" id="btn-rest-plus"
-                style="background:var(--color-surface-2);color:var(--color-text-1);border:1px solid var(--color-border);">+30s</button>
-            </div>
-            <button class="btn btn-primary btn-block py-4 rounded-2xl text-base font-bold" id="btn-rest-skip">
-              <i data-lucide="skip-forward" style="width:18px;height:18px;margin-right:6px;"></i>
-              Saltar descanso
-            </button>
-          </div>
-        </div>
-        <div id="rest-overlay" class="fixed inset-0 bg-black bg-opacity-60 z-40 d-none backdrop-blur-sm transition-opacity" style="opacity:0;"></div>
       </div>
     `;
 
@@ -291,17 +263,6 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
 
     // Bind Header Events
     document.getElementById('btn-back-workout').addEventListener('click', () => { window.location.hash = '#/'; });
-    
-    // Rest Modal Events
-    document.getElementById('workout-timer-container').addEventListener('click', () => {
-      if(restRemainingSeconds > 0) openRestControls();
-      else window.FITTRACK.toast('Inicia un descanso completando una serie');
-    });
-    
-    document.getElementById('rest-overlay').addEventListener('click', closeRestControls);
-    document.getElementById('btn-rest-skip').addEventListener('click', skipRest);
-    document.getElementById('btn-rest-plus').addEventListener('click', () => { restRemainingSeconds += 30; updateRestDisplay(); });
-    document.getElementById('btn-rest-minus').addEventListener('click', () => { restRemainingSeconds = Math.max(0, restRemainingSeconds - 30); updateRestDisplay(); });
 
   } catch (e) {
     container.innerHTML = `<div class="card bg-error-dim border-error text-error m-4">Error cargando sesión: ${e.message}</div>`;
@@ -337,21 +298,6 @@ function renderCurrentExercise() {
   const hasPrev = currentExIndex > 0;
   const hasNext = currentExIndex < activeWorkoutState.exercises.length - 1;
 
-  // Format sets: 1 | Reps | Kg
-  let setsHtml = ex.sets.map((set, setIndex) => `
-    <div class="set-row flex-row items-center gap-3 p-2 rounded-xl bg-surface-2 border border-color-border mb-2">
-      <div class="set-circle cursor-pointer ${set.completed ? 'completed' : ''}" data-set="${setIndex}" title="Serie ${setIndex + 1}">
-        ${set.completed ? '<i data-lucide="check" style="width:16px;height:16px;"></i>' : (setIndex + 1)}
-      </div>
-      <div class="flex-1">
-        <input type="number" inputmode="decimal" class="set-input-mockup w-full text-center" value="${set.reps || ''}" placeholder="Reps" data-set="${setIndex}" data-field="reps">
-      </div>
-      <div class="flex-1">
-        <input type="number" inputmode="decimal" class="set-input-mockup w-full text-center" value="${set.kg || ''}" placeholder="Kg" data-set="${setIndex}" data-field="kg">
-      </div>
-    </div>
-  `).join('');
-
   container.innerHTML = `
     <div class="card bg-surface px-5 py-6 rounded-3xl shadow-2xl relative overflow-hidden border border-color-border">
       
@@ -369,7 +315,7 @@ function renderCurrentExercise() {
       </div>
 
       <!-- Card Header: Nav + Title -->
-      <div class="flex-row justify-between items-center mb-4">
+      <div class="flex-row justify-between items-center mb-3">
         <button class="exercise-nav-btn" id="btn-prev-ex" ${!hasPrev ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
           <i data-lucide="chevron-left" style="width:24px;height:24px;"></i>
         </button>
@@ -387,22 +333,61 @@ function renderCurrentExercise() {
 
       <!-- Exercise Observations / Notes (Premium compact card) -->
       ${ex.notes && ex.notes.trim() ? `
-        <div class="exercise-observation-card">
+        <div class="exercise-observation-card mb-3">
           <svg class="obs-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           <span class="obs-body">${ex.notes.trim()}</span>
         </div>
       ` : ''}
 
-      <!-- Labels Header: # | Reps | Kg -->
-      <div class="sets-header-row flex-row items-center gap-3 mb-2 px-1">
-        <div style="width:36px; text-align:center;" class="text-xs font-bold text-color-3 uppercase tracking-wider">#</div>
-        <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Reps</div>
-        <div class="flex-1 text-center text-xs font-bold text-color-3 uppercase tracking-wider">Kg</div>
+      <!-- Central Circular Timer Dial Widget -->
+      <div class="workout-dial-container">
+        <div class="workout-dial-widget" id="workout-dial-widget" title="Temporizador">
+          <svg viewBox="0 0 170 170">
+            <circle class="dial-track-bg" cx="85" cy="85" r="75"></circle>
+            <circle class="dial-progress-fill" id="dial-progress-ring" cx="85" cy="85" r="75"></circle>
+          </svg>
+          <div class="dial-inner-disk">
+            <div class="dial-time" id="dial-time-display">${restRemainingSeconds > 0 ? formatTime(restRemainingSeconds) : formatTime(workoutDurationSeconds)}</div>
+            <div class="dial-label" id="dial-label-display">${restRemainingSeconds > 0 ? 'DESCANSO' : 'ENTRENANDO'}</div>
+          </div>
+        </div>
+        
+        <!-- Quick rest actions when resting -->
+        <div class="dial-rest-actions ${restRemainingSeconds > 0 ? '' : 'd-none'}" id="dial-rest-actions">
+          <button type="button" class="dial-action-btn" id="btn-dial-minus15">−15s</button>
+          <button type="button" class="dial-action-btn skip" id="btn-dial-skip">Saltar</button>
+          <button type="button" class="dial-action-btn" id="btn-dial-plus15">+15s</button>
+        </div>
+      </div>
+
+      <!-- Labels Header: # | REPS | KG -->
+      <div class="sets-header-row">
+        <div class="sets-header-col-num">#</div>
+        <div class="sets-header-col-reps">REPS</div>
+        <div class="sets-header-col-kg">KG</div>
+        <div class="sets-header-col-check"></div>
       </div>
 
       <!-- Sets List -->
       <div class="sets-container mb-4">
-        ${setsHtml}
+        ${ex.sets.map((set, setIndex) => `
+          <div class="set-row-luxury ${set.completed ? 'completed' : ''}" data-set="${setIndex}">
+            <div class="set-badge cursor-pointer" data-set="${setIndex}" title="Serie ${setIndex + 1}">
+              ${setIndex + 1}
+            </div>
+            <div class="set-inputs-wrap">
+              <input type="number" inputmode="decimal" class="set-input-num" value="${set.reps || ''}" placeholder="8" data-set="${setIndex}" data-field="reps">
+              <div class="set-divider"></div>
+              <input type="number" inputmode="decimal" class="set-input-num" value="${set.kg || ''}" placeholder="40" data-set="${setIndex}" data-field="kg">
+            </div>
+            <div class="set-check-btn ${set.completed ? 'completed' : 'pending'}" data-set="${setIndex}" title="${set.completed ? 'Completada' : 'Marcar como completada'}">
+              ${set.completed 
+                ? `<svg class="set-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>` 
+                : `<div class="set-check-ring"></div>`
+              }
+            </div>
+          </div>
+        `).join('')}
         
         <!-- Add set button -->
         <button type="button" class="btn-add-set-row flex-row items-center justify-center gap-2 mt-3 w-full p-3 rounded-2xl border border-dashed border-color-border cursor-pointer bg-surface-2 transition-all hover:bg-surface-3" id="btn-add-set-mockup">
@@ -426,11 +411,10 @@ function renderCurrentExercise() {
     </div>
   `;
 
-  
   if (window.lucide) lucide.createIcons();
   bindCurrentExerciseEvents();
+  updateDialDisplay();
 }
-
 
 function bindCurrentExerciseEvents() {
   const ex = activeWorkoutState.exercises[currentExIndex];
@@ -443,7 +427,7 @@ function bindCurrentExerciseEvents() {
   if(btnNext) btnNext.addEventListener('click', () => { currentExIndex++; renderCurrentExercise(); });
 
   // Inputs
-  document.querySelectorAll('.set-input-mockup').forEach(input => {
+  document.querySelectorAll('.set-input-num').forEach(input => {
     const handleInput = (e) => {
       const setIdx = parseInt(e.target.dataset.set);
       const field = e.target.dataset.field;
@@ -456,15 +440,49 @@ function bindCurrentExerciseEvents() {
     input.addEventListener('change', handleInput);
   });
 
-  // Circle toggle
-  document.querySelectorAll('.set-circle').forEach(circle => {
-    circle.addEventListener('click', (e) => {
+  // Badge click & Check button toggle
+  const toggleSetComplete = (setIdx) => {
+    const isNowCompleted = !ex.sets[setIdx].completed;
+    ex.sets[setIdx].completed = isNowCompleted;
+    saveWorkoutStateDebounced();
+    renderCurrentExercise();
+    
+    if (isNowCompleted) {
+      const restTime = parseInt(ex.rest) || 90;
+      startRestTimer(restTime);
+    }
+  };
+
+  document.querySelectorAll('.set-badge').forEach(badge => {
+    badge.addEventListener('click', (e) => {
       const setIdx = parseInt(e.currentTarget.dataset.set);
-      ex.sets[setIdx].completed = !ex.sets[setIdx].completed;
-      saveWorkoutStateDebounced();
-      renderCurrentExercise();
+      toggleSetComplete(setIdx);
     });
   });
+
+  document.querySelectorAll('.set-check-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const setIdx = parseInt(e.currentTarget.dataset.set);
+      toggleSetComplete(setIdx);
+    });
+  });
+
+  // Dial rest quick action events
+  const btnMinus15 = document.getElementById('btn-dial-minus15');
+  if (btnMinus15) btnMinus15.addEventListener('click', () => {
+    restRemainingSeconds = Math.max(0, restRemainingSeconds - 15);
+    updateDialDisplay();
+  });
+
+  const btnPlus15 = document.getElementById('btn-dial-plus15');
+  if (btnPlus15) btnPlus15.addEventListener('click', () => {
+    restRemainingSeconds += 15;
+    restTotalSeconds = Math.max(restTotalSeconds, restRemainingSeconds);
+    updateDialDisplay();
+  });
+
+  const btnSkip = document.getElementById('btn-dial-skip');
+  if (btnSkip) btnSkip.addEventListener('click', skipRest);
 
   // Add set
   const btnAdd = document.getElementById('btn-add-set-mockup');
@@ -479,12 +497,7 @@ function bindCurrentExerciseEvents() {
   if(btnGuardar) btnGuardar.addEventListener('click', () => {
     const setIdx = ex.sets.findIndex(s => !s.completed);
     if (setIdx !== -1) {
-      ex.sets[setIdx].completed = true;
-      saveWorkoutStateDebounced();
-      renderCurrentExercise();
-      
-      const restTime = parseInt(ex.rest) || 90;
-      startRestTimer(restTime);
+      toggleSetComplete(setIdx);
     } else {
       if (currentExIndex < activeWorkoutState.exercises.length - 1) {
         currentExIndex++;
@@ -501,7 +514,6 @@ function bindCurrentExerciseEvents() {
      const ok = await window.FITTRACK.confirm('¿Terminaste tu entrenamiento?', 'Finalizar Sesión', 'Finalizar', 'Continuar');
      if (ok) {
        if (workoutTimerInterval) clearInterval(workoutTimerInterval);
-       if (restTimerInterval) clearInterval(restTimerInterval);
        try {
          await window.FITTRACK.finishWorkout(activeWorkoutState.id, activeWorkoutState);
          activeWorkoutState = null;
@@ -527,101 +539,99 @@ function saveWorkoutStateDebounced() {
 }
 
 // ------------------------------------
-// Timer & Rest Logic
+// Timer & Rest Logic (In-Dial Widget)
 // ------------------------------------
+
+function updateDialDisplay() {
+  const timeEl = document.getElementById('dial-time-display');
+  const labelEl = document.getElementById('dial-label-display');
+  const ringEl = document.getElementById('dial-progress-ring');
+  const widgetEl = document.getElementById('workout-dial-widget');
+  const restActions = document.getElementById('dial-rest-actions');
+  const DIAL_CIRC = 2 * Math.PI * 75; // 471.24
+
+  if (!timeEl || !labelEl || !ringEl) return;
+
+  if (restRemainingSeconds > 0) {
+    timeEl.textContent = formatTime(restRemainingSeconds);
+    labelEl.textContent = 'DESCANSO';
+    if (restActions) restActions.classList.remove('d-none');
+
+    const progress = restTotalSeconds > 0 ? (restRemainingSeconds / restTotalSeconds) : 0;
+    ringEl.style.strokeDashoffset = (DIAL_CIRC * (1 - progress)).toString();
+
+    // Dynamic Color Progression as rest decreases
+    let color = '#B7F34A'; // Green (default)
+    let glowColor = 'rgba(183, 243, 74, 0.55)';
+    if (progress <= 0.2) {
+      color = '#FF5C5C'; // Red / Coral in final 20%
+      glowColor = 'rgba(255, 92, 92, 0.65)';
+    } else if (progress <= 0.5) {
+      color = '#FFC857'; // Amber / Yellow
+      glowColor = 'rgba(255, 200, 87, 0.6)';
+    }
+
+    ringEl.style.stroke = color;
+    labelEl.style.color = color;
+    if (widgetEl) {
+      widgetEl.style.setProperty('--dial-active-color', color);
+      widgetEl.style.setProperty('--dial-glow-color', glowColor);
+      widgetEl.style.setProperty('--dial-label-color', color);
+    }
+  } else {
+    timeEl.textContent = formatTime(workoutDurationSeconds);
+    labelEl.textContent = 'ENTRENANDO';
+    if (restActions) restActions.classList.add('d-none');
+
+    // Standard active cycle progress
+    const cycleSeconds = 60;
+    const cycleProgress = (workoutDurationSeconds % cycleSeconds) / cycleSeconds;
+    ringEl.style.strokeDashoffset = (DIAL_CIRC * (1 - cycleProgress)).toString();
+    ringEl.style.stroke = 'var(--color-primary)';
+    labelEl.style.color = 'var(--color-text-3)';
+    if (widgetEl) {
+      widgetEl.style.setProperty('--dial-active-color', 'var(--color-primary)');
+      widgetEl.style.setProperty('--dial-glow-color', 'rgba(183, 243, 74, 0.4)');
+      widgetEl.style.setProperty('--dial-label-color', 'rgba(255, 255, 255, 0.55)');
+    }
+  }
+}
 
 function startWorkoutTimer() {
   if (workoutTimerInterval) clearInterval(workoutTimerInterval);
-  const timerEl = document.getElementById('workout-timer');
-  const timerContainer = document.getElementById('workout-timer-container');
-  const timerIcon = document.getElementById('timer-icon');
   
   workoutTimerInterval = setInterval(() => {
     workoutDurationSeconds++;
     
     if (restRemainingSeconds > 0) {
-      timerEl.textContent = formatTime(restRemainingSeconds);
-      timerContainer.style.borderColor = 'var(--color-warning)';
-      timerContainer.style.color = 'var(--color-warning)';
-      timerContainer.style.boxShadow = '0 0 16px rgba(255, 200, 87, 0.2)';
-      if (timerIcon && timerIcon.getAttribute('data-lucide') !== 'bell') {
-        timerIcon.setAttribute('data-lucide', 'bell');
-        if (window.lucide) lucide.createIcons();
-      }
-    } else {
-      timerEl.textContent = formatTime(workoutDurationSeconds);
-      timerContainer.style.borderColor = 'var(--color-primary)';
-      timerContainer.style.color = 'var(--color-primary)';
-      timerContainer.style.boxShadow = '0 0 16px rgba(183, 243, 74, 0.1)';
-      if (timerIcon && timerIcon.getAttribute('data-lucide') !== 'timer') {
-        timerIcon.setAttribute('data-lucide', 'timer');
-        if (window.lucide) lucide.createIcons();
+      restRemainingSeconds--;
+      if (restRemainingSeconds <= 0) {
+        restRemainingSeconds = 0;
+        if (window.FITTRACK.toast) window.FITTRACK.toast("¡Descanso completado! Siguiente serie");
+        if (navigator.vibrate) navigator.vibrate([150, 80, 150]);
       }
     }
+    
+    updateDialDisplay();
   }, 1000);
 }
 
 function startRestTimer(seconds) {
-  restRemainingSeconds = seconds;
-  openRestControls();
-  if(restTimerInterval) clearInterval(restTimerInterval);
-  
-  updateRestDisplay();
-  
-  restTimerInterval = setInterval(() => {
-    restRemainingSeconds--;
-    if(restRemainingSeconds <= 0) {
-      clearInterval(restTimerInterval);
-      restRemainingSeconds = 0;
-      closeRestControls();
-      if(window.FITTRACK.toast) window.FITTRACK.toast("¡Descanso terminado!");
-      if(navigator.vibrate) navigator.vibrate([200, 100, 200]);
-    } else {
-      updateRestDisplay();
-    }
-  }, 1000);
-}
-
-function updateRestDisplay() {
-  const display = document.getElementById('rest-timer-display');
-  if (display) display.textContent = formatTime(restRemainingSeconds);
-}
-
-function openRestControls() {
-  const controls = document.getElementById('rest-controls');
-  const overlay = document.getElementById('rest-overlay');
-  if(controls && overlay) {
-    overlay.classList.remove('d-none');
-    setTimeout(() => {
-      controls.classList.remove('translate-y-full');
-      overlay.style.opacity = '1';
-    }, 10);
-  }
-}
-
-function closeRestControls() {
-  const controls = document.getElementById('rest-controls');
-  const overlay = document.getElementById('rest-overlay');
-  if(controls && overlay) {
-    controls.classList.add('translate-y-full');
-    overlay.style.opacity = '0';
-    setTimeout(() => {
-      overlay.classList.add('d-none');
-    }, 300);
-  }
+  restTotalSeconds = seconds || 90;
+  restRemainingSeconds = restTotalSeconds;
+  updateDialDisplay();
 }
 
 function skipRest() {
-  if(restTimerInterval) clearInterval(restTimerInterval);
   restRemainingSeconds = 0;
-  closeRestControls();
+  updateDialDisplay();
+  if (window.FITTRACK.toast) window.FITTRACK.toast("Descanso saltado");
 }
 
 window.addEventListener('hashchange', () => {
   if (window.location.hash !== '#/workout/active') {
     if (workoutTimerInterval) clearInterval(workoutTimerInterval);
-    if (restTimerInterval) clearInterval(restTimerInterval);
     workoutTimerInterval = null;
-    restTimerInterval = null;
+    restRemainingSeconds = 0;
   }
 });

@@ -603,47 +603,350 @@
    Workout Active Screen (Mockup Realism)
    ============================================ */
 /* ============================================
-   Workout Active Screen (Mockup Realism)
+   Workout Active Screen — Ultra-Premium Dial & Set Rows
    ============================================ */
-.timer-pill {
-  border: 1px solid rgba(183, 243, 74, 0.35);
-  color: #B7F34A;
-  border-radius: var(--radius-full);
-  padding: 0.4rem 1rem;
-  display: inline-flex;
-  gap: 0.5rem;
+
+/* ── Central Circular Timer Dial ── */
+.workout-dial-container {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  margin: 0.25rem 0 1.5rem;
+  position: relative;
+}
+
+.workout-dial-widget {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.workout-dial-widget:hover {
+  transform: scale(1.02);
+}
+
+.workout-dial-widget svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+  filter: drop-shadow(0 0 12px var(--dial-glow-color, rgba(183, 243, 74, 0.5)));
+  transition: filter 0.5s ease;
+}
+
+.dial-track-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.06);
+  stroke-width: 6;
+}
+
+.dial-progress-fill {
+  fill: none;
+  stroke: var(--dial-active-color, #B7F34A);
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 471; /* 2 * PI * 75 */
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 0.8s linear, stroke 0.5s ease;
+}
+
+.dial-inner-disk {
+  width: 136px;
+  height: 136px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #1D232A 0%, #0E1216 80%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    inset 0 4px 12px rgba(0, 0, 0, 0.8),
+    inset 0 -2px 6px rgba(255, 255, 255, 0.08),
+    0 10px 28px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.dial-time {
+  font-size: 2.15rem;
+  font-weight: 800;
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-variant-numeric: tabular-nums;
+  color: #FFFFFF;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.6);
+  margin-top: 2px;
+}
+
+.dial-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--dial-label-color, rgba(255, 255, 255, 0.55));
+  margin-top: 0.35rem;
+  transition: color 0.5s ease;
+}
+
+/* Quick rest controls below dial */
+.dial-rest-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+  animation: fadeIn 0.25s ease;
+}
+
+.dial-action-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--color-text-2);
+  padding: 0.35rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dial-action-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-text-1);
+}
+
+.dial-action-btn.skip {
+  background: rgba(183, 243, 74, 0.12);
+  border-color: rgba(183, 243, 74, 0.3);
+  color: var(--color-primary);
+}
+
+/* Light Theme overrides for Dial */
+[data-theme="light"] .dial-inner-disk {
+  background: radial-gradient(circle at 35% 30%, #202730 0%, #11161B 80%);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    inset 0 4px 10px rgba(0, 0, 0, 0.8),
+    0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .dial-track-bg {
+  stroke: rgba(0, 0, 0, 0.08);
+}
+
+/* ── Sets Table & Header ── */
+.sets-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-3);
+}
+
+.sets-header-col-num {
+  width: 32px;
+  text-align: center;
+}
+
+.sets-header-col-reps {
+  flex: 1;
+  text-align: center;
+  padding-left: 1.5rem;
+}
+
+.sets-header-col-kg {
+  flex: 1;
+  text-align: center;
+  padding-right: 1.5rem;
+}
+
+.sets-header-col-check {
+  width: 32px;
+}
+
+/* ── Set Row Luxury Pill ── */
+.set-row-luxury {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #14181D;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 1.15rem;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.65rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
+}
+
+.set-row-luxury:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.set-row-luxury.completed {
+  background: #161C22;
+  border-color: rgba(183, 243, 74, 0.25);
+}
+
+/* Set Number Badge */
+.set-badge {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--color-text-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+  border: 1.5px solid transparent;
+}
+
+.set-row-luxury.completed .set-badge {
+  border-color: #B7F34A;
+  color: #B7F34A;
+  background: transparent;
+  box-shadow: 0 0 10px rgba(183, 243, 74, 0.3);
+}
+
+/* Center Inputs container with divider */
+.set-inputs-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  padding: 0 0.5rem;
+}
+
+.set-input-num {
+  width: 70px;
+  text-align: center;
   font-size: 1.15rem;
   font-weight: 800;
-  letter-spacing: 0.04em;
-  font-variant-numeric: tabular-nums;
-  background: #111417;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 16px rgba(183, 243, 74, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transition: all 0.25s ease;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #FFFFFF;
+  font-family: inherit;
+  box-sizing: border-box;
+  padding: 0.2rem;
+  transition: color 0.2s ease;
+}
+
+.set-input-num::placeholder {
+  color: var(--color-text-3);
+  font-weight: 600;
+}
+
+.set-divider {
+  width: 1px;
+  height: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  margin: 0 0.75rem;
   flex-shrink: 0;
-  user-select: none;
 }
 
-.timer-pill:hover {
-  transform: translateY(-1px);
-  border-color: rgba(183, 243, 74, 0.6);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3), 0 0 22px rgba(183, 243, 74, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+/* Right Status Check Button */
+.set-check-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  border-radius: 50%;
+  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-.timer-pill i {
+.set-check-btn:active {
+  transform: scale(0.9);
+}
+
+.set-check-ring {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  transition: all 0.2s ease;
+}
+
+.set-check-btn:hover .set-check-ring {
+  border-color: rgba(255, 255, 255, 0.5);
+  transform: scale(1.05);
+}
+
+.set-check-icon {
+  width: 24px;
+  height: 24px;
   color: #B7F34A;
+  filter: drop-shadow(0 0 6px rgba(183, 243, 74, 0.7));
+  animation: checkPop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-[data-theme="light"] .timer-pill {
-  background: #111417;
-  color: #B7F34A;
-  border: 1px solid rgba(183, 243, 74, 0.35);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2), 0 0 14px rgba(183, 243, 74, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+@keyframes checkPop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }
 
-[data-theme="light"] .timer-pill i {
-  color: #B7F34A;
+/* Light Theme overrides for Set Rows */
+[data-theme="light"] .set-row-luxury {
+  background: #FFFFFF;
+  border-color: rgba(0, 0, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+[data-theme="light"] .set-row-luxury.completed {
+  background: #F9FDF5;
+  border-color: rgba(90, 138, 16, 0.3);
+  box-shadow: 0 2px 10px rgba(90, 138, 16, 0.08);
+}
+
+[data-theme="light"] .set-badge {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text-2);
+}
+
+[data-theme="light"] .set-row-luxury.completed .set-badge {
+  border-color: #5A8A10;
+  color: #5A8A10;
+  background: transparent;
+  box-shadow: 0 0 8px rgba(90, 138, 16, 0.2);
+}
+
+[data-theme="light"] .set-input-num {
+  color: #111417;
+}
+
+[data-theme="light"] .set-divider {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="light"] .set-check-ring {
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+[data-theme="light"] .set-check-icon {
+  color: #5A8A10;
+  filter: drop-shadow(0 0 4px rgba(90, 138, 16, 0.5));
 }
 
 .exercise-nav-btn {
@@ -702,50 +1005,6 @@
   border-left-color: var(--color-primary);
 }
 
-.set-circle {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: var(--color-surface-3);
-  color: var(--color-text-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
-  flex-shrink: 0;
-}
-.set-circle.completed {
-  background: var(--color-primary);
-  color: #0B0D0F;
-  box-shadow: 0 0 12px rgba(183, 243, 74, 0.4), inset 0 1px 2px rgba(255,255,255,0.5);
-}
-[data-theme="light"] .set-circle.completed { color: #FFFFFF; }
-
-.set-input-mockup {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--color-border);
-  border-bottom: 2px solid var(--color-primary);
-  border-radius: var(--radius-md);
-  color: var(--color-text-1);
-  font-size: 1.05rem;
-  font-weight: 700;
-  padding: 0.5rem 0.6rem;
-  transition: all 0.2s ease;
-  box-sizing: border-box;
-  min-width: 0;
-}
-.set-input-mockup:focus {
-  background: rgba(255, 255, 255, 0.06);
-  outline: none;
-  border-bottom-color: var(--color-primary-hover);
-  box-shadow: 0 0 8px rgba(183, 243, 74, 0.25);
-}
-[data-theme="light"] .set-input-mockup { background: rgba(0, 0, 0, 0.03); }
-[data-theme="light"] .set-input-mockup:focus { background: rgba(0, 0, 0, 0.05); }
-
 .add-set-dashed {
   border: 1px dashed var(--color-border);
   border-radius: var(--radius-lg);
@@ -753,17 +1012,6 @@
   transition: background 0.2s;
 }
 .add-set-dashed:hover { background: var(--color-surface-2); }
-
-.set-circle-add {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--color-surface-3);
-  color: var(--color-text-2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 #rest-controls {
   box-shadow: 0 -10px 40px rgba(0,0,0,0.6);

@@ -44,6 +44,13 @@ body {
   backface-visibility: hidden;
 }
 
+/* Remove 300ms mobile touch delay & tap highlights for instant responsiveness */
+button, .btn, a, input, select, .set-check-btn, .set-badge, .btn-add-set-luxury, .btn-finish-workout-luxury, .btn-summary-primary, .btn-summary-secondary, [role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+}
+
 /* Enable hardware-accelerated momentum scrolling */
 .main-content, #main-content {
   -webkit-overflow-scrolling: touch;

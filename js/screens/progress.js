@@ -3,7 +3,7 @@ window.FITTRACK.screens = window.FITTRACK.screens || {};
 
 window.FITTRACK.screens.renderProgress = async function(container) {
   container.innerHTML = `
-    <div class="flex-col items-center py-8"><div class="spinner"></div></div>
+    <div class="loading-center-container"><div class="spinner"></div></div>
   `;
 
   try {

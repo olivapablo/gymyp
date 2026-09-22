@@ -290,7 +290,7 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
       </button>
     </div>
     <div id="routines-list" class="flex-col gap-4">
-      <div class="flex-col items-center justify-center py-8">
+      <div class="loading-center-container">
         <div class="spinner"></div>
       </div>
     </div>
@@ -423,7 +423,7 @@ window.FITTRACK.screens.renderRoutineForm = async function(container, isEditing 
     </div>
     
     <div id="form-content">
-      <div class="flex-col items-center py-8"><div class="spinner"></div></div>
+      <div class="loading-center-container"><div class="spinner"></div></div>
     </div>
   `;
   if (window.lucide) lucide.createIcons();
@@ -542,7 +542,7 @@ window.FITTRACK.screens.renderRoutineForm = async function(container, isEditing 
 // RENDERING ROUTINE VIEW
 // ==========================================
 window.FITTRACK.screens.renderRoutineView = async function(container, routineId) {
-  container.innerHTML = `<div class="flex-col items-center py-8"><div class="spinner"></div></div>`;
+  container.innerHTML = `<div class="loading-center-container"><div class="spinner"></div></div>`;
 
   try {
     const routine = await window.FITTRACK.getRoutine(routineId);

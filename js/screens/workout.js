@@ -342,12 +342,6 @@ function renderCurrentExercise() {
           <div class="text-xs font-bold text-color-3 uppercase tracking-widest mb-1">${currentExIndex + 1} de ${activeWorkoutState.exercises.length}</div>
           <h2 class="text-xl font-black text-color-1 leading-tight tracking-tight uppercase">${ex.name}</h2>
           <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 3} × ${ex.targetReps || '8-12'}</span></p>
-          ${prevLogs.length > 0 ? `
-            <div class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-semibold" style="background: rgba(183, 243, 74, 0.08); color: var(--color-primary); border: 1px solid rgba(183, 243, 74, 0.22);">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-              <span>Última vez: ${prevLogs.map((s, idx) => `S${idx+1}: ${s.kg || 0}kg × ${s.reps || 0}`).join(' • ')}</span>
-            </div>
-          ` : ''}
         </div>
         
         <button class="exercise-nav-btn" id="btn-next-ex" ${!hasNext ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
@@ -419,25 +413,27 @@ function renderCurrentExercise() {
           `;
         }).join('')}
         
-        <!-- Add set button -->
-        <button type="button" class="btn-add-set-row flex-row items-center justify-center gap-2 mt-3 w-full p-3 rounded-2xl border border-dashed border-color-border cursor-pointer bg-surface-2 transition-all hover:bg-surface-3" id="btn-add-set-mockup">
-          <i data-lucide="plus" style="width:16px;height:16px;color:var(--color-primary);"></i>
-          <span class="font-semibold text-sm text-primary">Agregar serie</span>
-        </button>
+        <!-- Add set button — pill shaped -->
+        <div class="flex-row justify-center">
+          <button type="button" class="btn-add-set-luxury" id="btn-add-set-mockup">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            <span>Agregar serie</span>
+          </button>
+        </div>
       </div>
 
       <!-- Main Actions -->
-      <button class="btn btn-primary btn-block py-4 rounded-2xl text-lg shadow-glow" id="btn-guardar-serie">
-        <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i>
-        ${ex.sets.every(s => s.completed) ? 'Siguiente ejercicio' : 'Guardar serie'}
-      </button>
-      
-      <!-- Finish workout — solid red filled distinct button with proper spacing -->
-      <button class="btn btn-block mt-5 py-3.5 rounded-2xl text-sm font-bold shadow-md" id="btn-finish-workout-final"
-        style="background: linear-gradient(180deg, #EF4444 0%, #DC2626 100%); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4); letter-spacing: 0.02em;">
-        <i data-lucide="flag" style="width:16px;height:16px;margin-right:6px;"></i>
-        Finalizar entrenamiento
-      </button>
+      <div class="workout-action-buttons">
+        <button class="btn btn-primary btn-block py-4 rounded-2xl text-lg shadow-glow" id="btn-guardar-serie">
+          <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i>
+          ${ex.sets.every(s => s.completed) ? 'Siguiente ejercicio' : 'Guardar serie'}
+        </button>
+
+        <button class="btn-finish-workout-luxury" id="btn-finish-workout-final">
+          <i data-lucide="flag" style="width:16px;height:16px;"></i>
+          Finalizar entrenamiento
+        </button>
+      </div>
     </div>
   `;
 
@@ -552,25 +548,35 @@ function bindCurrentExerciseEvents() {
     }
   });
 
-  // Finish Workout
+  // Finish Workout — guarded against double-tap
   const btnFinish = document.getElementById('btn-finish-workout-final');
-  if(btnFinish) btnFinish.addEventListener('click', async () => {
-     const ok = await window.FITTRACK.confirm('¿Terminaste tu entrenamiento?', 'Finalizar Sesión', 'Finalizar', 'Continuar');
-     if (ok) {
-       if (workoutTimerInterval) clearInterval(workoutTimerInterval);
-       try {
-         const finalState = JSON.parse(JSON.stringify(activeWorkoutState));
-         const durationSecs = workoutDurationSeconds;
-         
-         await window.FITTRACK.finishWorkout(activeWorkoutState.id, activeWorkoutState);
-         activeWorkoutState = null;
-         
-         showWorkoutSummaryModal(finalState, durationSecs);
-       } catch (err) {
-         window.FITTRACK.alert("Error al finalizar: " + err.message, "Error");
-       }
-     }
-  });
+  if(btnFinish) {
+    let finishing = false;
+    btnFinish.addEventListener('click', async () => {
+      if (finishing) return;
+      finishing = true;
+      btnFinish.disabled = true;
+
+      try {
+        const ok = await window.FITTRACK.confirm('¿Terminaste tu entrenamiento?', 'Finalizar Sesión', 'Finalizar', 'Continuar');
+        if (ok) {
+          if (workoutTimerInterval) clearInterval(workoutTimerInterval);
+          try {
+            const finalState = JSON.parse(JSON.stringify(activeWorkoutState));
+            const durationSecs = workoutDurationSeconds;
+            await window.FITTRACK.finishWorkout(activeWorkoutState.id, activeWorkoutState);
+            activeWorkoutState = null;
+            showWorkoutSummaryModal(finalState, durationSecs);
+          } catch (err) {
+            window.FITTRACK.alert("Error al finalizar: " + err.message, "Error");
+          }
+        }
+      } finally {
+        finishing = false;
+        if (btnFinish && btnFinish.isConnected) btnFinish.disabled = false;
+      }
+    });
+  }
 }
 
 function showWorkoutSummaryModal(workoutData, durationSeconds) {

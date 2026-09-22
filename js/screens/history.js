@@ -10,7 +10,7 @@ window.FITTRACK.screens.renderHistory = async function(container) {
       </button>
     </div>
     <div id="history-list" class="flex-col gap-4">
-      <div class="flex-col items-center py-8"><div class="spinner"></div></div>
+      <div class="loading-center-container"><div class="spinner"></div></div>
     </div>
   `;
 

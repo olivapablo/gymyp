@@ -173,4 +173,39 @@ window.FITTRACK.deleteWorkout = async function(workoutId) {
   }
 };
 
+/**
+ * Get the latest logged weights and reps per exercise from completed history
+ */
+window.FITTRACK.getLastExerciseLogs = async function() {
+  try {
+    const history = await window.FITTRACK.getWorkoutHistory(30);
+    const exerciseMap = {};
+
+    history.forEach(workout => {
+      const exercises = workout.exercises || [];
+      exercises.forEach(ex => {
+        if (!ex || !ex.name) return;
+        const key = ex.name.trim().toLowerCase();
+        
+        // If not already recorded, capture from the most recent completed workout that has logs
+        if (!exerciseMap[key]) {
+          const completedSets = (ex.sets || []).filter(s => s && s.completed && (s.kg || s.reps));
+          if (completedSets.length > 0) {
+            exerciseMap[key] = completedSets.map(s => ({
+              kg: s.kg ? String(s.kg) : '',
+              reps: s.reps ? String(s.reps) : ''
+            }));
+          }
+        }
+      });
+    });
+
+    return exerciseMap;
+  } catch (error) {
+    console.error('[DB] Error getting last exercise logs:', error);
+    return {};
+  }
+};
+
+
 

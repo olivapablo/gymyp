@@ -19,6 +19,7 @@ let restTotalSeconds = 90;
 let restRemainingSeconds = 0;
 let saveTimeout = null;
 let isStartingWorkout = false;
+let previousExerciseLogs = {};
 
 window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
   container.innerHTML = `
@@ -212,6 +213,15 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
       return;
     }
 
+    // Load previous exercise logs for weight/reps memory
+    if (window.FITTRACK.getLastExerciseLogs) {
+      try {
+        previousExerciseLogs = await window.FITTRACK.getLastExerciseLogs();
+      } catch (e) {
+        console.warn('Could not fetch previous exercise logs:', e);
+      }
+    }
+
     if (activeWorkoutState.startTime && activeWorkoutState.startTime.seconds) {
       const startMs = activeWorkoutState.startTime.seconds * 1000;
       workoutDurationSeconds = Math.floor((Date.now() - startMs) / 1000);
@@ -293,6 +303,8 @@ function renderCurrentExercise() {
   if (!container || !activeWorkoutState || !activeWorkoutState.exercises.length) return;
   
   const ex = activeWorkoutState.exercises[currentExIndex];
+  const exKey = (ex.name || '').trim().toLowerCase();
+  const prevLogs = (previousExerciseLogs && previousExerciseLogs[exKey]) || [];
   
   // Ensure sets
   const targetSetsCount = parseInt(ex.targetSets) || 3;
@@ -330,6 +342,12 @@ function renderCurrentExercise() {
           <div class="text-xs font-bold text-color-3 uppercase tracking-widest mb-1">${currentExIndex + 1} de ${activeWorkoutState.exercises.length}</div>
           <h2 class="text-xl font-black text-color-1 leading-tight tracking-tight uppercase">${ex.name}</h2>
           <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 3} × ${ex.targetReps || '8-12'}</span></p>
+          ${prevLogs.length > 0 ? `
+            <div class="inline-flex items-center gap-1.5 mt-2 px-3 py-1 rounded-full text-xs font-semibold" style="background: rgba(183, 243, 74, 0.08); color: var(--color-primary); border: 1px solid rgba(183, 243, 74, 0.22);">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              <span>Última vez: ${prevLogs.map((s, idx) => `S${idx+1}: ${s.kg || 0}kg × ${s.reps || 0}`).join(' • ')}</span>
+            </div>
+          ` : ''}
         </div>
         
         <button class="exercise-nav-btn" id="btn-next-ex" ${!hasNext ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
@@ -376,24 +394,30 @@ function renderCurrentExercise() {
 
       <!-- Sets List -->
       <div class="sets-container mb-4">
-        ${ex.sets.map((set, setIndex) => `
-          <div class="set-row-luxury ${set.completed ? 'completed' : ''}" data-set="${setIndex}">
-            <div class="set-badge cursor-pointer" data-set="${setIndex}" title="Serie ${setIndex + 1}">
-              ${setIndex + 1}
+        ${ex.sets.map((set, setIndex) => {
+          const prevSet = prevLogs[setIndex] || prevLogs[prevLogs.length - 1];
+          const prevReps = prevSet ? prevSet.reps : (ex.targetReps ? String(ex.targetReps).split('-')[0] : '8');
+          const prevKg = prevSet ? prevSet.kg : (ex.weight ? String(ex.weight) : '');
+
+          return `
+            <div class="set-row-luxury ${set.completed ? 'completed' : ''}" data-set="${setIndex}">
+              <div class="set-badge cursor-pointer" data-set="${setIndex}" title="Serie ${setIndex + 1}">
+                ${setIndex + 1}
+              </div>
+              <div class="set-inputs-wrap">
+                <input type="number" inputmode="decimal" class="set-input-num" value="${set.reps !== undefined && set.reps !== null ? set.reps : ''}" placeholder="${prevReps || '8'}" data-set="${setIndex}" data-field="reps">
+                <div class="set-divider"></div>
+                <input type="number" inputmode="decimal" class="set-input-num" value="${set.kg !== undefined && set.kg !== null ? set.kg : ''}" placeholder="${prevKg || 'Kg'}" data-set="${setIndex}" data-field="kg">
+              </div>
+              <div class="set-check-btn ${set.completed ? 'completed' : 'pending'}" data-set="${setIndex}" title="${set.completed ? 'Completada' : 'Marcar como completada'}">
+                ${set.completed 
+                  ? `<svg class="set-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>` 
+                  : `<div class="set-check-ring"></div>`
+                }
+              </div>
             </div>
-            <div class="set-inputs-wrap">
-              <input type="number" inputmode="decimal" class="set-input-num" value="${set.reps || ''}" placeholder="8" data-set="${setIndex}" data-field="reps">
-              <div class="set-divider"></div>
-              <input type="number" inputmode="decimal" class="set-input-num" value="${set.kg || ''}" placeholder="40" data-set="${setIndex}" data-field="kg">
-            </div>
-            <div class="set-check-btn ${set.completed ? 'completed' : 'pending'}" data-set="${setIndex}" title="${set.completed ? 'Completada' : 'Marcar como completada'}">
-              ${set.completed 
-                ? `<svg class="set-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>` 
-                : `<div class="set-check-ring"></div>`
-              }
-            </div>
-          </div>
-        `).join('')}
+          `;
+        }).join('')}
         
         <!-- Add set button -->
         <button type="button" class="btn-add-set-row flex-row items-center justify-center gap-2 mt-3 w-full p-3 rounded-2xl border border-dashed border-color-border cursor-pointer bg-surface-2 transition-all hover:bg-surface-3" id="btn-add-set-mockup">
@@ -408,10 +432,10 @@ function renderCurrentExercise() {
         ${ex.sets.every(s => s.completed) ? 'Siguiente ejercicio' : 'Guardar serie'}
       </button>
       
-      <!-- Finish workout — subtle danger button, always visible -->
-      <button class="btn btn-block mt-3 py-3 rounded-2xl text-sm font-semibold" id="btn-finish-workout-final"
-        style="background:transparent; border:1px solid rgba(255,92,92,0.25); color:var(--color-error); letter-spacing:0.03em;">
-        <i data-lucide="flag" style="width:15px;height:15px;margin-right:6px;"></i>
+      <!-- Finish workout — solid red filled distinct button with proper spacing -->
+      <button class="btn btn-block mt-5 py-3.5 rounded-2xl text-sm font-bold shadow-md" id="btn-finish-workout-final"
+        style="background: linear-gradient(180deg, #EF4444 0%, #DC2626 100%); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.25); box-shadow: 0 4px 16px rgba(220, 38, 38, 0.4); letter-spacing: 0.02em;">
+        <i data-lucide="flag" style="width:16px;height:16px;margin-right:6px;"></i>
         Finalizar entrenamiento
       </button>
     </div>
@@ -424,6 +448,8 @@ function renderCurrentExercise() {
 
 function bindCurrentExerciseEvents() {
   const ex = activeWorkoutState.exercises[currentExIndex];
+  const exKey = (ex.name || '').trim().toLowerCase();
+  const prevLogs = (previousExerciseLogs && previousExerciseLogs[exKey]) || [];
 
   // Nav
   const btnPrev = document.getElementById('btn-prev-ex');
@@ -450,6 +476,18 @@ function bindCurrentExerciseEvents() {
   const toggleSetComplete = (setIdx) => {
     const isNowCompleted = !ex.sets[setIdx].completed;
     ex.sets[setIdx].completed = isNowCompleted;
+
+    // Auto-fill from placeholder/previous if user didn't type anything before completing
+    if (isNowCompleted) {
+      const prevSet = prevLogs[setIdx] || prevLogs[prevLogs.length - 1];
+      if ((ex.sets[setIdx].kg === '' || ex.sets[setIdx].kg === undefined || ex.sets[setIdx].kg === null) && prevSet && prevSet.kg) {
+        ex.sets[setIdx].kg = prevSet.kg;
+      }
+      if ((ex.sets[setIdx].reps === '' || ex.sets[setIdx].reps === undefined || ex.sets[setIdx].reps === null) && prevSet && prevSet.reps) {
+        ex.sets[setIdx].reps = prevSet.reps;
+      }
+    }
+
     saveWorkoutStateDebounced();
     renderCurrentExercise();
     
@@ -565,51 +603,92 @@ function showWorkoutSummaryModal(workoutData, durationSeconds) {
   const modal = document.createElement('div');
   modal.className = 'workout-summary-overlay';
   modal.innerHTML = `
+    <canvas id="summary-confetti-canvas" class="summary-confetti-canvas"></canvas>
+    
     <div class="workout-summary-card">
-      <div class="summary-trophy-badge">
-        <i data-lucide="trophy" style="width:36px;height:36px;"></i>
+      <div class="summary-hero-wrapper">
+        <div class="summary-trophy-glow"></div>
+        <div class="summary-trophy-badge">
+          <i data-lucide="trophy" class="summary-trophy-icon"></i>
+        </div>
+        <div class="summary-achievement-tag">
+          <i data-lucide="sparkles" style="width:13px;height:13px;"></i> SESIÓN COMPLETADA
+        </div>
       </div>
       
       <h2 class="summary-headline">¡Entrenamiento Finalizado!</h2>
-      <p class="summary-subtext">${workoutData.name || 'Gran sesión completada'}</p>
+      <div class="summary-routine-badge">
+        <i data-lucide="dumbbell" style="width:13px;height:13px;"></i>
+        <span>${workoutData.name || 'Gran sesión completada'}</span>
+      </div>
       
       <div class="summary-stats-grid">
-        <div class="summary-stat-box">
-          <span class="summary-stat-label">Tiempo</span>
-          <span class="summary-stat-val primary">${formatTime(durationSeconds)}</span>
+        <div class="summary-stat-box stat-time">
+          <div class="summary-stat-header">
+            <i data-lucide="timer" class="stat-icon"></i>
+            <span class="summary-stat-label">TIEMPO</span>
+          </div>
+          <span class="summary-stat-val text-lime">${formatTime(durationSeconds)}</span>
         </div>
-        <div class="summary-stat-box">
-          <span class="summary-stat-label">Volumen</span>
-          <span class="summary-stat-val">${totalVolume >= 1000 ? (totalVolume/1000).toFixed(1) + ' t' : totalVolume + ' kg'}</span>
+
+        <div class="summary-stat-box stat-volume">
+          <div class="summary-stat-header">
+            <i data-lucide="zap" class="stat-icon"></i>
+            <span class="summary-stat-label">VOLUMEN</span>
+          </div>
+          <span class="summary-stat-val text-cyan">${totalVolume >= 1000 ? (totalVolume/1000).toFixed(1) + ' t' : Math.round(totalVolume) + ' kg'}</span>
         </div>
-        <div class="summary-stat-box">
-          <span class="summary-stat-label">Series</span>
-          <span class="summary-stat-val">${completedSets} / ${totalSets}</span>
+
+        <div class="summary-stat-box stat-sets">
+          <div class="summary-stat-header">
+            <i data-lucide="check-circle-2" class="stat-icon"></i>
+            <span class="summary-stat-label">SERIES</span>
+          </div>
+          <span class="summary-stat-val text-pink">${completedSets}<span class="stat-total">/${totalSets}</span></span>
         </div>
-        <div class="summary-stat-box">
-          <span class="summary-stat-label">Ejercicios</span>
-          <span class="summary-stat-val">${exercisesList.length}</span>
+
+        <div class="summary-stat-box stat-exercises">
+          <div class="summary-stat-header">
+            <i data-lucide="layers" class="stat-icon"></i>
+            <span class="summary-stat-label">EJERCICIOS</span>
+          </div>
+          <span class="summary-stat-val text-amber">${exercisesList.length}</span>
         </div>
       </div>
       
-      <div class="summary-exercises-list">
-        ${exercisesList.map(ex => {
-          const cSets = (ex.sets || []).filter(s => s.completed).length;
-          return `
-            <div class="summary-ex-item">
-              <span class="summary-ex-name">• ${ex.name}</span>
-              <span class="summary-ex-sets">${cSets} series</span>
-            </div>
-          `;
-        }).join('')}
+      <div class="summary-exercises-section">
+        <div class="summary-section-title">
+          <span>DESGLOSE DE EJERCICIOS</span>
+          <span class="summary-ex-counter">${exercisesList.length} total</span>
+        </div>
+        <div class="summary-exercises-list custom-scroll">
+          ${exercisesList.map((ex, idx) => {
+            const cSets = (ex.sets || []).filter(s => s.completed).length;
+            const tSets = (ex.sets || []).length;
+            const isDone = cSets > 0;
+            return `
+              <div class="summary-ex-row ${isDone ? 'completed' : ''}">
+                <div class="summary-ex-left">
+                  <span class="summary-ex-num">${String(idx + 1).padStart(2, '0')}</span>
+                  <span class="summary-ex-name" title="${ex.name}">${ex.name}</span>
+                </div>
+                <div class="summary-ex-badge ${isDone ? 'badge-success' : 'badge-muted'}">
+                  ${isDone ? `<i data-lucide="check" style="width:11px;height:11px;"></i> ${cSets}/${tSets} series` : `0/${tSets} series`}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
       </div>
       
-      <div class="flex-col gap-2 w-full">
-        <button class="btn btn-primary btn-block py-3 text-base font-bold" id="btn-summary-history">
-          <i data-lucide="clock" style="width:18px;height:18px;"></i> Ver en Historial
+      <div class="summary-actions-container">
+        <button class="btn-summary-primary" id="btn-summary-history">
+          <i data-lucide="history" style="width:18px;height:18px;"></i>
+          <span>Ver en Historial</span>
         </button>
-        <button class="btn btn-secondary btn-block py-3 text-sm font-semibold" id="btn-summary-home">
-          Ir al Inicio
+        <button class="btn-summary-secondary" id="btn-summary-home">
+          <i data-lucide="home" style="width:16px;height:16px;"></i>
+          <span>Ir al Inicio</span>
         </button>
       </div>
     </div>
@@ -617,6 +696,13 @@ function showWorkoutSummaryModal(workoutData, durationSeconds) {
 
   document.body.appendChild(modal);
   if (window.lucide) lucide.createIcons();
+
+  // Launch celebration confetti
+  try {
+    launchSummaryConfetti();
+  } catch (err) {
+    console.warn("Confetti error", err);
+  }
 
   document.getElementById('btn-summary-history').addEventListener('click', () => {
     modal.remove();
@@ -627,6 +713,79 @@ function showWorkoutSummaryModal(workoutData, durationSeconds) {
     modal.remove();
     window.location.hash = '#/';
   });
+}
+
+function launchSummaryConfetti() {
+  const canvas = document.getElementById('summary-confetti-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  
+  canvas.width = window.innerWidth * dpr;
+  canvas.height = window.innerHeight * dpr;
+  ctx.scale(dpr, dpr);
+
+  const colors = ['#B7F34A', '#FACC15', '#38BDF8', '#F472B6', '#FFFFFF', '#A3E635'];
+  const particles = [];
+  const particleCount = 75;
+
+  for (let i = 0; i < particleCount; i++) {
+    particles.push({
+      x: window.innerWidth * 0.5 + (Math.random() - 0.5) * 80,
+      y: window.innerHeight * 0.45,
+      vx: (Math.random() - 0.5) * 14,
+      vy: (Math.random() * -12) - 4,
+      size: Math.random() * 7 + 4,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      rotation: Math.random() * 360,
+      rotSpeed: (Math.random() - 0.5) * 10,
+      opacity: 1,
+      shape: Math.random() > 0.4 ? 'rect' : 'circle'
+    });
+  }
+
+  let animationFrame;
+  const startTime = Date.now();
+
+  function renderConfetti() {
+    const elapsed = Date.now() - startTime;
+    if (elapsed > 3500) {
+      ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      return;
+    }
+
+    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.35; // gravity
+      p.vx *= 0.98; // air drag
+      p.rotation += p.rotSpeed;
+      if (elapsed > 2000) {
+        p.opacity = Math.max(0, 1 - (elapsed - 2000) / 1500);
+      }
+
+      ctx.save();
+      ctx.globalAlpha = p.opacity;
+      ctx.translate(p.x, p.y);
+      ctx.rotate((p.rotation * Math.PI) / 180);
+      ctx.fillStyle = p.color;
+
+      if (p.shape === 'rect') {
+        ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size * 0.6);
+      } else {
+        ctx.beginPath();
+        ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+    });
+
+    animationFrame = requestAnimationFrame(renderConfetti);
+  }
+
+  renderConfetti();
 }
 
 function saveWorkoutStateDebounced() {
@@ -708,7 +867,7 @@ function startWorkoutTimer() {
     workoutDurationSeconds++;
     
     if (restRemainingSeconds > 0) {
-      if (restRemainingSeconds <= 5 && restRemainingSeconds >= 1) {
+      if (restRemainingSeconds > 1 && restRemainingSeconds <= 5) {
         if (window.FITTRACK.audio) window.FITTRACK.audio.playRestWarningTick(restRemainingSeconds);
       }
       restRemainingSeconds--;
@@ -732,6 +891,7 @@ function startRestTimer(seconds) {
 
 function skipRest() {
   restRemainingSeconds = 0;
+  if (window.FITTRACK.audio) window.FITTRACK.audio.playBoxingBell();
   updateDialDisplay();
   if (window.FITTRACK.toast) window.FITTRACK.toast("Descanso saltado");
 }

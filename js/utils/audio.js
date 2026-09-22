@@ -1,14 +1,32 @@
 // Web Audio API Synthesized Audio Engine for FITTRACK
+// High-volume, punchy synthesizer designed to cut through background music clearly
 window.FITTRACK = window.FITTRACK || {};
 
 (function() {
   let audioCtx = null;
+  let masterCompressor = null;
+  let masterGain = null;
 
   function getAudioContext() {
     if (!audioCtx) {
       const AudioContextClass = window.AudioContext || window.webkitAudioContext;
       if (AudioContextClass) {
         audioCtx = new AudioContextClass();
+
+        // Dynamics Compressor to maximize perceived loudness without harsh digital distortion
+        masterCompressor = audioCtx.createDynamicsCompressor();
+        masterCompressor.threshold.setValueAtTime(-10, audioCtx.currentTime);
+        masterCompressor.knee.setValueAtTime(8, audioCtx.currentTime);
+        masterCompressor.ratio.setValueAtTime(6, audioCtx.currentTime);
+        masterCompressor.attack.setValueAtTime(0.002, audioCtx.currentTime);
+        masterCompressor.release.setValueAtTime(0.12, audioCtx.currentTime);
+
+        // High-output master gain booster
+        masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(1.15, audioCtx.currentTime);
+
+        masterCompressor.connect(masterGain);
+        masterGain.connect(audioCtx.destination);
       }
     }
     if (audioCtx && audioCtx.state === 'suspended') {
@@ -17,93 +35,169 @@ window.FITTRACK = window.FITTRACK || {};
     return audioCtx;
   }
 
+  function getDestination(ctx) {
+    return masterCompressor || ctx.destination;
+  }
+
+  // Helper for realistic metallic boxing bell strike
+  function playBellStrike(ctx, startTime, gainLevel = 0.85) {
+    // Fundamental + resonant metallic inharmonics
+    const harmonics = [
+      { freq: 850, type: 'sine', gain: 0.75, decay: 0.85 },
+      { freq: 1260, type: 'triangle', gain: 0.55, decay: 0.65 },
+      { freq: 1780, type: 'triangle', gain: 0.40, decay: 0.50 },
+      { freq: 2820, type: 'sine', gain: 0.28, decay: 0.35 },
+      { freq: 4180, type: 'sine', gain: 0.18, decay: 0.20 }
+    ];
+
+    harmonics.forEach(h => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = h.type;
+      osc.frequency.setValueAtTime(h.freq, startTime);
+
+      const targetGain = h.gain * gainLevel;
+      gain.gain.setValueAtTime(0.0001, startTime);
+      gain.gain.linearRampToValueAtTime(targetGain, startTime + 0.004);
+      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + h.decay);
+
+      osc.connect(gain);
+      gain.connect(getDestination(ctx));
+
+      osc.start(startTime);
+      osc.stop(startTime + h.decay);
+    });
+  }
+
   window.FITTRACK.audio = {
-    // Short tick for countdown (5, 4, 3, 2, 1)
-    playCountdownTick(freq = 600, duration = 0.08) {
+    // Loud, punchy tick for countdown (5, 4, 3, 2, 1)
+    playCountdownTick(freq = 750, duration = 0.12) {
       try {
         const ctx = getAudioContext();
         if (!ctx) return;
+        const now = ctx.currentTime;
+
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
 
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.type = 'triangle'; // Triangle wave cuts through background music much better than sine
+        osc.frequency.setValueAtTime(freq, now);
 
-        gain.gain.setValueAtTime(0.25, ctx.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.85, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(getDestination(ctx));
 
-        osc.start();
-        osc.stop(ctx.currentTime + duration);
-      } catch (e) {}
+        osc.start(now);
+        osc.stop(now + duration);
+      } catch (e) {
+        console.warn('Audio tick error:', e);
+      }
     },
 
-    // Energetic start sound on ¡YA! / Go!
-    playStartGoSound() {
+    // Authentic Double Boxing Bell ("DING! ... DING!")
+    playBoxingBell() {
       try {
         const ctx = getAudioContext();
         if (!ctx) return;
-        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
-        notes.forEach((freq, idx) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          const startTime = ctx.currentTime + idx * 0.06;
-          const duration = 0.4;
+        const now = ctx.currentTime;
 
-          osc.type = 'triangle';
-          osc.frequency.setValueAtTime(freq, startTime);
-
-          gain.gain.setValueAtTime(0.25, startTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-
-          osc.start(startTime);
-          osc.stop(startTime + duration);
-        });
-      } catch (e) {}
+        // Strike 1
+        playBellStrike(ctx, now, 0.85);
+        // Strike 2 (280ms later)
+        playBellStrike(ctx, now + 0.28, 0.95);
+      } catch (e) {
+        console.warn('Boxing bell audio error:', e);
+      }
     },
 
-    // Rest countdown tick (final 5, 4, 3, 2, 1 seconds)
+    // Realistic Sports Referee / Coach Whistle with pea flutter
+    playWhistle(duration = 0.42) {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        // LFO for the spinning pea flutter vibration (~28Hz)
+        const lfo = ctx.createOscillator();
+        const lfoGain = ctx.createGain();
+        lfo.frequency.setValueAtTime(28, now);
+        lfoGain.gain.setValueAtTime(90, now); // frequency modulation depth
+
+        // Whistle Tone 1 (Primary high pitch)
+        const osc1 = ctx.createOscillator();
+        osc1.type = 'triangle';
+        osc1.frequency.setValueAtTime(2450, now);
+
+        // Whistle Tone 2 (Harmonic high pitch)
+        const osc2 = ctx.createOscillator();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(2820, now);
+
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc1.frequency);
+        lfoGain.connect(osc2.frequency);
+
+        // Master whistle gain envelope with sharp athletic attack
+        const whistleGain = ctx.createGain();
+        whistleGain.gain.setValueAtTime(0.001, now);
+        whistleGain.gain.linearRampToValueAtTime(0.9, now + 0.02);
+        whistleGain.gain.setValueAtTime(0.9, now + duration - 0.06);
+        whistleGain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+        osc1.connect(whistleGain);
+        osc2.connect(whistleGain);
+        whistleGain.connect(getDestination(ctx));
+
+        lfo.start(now);
+        osc1.start(now);
+        osc2.start(now);
+
+        lfo.stop(now + duration);
+        osc1.stop(now + duration);
+        osc2.stop(now + duration);
+      } catch (e) {
+        console.warn('Whistle audio error:', e);
+      }
+    },
+
+    // Energetic Start Sound on "¡YA!" / Go!
+    playStartGoSound() {
+      // Play double boxing bell on start
+      this.playBoxingBell();
+    },
+
+    // Warning ticks in last 5 seconds of rest
     playRestWarningTick(secondsRemaining) {
-      const freq = secondsRemaining === 1 ? 880 : 587.33;
-      this.playCountdownTick(freq, 0.1);
+      const freq = secondsRemaining === 1 ? 1100 : 750;
+      this.playCountdownTick(freq, 0.12);
     },
 
-    // Rest completed chime
+    // Rest finished: Whistle sound followed by boxing bell
     playRestFinishedSound() {
       try {
+        this.playWhistle(0.38);
         const ctx = getAudioContext();
-        if (!ctx) return;
-        const chord = [659.25, 880, 1046.50]; // E5, A5, C6
-        chord.forEach((freq) => {
-          const osc = ctx.createOscillator();
-          const gain = ctx.createGain();
-          const duration = 0.45;
-
-          osc.type = 'sine';
-          osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-          gain.gain.setValueAtTime(0.2, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
-          osc.connect(gain);
-          gain.connect(ctx.destination);
-
-          osc.start();
-          osc.stop(ctx.currentTime + duration);
-        });
-      } catch (e) {}
+        if (ctx) {
+          // Play boxing bell right after whistle to signal round resumption
+          setTimeout(() => {
+            this.playBoxingBell();
+          }, 320);
+        }
+      } catch (e) {
+        console.warn('Rest finished audio error:', e);
+      }
     },
 
-    // Workout finished celebratory chime
+    // Workout finished celebratory victory fanfare
     playFinishWorkoutSound() {
       try {
         const ctx = getAudioContext();
         if (!ctx) return;
+        const now = ctx.currentTime;
         const fanfare = [
           { freq: 523.25, time: 0 },
           { freq: 659.25, time: 0.12 },
@@ -113,22 +207,25 @@ window.FITTRACK = window.FITTRACK || {};
         fanfare.forEach(note => {
           const osc = ctx.createOscillator();
           const gain = ctx.createGain();
-          const startTime = ctx.currentTime + note.time;
-          const duration = 0.6;
+          const startTime = now + note.time;
+          const duration = 0.65;
 
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(note.freq, startTime);
 
-          gain.gain.setValueAtTime(0.3, startTime);
+          gain.gain.setValueAtTime(0.001, startTime);
+          gain.gain.linearRampToValueAtTime(0.75, startTime + 0.01);
           gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
 
           osc.connect(gain);
-          gain.connect(ctx.destination);
+          gain.connect(getDestination(ctx));
 
           osc.start(startTime);
           osc.stop(startTime + duration);
         });
-      } catch (e) {}
+      } catch (e) {
+        console.warn('Finish audio error:', e);
+      }
     }
   };
 })();

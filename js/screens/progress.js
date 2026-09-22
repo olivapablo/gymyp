@@ -124,12 +124,7 @@ window.FITTRACK.screens.renderProgress = async function(container) {
       </div>
     `;
 
-    let initialMeasuresHtml = `
-      <div class="card flex-col items-center text-center py-8 mb-4">
-        <i data-lucide="ruler" style="width:36px;height:36px;margin-bottom:0.75rem;color:var(--color-text-3);"></i>
-        <p class="text-color-2 text-sm">Aún no tienes medidas registradas.<br>Empieza a trackear tu cuerpo.</p>
-      </div>
-    `;
+    let initialMeasuresHtml = renderMeasurementsHtml(null);
 
     try {
       let m = null;
@@ -160,19 +155,7 @@ window.FITTRACK.screens.renderProgress = async function(container) {
       }
 
       if (m && (m.weight || m.fat || m.waist || m.hip || m.chest || m.arms || m.thighs)) {
-        const d = m.date ? new Date(m.date) : new Date();
-        initialMeasuresHtml = `
-          <div class="body-measure-grid mb-4" style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));">
-            ${m.weight ? `<div class="body-measure-card"><span class="measure-label">Peso</span><span class="measure-value">${m.weight}</span><span class="measure-unit">kg</span></div>` : ''}
-            ${m.fat ? `<div class="body-measure-card"><span class="measure-label">Grasa</span><span class="measure-value">${m.fat}</span><span class="measure-unit">%</span></div>` : ''}
-            ${m.waist ? `<div class="body-measure-card"><span class="measure-label">Cintura</span><span class="measure-value">${m.waist}</span><span class="measure-unit">cm</span></div>` : ''}
-            ${m.hip ? `<div class="body-measure-card"><span class="measure-label">Cadera/Glúteos</span><span class="measure-value">${m.hip}</span><span class="measure-unit">cm</span></div>` : ''}
-            ${m.chest ? `<div class="body-measure-card"><span class="measure-label">Pecho</span><span class="measure-value">${m.chest}</span><span class="measure-unit">cm</span></div>` : ''}
-            ${m.arms ? `<div class="body-measure-card"><span class="measure-label">Brazos</span><span class="measure-value">${m.arms}</span><span class="measure-unit">cm</span></div>` : ''}
-            ${m.thighs ? `<div class="body-measure-card"><span class="measure-label">Muslos</span><span class="measure-value">${m.thighs}</span><span class="measure-unit">cm</span></div>` : ''}
-          </div>
-          <p class="text-xs text-color-3 mb-4">Último registro · ${d.toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'})}</p>
-        `;
+        initialMeasuresHtml = renderMeasurementsHtml(m);
       }
     } catch(e) {}
 
@@ -194,6 +177,12 @@ window.FITTRACK.screens.renderProgress = async function(container) {
 };
 
 function openMeasureModal() {
+  let existing = {};
+  try {
+    const raw = localStorage.getItem('fittrack_latest_measures');
+    if (raw) existing = JSON.parse(raw);
+  } catch(e) {}
+
   const overlay = document.createElement('div');
   overlay.className = 'exercise-modal-overlay';
   overlay.innerHTML = `
@@ -214,39 +203,39 @@ function openMeasureModal() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
         <div class="ex-form-group" style="margin-bottom:0">
           <label class="ex-field-label">Peso (KG)</label>
-          <input type="number" step="0.1" class="ex-input" id="m-weight" placeholder="Ej: 78.5">
+          <input type="number" step="0.1" class="ex-input" id="m-weight" value="${existing.weight || ''}" placeholder="Ej: 78.5">
         </div>
         <div class="ex-form-group" style="margin-bottom:0">
           <label class="ex-field-label">% Grasa Corp.</label>
-          <input type="number" step="0.1" class="ex-input" id="m-fat" placeholder="Ej: 18">
+          <input type="number" step="0.1" class="ex-input" id="m-fat" value="${existing.fat || ''}" placeholder="Ej: 18">
         </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
         <div class="ex-form-group" style="margin-bottom:0">
           <label class="ex-field-label">Cintura (CM)</label>
-          <input type="number" step="0.5" class="ex-input" id="m-waist" placeholder="Ej: 82">
+          <input type="number" step="0.5" class="ex-input" id="m-waist" value="${existing.waist || ''}" placeholder="Ej: 82">
         </div>
         <div class="ex-form-group" style="margin-bottom:0">
           <label class="ex-field-label">Cadera / Glúteos (CM)</label>
-          <input type="number" step="0.5" class="ex-input" id="m-hip" placeholder="Ej: 95">
+          <input type="number" step="0.5" class="ex-input" id="m-hip" value="${existing.hip || ''}" placeholder="Ej: 95">
         </div>
       </div>
 
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.75rem;margin-bottom:0.75rem;">
         <div class="ex-form-group" style="margin-bottom:0">
           <label class="ex-field-label">Pecho (CM)</label>
-          <input type="number" step="0.5" class="ex-input" id="m-chest" placeholder="Ej: 100">
+          <input type="number" step="0.5" class="ex-input" id="m-chest" value="${existing.chest || ''}" placeholder="Ej: 100">
         </div>
         <div class="ex-form-group" style="margin-bottom:0">
           <label class="ex-field-label">Brazos / Bíceps (CM)</label>
-          <input type="number" step="0.5" class="ex-input" id="m-arms" placeholder="Ej: 36">
+          <input type="number" step="0.5" class="ex-input" id="m-arms" value="${existing.arms || ''}" placeholder="Ej: 36">
         </div>
       </div>
 
       <div class="ex-form-group" style="margin-bottom:1rem;">
         <label class="ex-field-label">Muslos / Cuádriceps (CM)</label>
-        <input type="number" step="0.5" class="ex-input" id="m-thighs" placeholder="Ej: 58">
+        <input type="number" step="0.5" class="ex-input" id="m-thighs" value="${existing.thighs || ''}" placeholder="Ej: 58">
       </div>
 
       <div class="ex-modal-actions">
@@ -279,50 +268,60 @@ function openMeasureModal() {
     // Show saved data in the measures container
     const container = document.getElementById('measures-container');
     if (container) {
-      container.innerHTML = `
-        <div class="body-measure-grid mb-4" style="grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));">
-          ${weight ? `<div class="body-measure-card">
-            <span class="measure-label">Peso</span>
-            <span class="measure-value">${weight}</span>
-            <span class="measure-unit">kg</span>
-          </div>` : ''}
-          ${fat ? `<div class="body-measure-card">
-            <span class="measure-label">Grasa</span>
-            <span class="measure-value">${fat}</span>
-            <span class="measure-unit">%</span>
-          </div>` : ''}
-          ${waist ? `<div class="body-measure-card">
-            <span class="measure-label">Cintura</span>
-            <span class="measure-value">${waist}</span>
-            <span class="measure-unit">cm</span>
-          </div>` : ''}
-          ${hip ? `<div class="body-measure-card">
-            <span class="measure-label">Cadera/Glúteos</span>
-            <span class="measure-value">${hip}</span>
-            <span class="measure-unit">cm</span>
-          </div>` : ''}
-          ${chest ? `<div class="body-measure-card">
-            <span class="measure-label">Pecho</span>
-            <span class="measure-value">${chest}</span>
-            <span class="measure-unit">cm</span>
-          </div>` : ''}
-          ${arms ? `<div class="body-measure-card">
-            <span class="measure-label">Brazos</span>
-            <span class="measure-value">${arms}</span>
-            <span class="measure-unit">cm</span>
-          </div>` : ''}
-          ${thighs ? `<div class="body-measure-card">
-            <span class="measure-label">Muslos</span>
-            <span class="measure-value">${thighs}</span>
-            <span class="measure-unit">cm</span>
-          </div>` : ''}
-        </div>
-        <p class="text-xs text-color-3 mb-4">Registrado hoy · ${new Date().toLocaleDateString('es-ES',{day:'numeric',month:'short',year:'numeric'})}</p>
-      `;
+      container.innerHTML = renderMeasurementsHtml(measureData);
+      if (window.lucide) lucide.createIcons();
     }
 
     document.body.removeChild(overlay);
   });
 
   document.body.appendChild(overlay);
+  if (window.lucide) lucide.createIcons();
+}
+
+function renderMeasurementsHtml(m) {
+  if (!m || (!m.weight && !m.fat && !m.waist && !m.hip && !m.chest && !m.arms && !m.thighs)) {
+    return `
+      <div class="card flex-col items-center text-center py-8 mb-4">
+        <i data-lucide="ruler" style="width:36px;height:36px;margin-bottom:0.75rem;color:var(--color-text-3);"></i>
+        <p class="text-color-2 text-sm">Aún no tienes medidas registradas.<br>Empieza a trackear tu cuerpo.</p>
+      </div>
+    `;
+  }
+
+  const d = m.date ? new Date(m.date) : new Date();
+  const dateFormatted = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  const metrics = [
+    { key: 'weight', label: 'Peso', value: m.weight, unit: 'kg', icon: 'scale', color: 'lime' },
+    { key: 'fat', label: '% Grasa', value: m.fat, unit: '%', icon: 'percent', color: 'cyan' },
+    { key: 'waist', label: 'Cintura', value: m.waist, unit: 'cm', icon: 'ruler', color: 'amber' },
+    { key: 'hip', label: 'Cadera / Glúteos', value: m.hip, unit: 'cm', icon: 'activity', color: 'pink' },
+    { key: 'chest', label: 'Pecho', value: m.chest, unit: 'cm', icon: 'shield', color: 'blue' },
+    { key: 'arms', label: 'Brazos', value: m.arms, unit: 'cm', icon: 'flame', color: 'purple' },
+    { key: 'thighs', label: 'Muslos', value: m.thighs, unit: 'cm', icon: 'zap', color: 'emerald' },
+  ].filter(item => item.value && String(item.value).trim() !== '');
+
+  return `
+    <div class="body-measure-grid mb-3">
+      ${metrics.map(item => `
+        <div class="body-measure-card measure-${item.color}">
+          <div class="body-measure-header">
+            <div class="body-measure-icon-wrap">
+              <i data-lucide="${item.icon}"></i>
+            </div>
+            <span class="measure-label" title="${item.label}">${item.label}</span>
+          </div>
+          <div class="body-measure-body">
+            <span class="measure-value">${item.value}</span>
+            <span class="measure-unit">${item.unit}</span>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div class="measurements-footer-info mb-5">
+      <i data-lucide="calendar" style="width:13px;height:13px;color:var(--color-text-3);"></i>
+      <span>Último registro · ${dateFormatted}</span>
+    </div>
+  `;
 }

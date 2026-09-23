@@ -42,9 +42,9 @@
   ],
   "icons": [
     {
-      "src": "assets/icon.svg",
-      "type": "image/svg+xml",
-      "sizes": "any",
+      "src": "assets/icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
       "purpose": "any"
     },
     {

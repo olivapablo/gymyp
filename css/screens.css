@@ -1773,22 +1773,36 @@
 
 
 /* ----------------------------------
-   Header & Sidebar Logo SVG
+   Header & Sidebar Logo (PSG Training)
    ---------------------------------- */
 .header-title {
   display: flex;
   align-items: center;
 }
-.header-logo-svg {
-  width: auto;
-  height: 30px;
+
+.brand-logo-dark {
   display: block;
-  filter: drop-shadow(0 1px 8px rgba(183, 255, 58, 0.18));
 }
-.sidebar-logo-svg {
-  width: auto;
-  height: 34px;
-  display: block;
+
+.brand-logo-light {
+  display: none;
+}
+
+/* Light Mode: switch to black logo */
+[data-theme="light"] .brand-logo-dark {
+  display: none !important;
+}
+
+[data-theme="light"] .brand-logo-light {
+  display: block !important;
+}
+
+.header-logo-img {
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.35));
+}
+
+.sidebar-logo-img {
+  filter: drop-shadow(0 2px 10px rgba(0, 0, 0, 0.3));
 }
 
 /* ----------------------------------

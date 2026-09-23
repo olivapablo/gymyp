@@ -112,6 +112,16 @@ window.FITTRACK.finishWorkout = async function(workoutId, workoutData) {
     return true;
   } catch (error) {
     console.error('[DB] Error finishing workout:', error);
+    // If offline or network error, save to local queue
+    if (!navigator.onLine || error.code === 'unavailable' || error.message?.includes('network')) {
+      if (window.FITTRACK.offlineQueue) {
+        window.FITTRACK.offlineQueue.enqueueWrite('finishWorkout', { workoutId, workoutData });
+        if (window.FITTRACK.toast) {
+          window.FITTRACK.toast('📦 Guardado localmente (sin conexión). Se sincronizará al volver online.');
+        }
+        return true;
+      }
+    }
     throw error;
   }
 };

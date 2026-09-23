@@ -437,7 +437,12 @@ function renderCurrentExercise() {
     </div>
   `;
 
-  if (window.lucide) lucide.createIcons();
+  if (window.lucide) {
+    // Scope lucide creation to container only, avoids expensive full-DOM traversal
+    lucide.createIcons({
+      root: container
+    });
+  }
   bindCurrentExerciseEvents();
   updateDialDisplay();
 }
@@ -475,6 +480,11 @@ function bindCurrentExerciseEvents() {
 
     // Auto-fill from placeholder/previous if user didn't type anything before completing
     if (isNowCompleted) {
+      // Haptic feedback vibration (35ms short burst)
+      if (navigator.vibrate) {
+        navigator.vibrate(35);
+      }
+
       const prevSet = prevLogs[setIdx] || prevLogs[prevLogs.length - 1];
       if ((ex.sets[setIdx].kg === '' || ex.sets[setIdx].kg === undefined || ex.sets[setIdx].kg === null) && prevSet && prevSet.kg) {
         ex.sets[setIdx].kg = prevSet.kg;
@@ -488,6 +498,12 @@ function bindCurrentExerciseEvents() {
     renderCurrentExercise();
     
     if (isNowCompleted) {
+      // Trigger check pulse animation on the newly completed button
+      const newlyCompletedBtn = document.querySelector(`.set-check-btn[data-set="${setIdx}"]`);
+      if (newlyCompletedBtn) {
+        newlyCompletedBtn.classList.add('set-completed-pulse');
+      }
+
       const restTime = parseInt(ex.rest) || 90;
       startRestTimer(restTime);
     }

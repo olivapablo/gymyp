@@ -71,11 +71,19 @@ async function updateSidebarUserInfo(user) {
     const profile = await window.FITTRACK.getProfile();
     const nameEl = document.getElementById('sidebar-user-name');
     const avatarEl = document.getElementById('sidebar-user-avatar');
+    const photo = profile.photoURL || user.photoURL;
+
     if (nameEl) {
       nameEl.textContent = profile.displayName || user.displayName || 'Usuario';
     }
-    if (avatarEl && (profile.photoURL || user.photoURL)) {
-      avatarEl.innerHTML = `<img src="${profile.photoURL || user.photoURL}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    if (avatarEl && photo) {
+      avatarEl.innerHTML = `<img src="${photo}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+    }
+
+    // Also update mobile header profile button
+    const btnProfileEl = document.getElementById('btn-profile');
+    if (btnProfileEl && photo) {
+      btnProfileEl.innerHTML = `<img src="${photo}" alt="Perfil" class="header-profile-avatar-img">`;
     }
   } catch(e) {
     console.warn('[App] Could not update sidebar user info:', e);
@@ -96,6 +104,13 @@ async function bootstrap() {
       initRoutes();
       showApp();
       updateSidebarUserInfo(user);
+
+      // Trigger Onboarding for first-time users
+      if (window.FITTRACK.isOnboardingDone && !window.FITTRACK.isOnboardingDone()) {
+        setTimeout(() => {
+          if (window.FITTRACK.showOnboarding) window.FITTRACK.showOnboarding();
+        }, 600);
+      }
     } else {
       console.log('[App] No user signed in');
       showLogin();

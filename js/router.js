@@ -5,6 +5,7 @@ class Router {
     this.routes = {};
     this.currentRoute = null;
     this.mainContent = document.getElementById('main-content');
+    this._transitioning = false;
     window.addEventListener('hashchange', () => this.handleRoute());
   }
 
@@ -21,16 +22,14 @@ class Router {
     if (this.currentRoute === rawPath) return;
     this.currentRoute = rawPath;
 
-    // Basic dynamic route parsing: split by '/'
+    // Basic dynamic route parsing
     const parts = rawPath.split('/').filter(Boolean);
     let handler = null;
     let params = [];
 
-    // Try exact match first
     if (this.routes[rawPath]) {
       handler = this.routes[rawPath];
     } else if (parts.length >= 2) {
-      // Try to match base route (e.g. 'routine/view' for '/routine/view/123')
       const baseRoute = '/' + parts[0] + '/' + parts[1];
       if (this.routes[baseRoute]) {
         handler = this.routes[baseRoute];
@@ -38,21 +37,34 @@ class Router {
       }
     }
 
-    if (handler) {
+    if (!handler) {
+      console.warn(`[Router] No route found for: ${rawPath}`);
+      this.navigate('/');
+      return;
+    }
+
+    const doRender = () => {
+      this._transitioning = false;
       this.mainContent.innerHTML = '';
+
       const viewContainer = document.createElement('div');
-      viewContainer.className = 'view-container';
+      viewContainer.className = 'view-container screen-enter';
       this.mainContent.appendChild(viewContainer);
-      
-      // Call handler with container and any extracted params
+
       handler(viewContainer, ...params);
-      
       this.updateNavState(rawPath);
       window.scrollTo(0, 0);
       this.mainContent.scrollTo(0, 0);
+    };
+
+    // Animate out the current view, then render new one
+    const oldView = this.mainContent.querySelector('.view-container');
+    if (oldView && !this._transitioning) {
+      this._transitioning = true;
+      oldView.classList.add('screen-exit');
+      setTimeout(doRender, 130);
     } else {
-      console.warn(`[Router] No route found for: ${rawPath}`);
-      this.navigate('/');
+      doRender();
     }
   }
 

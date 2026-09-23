@@ -3,7 +3,7 @@ window.FITTRACK.screens = window.FITTRACK.screens || {};
 
 window.FITTRACK.screens.renderProfile = async function(container) {
   container.innerHTML = `
-    <div class="flex-col items-center py-12"><div class="spinner"></div></div>
+    <div class="loading-center-container"><div class="spinner"></div></div>
   `;
 
   try {
@@ -33,6 +33,11 @@ window.FITTRACK.screens.renderProfile = async function(container) {
     });
 
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+
+    // Notification scheduler status
+    const notifEnabled = window.FITTRACK.notifScheduler ? window.FITTRACK.notifScheduler.isEnabled() : false;
+    const scheduled = window.FITTRACK.notifScheduler ? window.FITTRACK.notifScheduler.getScheduledTime() : { hour: 8, minute: 0 };
+    const timeValue = `${String(scheduled.hour).padStart(2, '0')}:${String(scheduled.minute).padStart(2, '0')}`;
 
     container.innerHTML = `
       <h1 class="text-3xl font-bold mb-6">Perfil</h1>
@@ -109,15 +114,46 @@ window.FITTRACK.screens.renderProfile = async function(container) {
 
         <div class="profile-setting-divider"></div>
 
-        <!-- Notifications -->
-        <div class="profile-setting-row" onclick="window.location.hash='#/notifications'" style="cursor:pointer;">
+        <!-- Workout Reminder (Native Local Notification) -->
+        <div class="profile-setting-row flex-col items-start gap-3" style="padding: 1rem 1.25rem;">
+          <div class="flex-row items-center justify-between w-full">
+            <div class="flex-row items-center gap-3">
+              <div class="profile-setting-icon">
+                <i data-lucide="bell" style="width:18px;height:18px;color:var(--color-primary);"></i>
+              </div>
+              <div>
+                <div class="font-medium" style="font-size:0.9rem;">Recordatorio diario</div>
+                <div style="font-size:0.72rem;color:var(--color-text-3);">Aviso local para entrenar</div>
+              </div>
+            </div>
+            <div class="profile-toggle ${notifEnabled ? 'active' : ''}" id="notif-toggle">
+              <div class="profile-toggle-knob"></div>
+            </div>
+          </div>
+
+          <div id="notif-time-row" class="w-full ${notifEnabled ? '' : 'd-none'}" style="padding-left: 2.75rem;">
+            <div class="flex-row items-center gap-2">
+              <span style="font-size:0.8rem; color:var(--color-text-2);">Hora:</span>
+              <input type="time" id="notif-time-input" value="${timeValue}" 
+                style="background:var(--color-surface-2); border:1px solid var(--color-border); color:var(--color-text-1); padding:0.35rem 0.65rem; border-radius:var(--radius-lg); font-size:0.85rem; font-weight:600; font-family:inherit;">
+              <button id="btn-save-notif-time" class="btn btn-primary btn-sm" style="font-size:0.75rem; padding:0.35rem 0.75rem;">
+                Guardar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="profile-setting-divider"></div>
+
+        <!-- Onboarding walkthrough replay -->
+        <div class="profile-setting-row" id="row-replay-onboarding" style="cursor:pointer;">
           <div class="flex-row items-center gap-3">
             <div class="profile-setting-icon">
-              <i data-lucide="bell" style="width:18px;height:18px;color:var(--color-primary);"></i>
+              <i data-lucide="help-circle" style="width:18px;height:18px;color:var(--color-text-2);"></i>
             </div>
             <div>
-              <div class="font-medium" style="font-size:0.9rem;">Notificaciones</div>
-              <div style="font-size:0.72rem;color:var(--color-text-3);">Avisos y recordatorios</div>
+              <div class="font-medium" style="font-size:0.9rem;">Guía de inicio</div>
+              <div style="font-size:0.72rem;color:var(--color-text-3);">Repetir tutorial de bienvenida</div>
             </div>
           </div>
           <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--color-text-3);"></i>
@@ -153,6 +189,57 @@ window.FITTRACK.screens.renderProfile = async function(container) {
 
     if (window.lucide) lucide.createIcons();
 
+    // Notification Toggle & Time logic
+    const notifToggle = document.getElementById('notif-toggle');
+    const notifTimeRow = document.getElementById('notif-time-row');
+    const notifTimeInput = document.getElementById('notif-time-input');
+    const btnSaveNotif = document.getElementById('btn-save-notif-time');
+
+    if (notifToggle) {
+      notifToggle.addEventListener('click', async () => {
+        if (!window.FITTRACK.notifScheduler) return;
+        const nowActive = notifToggle.classList.contains('active');
+
+        if (!nowActive) {
+          // Attempting to turn ON
+          const [h, m] = (notifTimeInput.value || '08:00').split(':').map(Number);
+          const ok = await window.FITTRACK.notifScheduler.saveSchedule(h, m);
+          if (ok) {
+            notifToggle.classList.add('active');
+            notifTimeRow.classList.remove('d-none');
+            if (window.FITTRACK.toast) window.FITTRACK.toast('Recordatorio activado a las ' + notifTimeInput.value);
+          } else {
+            await window.FITTRACK.alert('Para recibir recordatorios, debes permitir las notificaciones en tu navegador.', 'Permiso denegado');
+          }
+        } else {
+          // Turning OFF
+          window.FITTRACK.notifScheduler.disableSchedule();
+          notifToggle.classList.remove('active');
+          notifTimeRow.classList.add('d-none');
+          if (window.FITTRACK.toast) window.FITTRACK.toast('Recordatorio desactivado');
+        }
+      });
+    }
+
+    if (btnSaveNotif) {
+      btnSaveNotif.addEventListener('click', async () => {
+        if (!window.FITTRACK.notifScheduler) return;
+        const [h, m] = (notifTimeInput.value || '08:00').split(':').map(Number);
+        await window.FITTRACK.notifScheduler.saveSchedule(h, m);
+        if (window.FITTRACK.toast) window.FITTRACK.toast('Hora guardada: ' + notifTimeInput.value);
+      });
+    }
+
+    // Replay onboarding
+    const rowReplay = document.getElementById('row-replay-onboarding');
+    if (rowReplay) {
+      rowReplay.addEventListener('click', () => {
+        if (window.FITTRACK.showOnboarding) {
+          window.FITTRACK.showOnboarding();
+        }
+      });
+    }
+
     // PWA Install
     const btnInstall = document.getElementById('btn-profile-install-pwa');
     if (btnInstall) {
@@ -168,7 +255,6 @@ window.FITTRACK.screens.renderProfile = async function(container) {
     // Theme toggle
     document.getElementById('theme-toggle').addEventListener('click', () => {
       window.FITTRACK.toggleTheme();
-      // Re-render to reflect new theme
       window.FITTRACK.screens.renderProfile(container);
     });
 

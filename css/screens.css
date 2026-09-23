@@ -1870,3 +1870,192 @@
   min-height: 52vh;
   width: 100%;
 }
+
+/* ----------------------------------
+   Screen Transitions (Slide / Fade)
+   ---------------------------------- */
+.screen-enter {
+  animation: screenEnterAnim 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: opacity, transform;
+}
+
+.screen-exit {
+  animation: screenExitAnim 0.13s ease-in forwards;
+  will-change: opacity, transform;
+  pointer-events: none;
+}
+
+@keyframes screenEnterAnim {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes screenExitAnim {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+/* ----------------------------------
+   Loading Screen Logo Entrance Animation
+   ---------------------------------- */
+.loading-logo-entrance {
+  animation: logoEntranceAnim 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes logoEntranceAnim {
+  0% {
+    opacity: 0;
+    transform: scale(0.82) translateY(-8px);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ----------------------------------
+   Micro-animations: Set Check Complete
+   ---------------------------------- */
+.set-check-btn.set-completed-pulse {
+  animation: checkPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+
+@keyframes checkPop {
+  0% { transform: scale(0.85); }
+  50% { transform: scale(1.22); filter: drop-shadow(0 0 10px rgba(183, 255, 58, 0.6)); }
+  100% { transform: scale(1); }
+}
+
+/* ----------------------------------
+   Onboarding Overlay & Cards
+   ---------------------------------- */
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: radial-gradient(circle at top, #18201A 0%, #080B09 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: max(2.5rem, env(safe-area-inset-top)) 1.75rem max(2rem, env(safe-area-inset-bottom)) 1.75rem;
+  box-sizing: border-box;
+}
+
+.onboarding-logo-mark {
+  margin-top: 1rem;
+  filter: drop-shadow(0 4px 16px rgba(183, 255, 58, 0.35));
+}
+
+.onboarding-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+}
+
+@keyframes obStepIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.onboarding-icon-wrap {
+  width: 90px;
+  height: 90px;
+  border-radius: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+}
+
+.onboarding-title {
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #FFFFFF;
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.onboarding-desc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.onboarding-dots {
+  display: flex;
+  gap: 8px;
+  margin: 1.5rem 0;
+}
+
+.onboarding-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.onboarding-dot.active {
+  width: 26px;
+  background: var(--color-primary, #B7FF3A);
+  box-shadow: 0 0 10px rgba(183, 255, 58, 0.5);
+}
+
+.onboarding-actions {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ob-skip-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 0.88rem;
+  font-weight: 600;
+  padding: 0.6rem;
+  cursor: pointer;
+  transition: color 0.15s ease;
+}
+
+.ob-skip-btn:hover {
+  color: #FFFFFF;
+}
+
+/* Header Avatar Real Photo styling */
+.header-profile-avatar-img {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid var(--color-primary, #B7FF3A);
+}

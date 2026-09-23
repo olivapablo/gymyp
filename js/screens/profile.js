@@ -131,14 +131,19 @@ window.FITTRACK.screens.renderProfile = async function(container) {
             </div>
           </div>
 
-          <div id="notif-time-row" class="w-full ${notifEnabled ? '' : 'd-none'}" style="padding-left: 2.75rem;">
-            <div class="flex-row items-center gap-2">
-              <span style="font-size:0.8rem; color:var(--color-text-2);">Hora:</span>
-              <input type="time" id="notif-time-input" value="${timeValue}" 
-                style="background:var(--color-surface-2); border:1px solid var(--color-border); color:var(--color-text-1); padding:0.35rem 0.65rem; border-radius:var(--radius-lg); font-size:0.85rem; font-weight:600; font-family:inherit;">
-              <button id="btn-save-notif-time" class="btn btn-primary btn-sm" style="font-size:0.75rem; padding:0.35rem 0.75rem;">
-                Guardar
-              </button>
+          <div id="notif-time-row" class="w-full ${notifEnabled ? '' : 'd-none'}" style="margin-top: 0.5rem; background: var(--color-surface-2); padding: 0.75rem 1rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border-subtle); box-sizing: border-box;">
+            <div class="flex-row items-center justify-between gap-3 w-full" style="box-sizing: border-box;">
+              <div class="flex-row items-center gap-2">
+                <i data-lucide="clock" style="width:16px;height:16px;color:var(--color-primary);flex-shrink:0;"></i>
+                <span style="font-size:0.85rem;font-weight:600;color:var(--color-text-1);">Horario:</span>
+              </div>
+              <div class="flex-row items-center gap-2">
+                <input type="time" id="notif-time-input" value="${timeValue}" 
+                  style="background: var(--color-surface); border: 1.5px solid var(--color-border); color: var(--color-text-1); padding: 0.45rem 0.65rem; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; font-family: inherit; outline: none; cursor: pointer; min-width: 95px;">
+                <button id="btn-save-notif-time" class="btn btn-primary btn-sm" style="font-size: 0.78rem; font-weight: 700; padding: 0.45rem 0.85rem; border-radius: var(--radius-md);">
+                  Guardar
+                </button>
+              </div>
             </div>
           </div>
         </div>

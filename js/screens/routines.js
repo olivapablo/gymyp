@@ -306,9 +306,9 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
   });
 
   try {
-    const routines = await window.FITTRACK.getRoutines();
+    const rawRoutines = await window.FITTRACK.getRoutines();
     
-    if (routines.length === 0) {
+    if (rawRoutines.length === 0) {
       routinesListEl.innerHTML = `
         <div class="card flex-col items-center text-center py-12">
           <i data-lucide="clipboard-list" class="text-color-3 mb-4" style="width: 48px; height: 48px;"></i>
@@ -318,11 +318,22 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
         </div>
       `;
     } else {
+      const checkIsPartner = (r) => {
+        return r.isShared || 
+               r.senderEmail === 'mar.armando1997@gmail.com' || 
+               (r.description && r.description.includes('mar.armando1997@gmail.com')) || 
+               r.assignedEmail === 'mar.armando1997@gmail.com' ||
+               (r.name && r.name.toLowerCase().includes('mar.armando'));
+      };
+
+      const routines = [...rawRoutines].sort((a, b) => {
+        const aPart = checkIsPartner(a) ? 1 : 0;
+        const bPart = checkIsPartner(b) ? 1 : 0;
+        return aPart - bPart;
+      });
+
       routinesListEl.innerHTML = routines.map(r => {
-        const isPartner = r.senderEmail === 'mar.armando1997@gmail.com' || 
-                          (r.description && r.description.includes('mar.armando1997@gmail.com')) || 
-                          r.assignedEmail === 'mar.armando1997@gmail.com' ||
-                          (r.name && r.name.toLowerCase().includes('mar.armando'));
+        const isPartner = checkIsPartner(r);
                           
         const cardStyle = isPartner ? 'border: 1px solid var(--color-info); background-color: var(--color-info-dim);' : '';
         const titleColor = isPartner ? 'color: var(--color-info);' : '';

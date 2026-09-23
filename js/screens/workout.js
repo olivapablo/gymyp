@@ -49,21 +49,50 @@ window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
       `;
     }
 
-    const routines = await window.FITTRACK.getRoutines();
+    const rawRoutines = await window.FITTRACK.getRoutines();
     const selectionEl = document.getElementById('routines-selection');
     
-    if (routines.length === 0) {
+    if (rawRoutines.length === 0) {
       selectionEl.innerHTML = `<p class="text-color-3 text-sm">No tienes rutinas. Ve a "Rutinas" para crear una.</p>`;
     } else {
-      selectionEl.innerHTML = routines.map(r => `
-        <div class="card card-interactive flex-row justify-between items-center" onclick="window.FITTRACK.screens.startRoutineWorkout('${r.id}', this)">
-          <div>
-            <h4 class="font-semibold text-lg">${r.name}</h4>
-            <p class="text-color-2 text-sm">${r.exercises ? r.exercises.length : 0} ejercicios</p>
+      // Helper to identify partner/shared routine
+      const checkIsPartner = (r) => {
+        return r.isShared || 
+               r.senderEmail === 'mar.armando1997@gmail.com' || 
+               (r.description && r.description.includes('mar.armando1997@gmail.com')) || 
+               r.assignedEmail === 'mar.armando1997@gmail.com' ||
+               (r.name && r.name.toLowerCase().includes('mar.armando'));
+      };
+
+      // Sort: Own routines first (false before true)
+      const routines = [...rawRoutines].sort((a, b) => {
+        const aPart = checkIsPartner(a) ? 1 : 0;
+        const bPart = checkIsPartner(b) ? 1 : 0;
+        return aPart - bPart;
+      });
+
+      selectionEl.innerHTML = routines.map(r => {
+        const isPartner = checkIsPartner(r);
+        const cardStyle = isPartner ? 'border: 1px solid var(--color-info); background-color: var(--color-info-dim);' : '';
+        const titleColor = isPartner ? 'color: var(--color-info);' : '';
+        const iconColor = isPartner ? 'var(--color-info)' : 'var(--color-primary)';
+
+        return `
+          <div class="card card-interactive flex-row justify-between items-center" onclick="window.FITTRACK.screens.startRoutineWorkout('${r.id}', this)" style="${cardStyle}">
+            <div class="flex-col gap-1">
+              <div class="flex-row items-center gap-2 flex-wrap">
+                <h4 class="font-semibold text-lg" style="${titleColor}">${r.name}</h4>
+                ${isPartner 
+                  ? `<span class="badge" style="background-color: var(--color-info); color: #fff; font-size:0.65rem; padding: 2px 7px;"><i data-lucide="user" style="width:10px;height:10px;margin-right:3px;"></i> Rutina de Pareja</span>` 
+                  : `<span class="badge badge-primary" style="font-size:0.65rem; padding: 2px 7px;"><i data-lucide="check" style="width:10px;height:10px;margin-right:3px;"></i> Mi Rutina</span>`
+                }
+              </div>
+              <p class="text-color-2 text-sm">${r.exercises ? r.exercises.length : 0} ejercicios</p>
+            </div>
+            <i data-lucide="play-circle" style="width: 26px; height: 26px; color: ${iconColor};"></i>
           </div>
-          <i data-lucide="play-circle" class="text-primary" style="width: 24px; height: 24px;"></i>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
     if (window.lucide) lucide.createIcons();
   } catch(e) {

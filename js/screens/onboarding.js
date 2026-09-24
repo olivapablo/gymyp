@@ -24,23 +24,17 @@ window.FITTRACK.showGuide = function (onClose) {
     {
       icon: 'zap',
       title: 'Bienvenido a POG TRAINING',
-      subtitle: 'Disciplina hoy, resultados mañana',
-      desc: 'Tu central de entrenamiento para maximizar cada sesión con control métrico riguroso y cero distracciones.',
+      subtitle: 'Control total de tu entrenamiento',
       features: [
         {
           icon: 'dumbbell',
           title: 'Rutinas estructuradas',
-          desc: 'Diseña tu programa con series, repeticiones y descanso por ejercicio.'
+          desc: 'Series, repeticiones y descanso por ejercicio.'
         },
         {
           icon: 'volume-2',
           title: 'Audio Coach acústico',
           desc: 'Silbato al iniciar el descanso y doble campana al terminar.'
-        },
-        {
-          icon: 'trending-up',
-          title: 'Cálculo de volumen',
-          desc: 'Tonelaje acumulado automático (kg × reps) e historial de cada sesión.'
         }
       ]
     },
@@ -48,72 +42,51 @@ window.FITTRACK.showGuide = function (onClose) {
       icon: 'clipboard-list',
       title: 'Rutinas y Planificación',
       subtitle: 'Estructura por días y objetivos',
-      desc: 'Organiza tus sesiones fácilmente o activa las plantillas predeterminadas de fuerza e hipertrofia.',
       features: [
         {
           icon: 'calendar',
-          title: 'División flexible por días',
-          desc: 'Separa tus entrenamientos por días (Día 1, Día 2, etc.) o grupos musculares.'
+          title: 'División por días',
+          desc: 'Separa tus entrenamientos por días o grupos musculares.'
         },
         {
           icon: 'sliders',
-          title: 'Variables precisas',
-          desc: 'Asigna el peso objetivo, rango de reps y segundos de recuperación a cada ejercicio.'
-        },
-        {
-          icon: 'plus-circle',
-          title: 'Flexibilidad en la sala',
-          desc: 'Añade, edita o reordena ejercicios en cualquier momento según las máquinas disponibles.'
+          title: 'Flexibilidad en sala',
+          desc: 'Edita pesos, reps y descansos en cualquier momento.'
         }
       ]
     },
     {
       icon: 'bell',
-      title: 'Entrenamiento en Vivo & Audio',
-      subtitle: 'Señales acústicas de alta penetración',
-      desc: 'El cronómetro te guía con sonidos claros para que entrenes concentrado sin mirar la pantalla:',
+      title: 'Descansos & Audio Coach',
+      subtitle: 'Señales acústicas para no mirar la pantalla',
       features: [
         {
           icon: 'play',
-          title: 'Al Iniciar Descanso 📣',
-          desc: 'Suena el silbato arbitral marcando el inicio de tu recuperación.',
-          soundType: 'whistle',
-          soundLabel: 'Probar Silbato'
+          title: 'Silbato de inicio 📣',
+          desc: 'Suena al pulsar iniciar tu tiempo de descanso.'
         },
         {
           icon: 'award',
-          title: 'Al Terminar Descanso 🔔',
-          desc: 'Suena la doble campana ("DING! DING!") indicando la siguiente serie.',
-          soundType: 'bell',
-          soundLabel: 'Probar Doble Campana'
-        },
-        {
-          icon: 'rotate-cw',
-          title: 'Dial táctil de descanso',
-          desc: 'Ajusta con +15s / -15s o pulsa "Saltar" si ya estás listo. (Ticks rítmicos en los últimos 5s).'
+          title: 'Doble campana 🔔',
+          desc: 'Suena al completarse el descanso para tu siguiente serie.'
         }
-      ]
+      ],
+      soundButtons: true
     },
     {
       icon: 'smartphone',
       title: 'Métricas & Modo Offline',
-      subtitle: 'Sin cortes y disponible donde sea',
-      desc: 'Diseñada con tecnología PWA para rendir al máximo incluso en sótanos de gimnasios sin señal.',
+      subtitle: 'Rendimiento total donde entrenes',
       features: [
         {
-          icon: 'layers',
-          title: 'Tonelaje total y racha',
-          desc: 'Monitorea tu volumen de carga acumulado y mantén la racha semanal en el Dashboard.'
+          icon: 'trending-up',
+          title: 'Cálculo de volumen',
+          desc: 'Tonelaje total acumulado (kg × reps) e historial de progreso.'
         },
         {
           icon: 'wifi-off',
           title: '100% Offline-First',
-          desc: 'Registra sin conexión; tus series se sincronizan en la nube automáticamente al reconectar.'
-        },
-        {
-          icon: 'download',
-          title: 'Instalar en Pantalla de Inicio',
-          desc: 'Instala la app desde el Perfil o menú del navegador para una experiencia en pantalla completa.'
+          desc: 'Registra sin conexión; sincronización automática al reconectar.'
         }
       ]
     }
@@ -172,7 +145,7 @@ window.FITTRACK.showGuide = function (onClose) {
           </div>
 
           <button class="guide-close-btn" id="btn-guide-close" aria-label="Cerrar">
-            <i data-lucide="x" style="width:18px;height:18px;"></i>
+            <i data-lucide="x" style="width:16px;height:16px;"></i>
           </button>
         </div>
 
@@ -181,7 +154,7 @@ window.FITTRACK.showGuide = function (onClose) {
           <div class="guide-slide-content">
             <div class="guide-slide-header">
               <div class="guide-icon-halo">
-                <i data-lucide="${s.icon}" style="width:28px;height:28px;"></i>
+                <i data-lucide="${s.icon}" style="width:20px;height:20px;"></i>
               </div>
               <div class="guide-header-text">
                 <h2 class="guide-title">${s.title}</h2>
@@ -189,27 +162,32 @@ window.FITTRACK.showGuide = function (onClose) {
               </div>
             </div>
 
-            <p class="guide-lead-desc">${s.desc}</p>
-
             <div class="guide-features-list">
               ${s.features.map(f => `
-                <div class="guide-feature-card ${f.soundType ? 'guide-feature-sound' : ''}">
+                <div class="guide-feature-card">
                   <div class="guide-feat-icon-wrap">
-                    <i data-lucide="${f.icon}" style="width:18px;height:18px;"></i>
+                    <i data-lucide="${f.icon}" style="width:15px;height:15px;"></i>
                   </div>
                   <div class="guide-feat-content">
                     <div class="guide-feat-title">${f.title}</div>
                     <div class="guide-feat-desc">${f.desc}</div>
-                    ${f.soundType ? `
-                      <button class="guide-sound-test-btn" data-sound="${f.soundType}">
-                        <i data-lucide="volume-2" style="width:14px;height:14px;"></i>
-                        <span>${f.soundLabel}</span>
-                      </button>
-                    ` : ''}
                   </div>
                 </div>
               `).join('')}
             </div>
+
+            ${s.soundButtons ? `
+              <div class="guide-sound-test-row">
+                <button class="guide-sound-test-btn" data-sound="whistle">
+                  <i data-lucide="volume-2" style="width:13px;height:13px;"></i>
+                  <span>Probar Silbato</span>
+                </button>
+                <button class="guide-sound-test-btn" data-sound="bell">
+                  <i data-lucide="bell" style="width:13px;height:13px;"></i>
+                  <span>Probar Campana</span>
+                </button>
+              </div>
+            ` : ''}
           </div>
         </div>
 

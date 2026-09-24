@@ -877,30 +877,47 @@
   margin-bottom: 0.5rem;
   font-size: 0.7rem;
   font-weight: 800;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--color-text-3);
+  box-sizing: border-box;
 }
 
 .sets-header-col-num {
-  width: 32px;
+  width: 30px;
   text-align: center;
+  flex-shrink: 0;
+}
+
+.sets-header-inputs-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 0.5rem;
 }
 
 .sets-header-col-reps {
-  flex: 1;
+  width: 70px;
   text-align: center;
-  padding-left: 1.5rem;
+  flex-shrink: 0;
+}
+
+.sets-header-divider-space {
+  width: 1px;
+  margin: 0 0.75rem;
+  flex-shrink: 0;
 }
 
 .sets-header-col-kg {
-  flex: 1;
+  width: 70px;
   text-align: center;
-  padding-right: 1.5rem;
+  flex-shrink: 0;
 }
 
 .sets-header-col-check {
   width: 32px;
+  flex-shrink: 0;
 }
 
 /* ── Set Row Luxury Pill ── */
@@ -1223,23 +1240,24 @@ body.in-workout #exercise-card-container > .card {
   }
 
   .workout-card-content-grid {
-    display: grid !important;
-    grid-template-columns: minmax(260px, 320px) 1fr !important;
-    gap: 1.5rem !important;
-    align-items: start !important;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 640px !important;
+    margin: 0 auto !important;
   }
 
   .workout-card-visual-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    position: sticky;
-    top: 0.5rem;
+    width: 100%;
   }
 
   .workout-card-sets-col {
     display: flex;
     flex-direction: column;
+    width: 100%;
     min-width: 0;
   }
 
@@ -1892,14 +1910,10 @@ body.in-workout #exercise-card-container > .card {
 /* ----------------------------------
    Header & Sidebar Logo (POG Training)
    ---------------------------------- */
-.app-header {
-  position: relative;
-}
-
 .header-title {
   position: absolute;
   left: 50%;
-  top: 50%;
+  top: calc(50% + (env(safe-area-inset-top) / 2));
   transform: translate(-50%, -50%);
   display: flex;
   align-items: center;
@@ -2124,27 +2138,28 @@ body.in-workout #exercise-card-container > .card {
 
 .guide-modal-container {
   width: 100%;
-  max-width: 520px;
-  height: min(88vh, 680px);
+  max-width: 345px;
+  height: auto;
+  max-height: min(78vh, 420px);
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   box-shadow: 
-    0 24px 60px rgba(0, 0, 0, 0.35),
-    0 2px 8px rgba(0, 0, 0, 0.1),
+    0 16px 40px rgba(0, 0, 0, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.08),
     0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  border-radius: 24px;
+  border-radius: 18px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
   position: relative;
   box-sizing: border-box;
-  animation: guideModalIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: guideModalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes guideModalIn {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(14px);
+    transform: scale(0.96) translateY(8px);
   }
   to {
     opacity: 1;
@@ -2156,31 +2171,31 @@ body.in-workout #exercise-card-container > .card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1.15rem 1.35rem 0.85rem 1.35rem;
+  padding: 0.65rem 0.95rem 0.55rem 0.95rem;
   border-bottom: 1px solid var(--color-border);
-  gap: 0.75rem;
+  gap: 0.5rem;
   flex-shrink: 0;
 }
 
 .guide-brand-wrap {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
+  gap: 0.35rem;
 }
 
 .guide-brand-name {
-  font-size: 0.88rem;
+  font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.02em;
   color: var(--color-text-1);
 }
 
 .guide-brand-sub {
-  font-size: 0.65rem;
+  font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.08em;
-  padding: 2px 7px;
-  border-radius: 6px;
+  padding: 2px 5px;
+  border-radius: 4px;
   background: var(--color-primary-dim);
   color: var(--color-primary);
   border: 1px solid rgba(183, 243, 74, 0.25);
@@ -2193,38 +2208,38 @@ body.in-workout #exercise-card-container > .card {
 .guide-step-indicators {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 5px;
 }
 
 .guide-step-pill {
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   border-radius: 50%;
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
   color: var(--color-text-3);
-  font-size: 0.74rem;
+  font-size: 0.65rem;
   font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   padding: 0;
 }
 
 .guide-step-pill:hover {
   background: var(--color-surface-3);
   color: var(--color-text-1);
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
 .guide-step-pill.active {
   background: var(--color-primary);
   border-color: var(--color-primary);
   color: var(--color-primary-text);
-  box-shadow: 0 0 14px var(--color-primary-dim);
-  transform: scale(1.12);
+  box-shadow: 0 0 10px var(--color-primary-dim);
+  transform: scale(1.08);
 }
 
 .guide-step-pill.completed {
@@ -2234,8 +2249,8 @@ body.in-workout #exercise-card-container > .card {
 }
 
 .guide-close-btn {
-  width: 32px;
-  height: 32px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
@@ -2251,13 +2266,13 @@ body.in-workout #exercise-card-container > .card {
 .guide-close-btn:hover {
   background: var(--color-surface-3);
   color: var(--color-text-1);
-  transform: scale(1.08);
+  transform: scale(1.06);
 }
 
 .guide-slide-body {
   flex: 1;
   overflow-y: auto;
-  padding: 1.25rem 1.35rem;
+  padding: 0.65rem 0.95rem;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -2272,13 +2287,13 @@ body.in-workout #exercise-card-container > .card {
 }
 
 .guide-slide-content {
-  animation: guideSlideIn 0.24s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: guideSlideIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes guideSlideIn {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(5px);
   }
   to {
     opacity: 1;
@@ -2289,17 +2304,17 @@ body.in-workout #exercise-card-container > .card {
 .guide-slide-header {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.9rem;
+  gap: 0.65rem;
+  margin-bottom: 0.5rem;
 }
 
 .guide-icon-halo {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
   background: var(--color-primary-dim);
   color: var(--color-primary);
-  border: 1.5px solid rgba(183, 243, 74, 0.25);
+  border: 1px solid rgba(183, 243, 74, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2313,52 +2328,41 @@ body.in-workout #exercise-card-container > .card {
 .guide-header-text {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.05rem;
 }
 
 .guide-title {
-  font-size: 1.2rem;
+  font-size: 0.92rem;
   font-weight: 800;
   color: var(--color-text-1);
   line-height: 1.2;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   margin: 0;
 }
 
 .guide-subtitle {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   font-weight: 600;
   color: var(--color-text-3);
   margin: 0;
 }
 
-.guide-lead-desc {
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--color-text-2);
-  margin-bottom: 1rem;
-  background: var(--color-surface-2);
-  padding: 0.65rem 0.9rem;
-  border-radius: 12px;
-  border: 1px solid var(--color-border);
-}
-
 .guide-features-list {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  margin-bottom: 0.5rem;
+  gap: 0.45rem;
+  margin-bottom: 0.2rem;
 }
 
 .guide-feature-card {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
+  gap: 0.55rem;
   background: var(--color-surface-2);
   border: 1px solid var(--color-border);
-  padding: 0.75rem 0.9rem;
-  border-radius: 14px;
-  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  padding: 0.45rem 0.65rem;
+  border-radius: 10px;
+  transition: transform 0.18s ease, border-color 0.18s ease;
 }
 
 .guide-feature-card:hover {
@@ -2366,22 +2370,17 @@ body.in-workout #exercise-card-container > .card {
   transform: translateY(-1px);
 }
 
-.guide-feature-sound {
-  border-left: 3px solid var(--color-primary);
-  background: var(--color-surface-2);
-}
-
 .guide-feat-icon-wrap {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
   background: var(--color-primary-dim);
   color: var(--color-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  margin-top: 2px;
+  margin-top: 1px;
 }
 
 .guide-feat-content {
@@ -2389,26 +2388,33 @@ body.in-workout #exercise-card-container > .card {
 }
 
 .guide-feat-title {
-  font-size: 0.86rem;
+  font-size: 0.76rem;
   font-weight: 700;
   color: var(--color-text-1);
-  margin-bottom: 0.15rem;
+  margin-bottom: 0.08rem;
 }
 
 .guide-feat-desc {
-  font-size: 0.76rem;
-  line-height: 1.4;
+  font-size: 0.68rem;
+  line-height: 1.32;
   color: var(--color-text-2);
 }
 
-.guide-sound-test-btn {
+.guide-sound-test-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
   margin-top: 0.45rem;
+}
+
+.guide-sound-test-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.72rem;
+  gap: 0.35rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  padding: 0.35rem 0.75rem;
+  padding: 0.26rem 0.6rem;
   border-radius: 9999px;
   background: var(--color-primary-dim);
   color: var(--color-primary);
@@ -2425,11 +2431,11 @@ body.in-workout #exercise-card-container > .card {
 .guide-sound-test-btn:active,
 .guide-sound-test-btn.pulse-active {
   transform: scale(0.95);
-  box-shadow: 0 0 14px var(--color-primary);
+  box-shadow: 0 0 10px var(--color-primary);
 }
 
 .guide-footer {
-  padding: 0.9rem 1.25rem;
+  padding: 0.6rem 0.95rem 0.7rem 0.95rem;
   border-top: 1px solid var(--color-border);
   background: var(--color-surface);
   flex-shrink: 0;
@@ -2439,20 +2445,20 @@ body.in-workout #exercise-card-container > .card {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .guide-btn-prev {
   background: var(--grad-btn-realism);
   border: 1px solid var(--color-border);
   color: var(--color-text-1);
-  padding: 0.65rem 1rem;
-  border-radius: 14px;
-  font-size: 0.84rem;
+  padding: 0.45rem 0.7rem;
+  border-radius: 10px;
+  font-size: 0.74rem;
   font-weight: 700;
   display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.25rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -2465,10 +2471,10 @@ body.in-workout #exercise-card-container > .card {
   background: transparent;
   border: none;
   color: var(--color-text-3);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 600;
   cursor: pointer;
-  padding: 0.45rem;
+  padding: 0.35rem;
   transition: color 0.15s ease;
 }
 
@@ -2478,20 +2484,20 @@ body.in-workout #exercise-card-container > .card {
 
 .guide-btn-next {
   flex: 1;
-  max-width: 220px;
+  max-width: 145px;
   margin-left: auto;
-  padding: 0.75rem 1.2rem;
-  border-radius: 16px;
-  font-size: 0.88rem;
+  padding: 0.55rem 0.85rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
   font-weight: 800;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.4rem;
+  gap: 0.35rem;
   background: var(--grad-btn-primary-realism);
   color: var(--color-primary-text);
   border: 1px solid rgba(255, 255, 255, 0.25);
-  box-shadow: 0 4px 16px var(--color-primary-dim);
+  box-shadow: 0 4px 14px var(--color-primary-dim);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -2502,14 +2508,31 @@ body.in-workout #exercise-card-container > .card {
 
 @media (max-width: 480px) {
   .guide-modal-container {
-    height: 92vh;
-    border-radius: 20px;
+    width: min(90vw, 340px);
+    max-height: 80vh;
+    border-radius: 16px;
   }
   .guide-slide-body {
-    padding: 1rem 1rem;
+    padding: 0.6rem 0.85rem;
   }
   .guide-title {
-    font-size: 1.1rem;
+    font-size: 0.88rem;
+  }
+}
+
+@media (max-height: 480px) {
+  .guide-modal-container {
+    max-height: 94vh;
+    max-width: 440px;
+  }
+  .guide-top-bar {
+    padding: 0.4rem 0.85rem;
+  }
+  .guide-slide-body {
+    padding: 0.45rem 0.85rem;
+  }
+  .guide-footer {
+    padding: 0.4rem 0.85rem;
   }
 }
 

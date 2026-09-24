@@ -367,6 +367,61 @@
   gap: 0.75rem;
 }
 
+.profile-setting-row-group {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.notif-time-drawer {
+  padding: 0 1rem 0.95rem 1rem;
+  animation: notifDrawerSlide 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes notifDrawerSlide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notif-time-drawer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
+  padding: 0.65rem 0.95rem;
+  border-radius: 12px;
+  gap: 0.75rem;
+  box-sizing: border-box;
+}
+
+.notif-time-input {
+  background: var(--color-surface);
+  border: 1.5px solid var(--color-border);
+  color: var(--color-text-1);
+  padding: 0.4rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  font-family: inherit;
+  outline: none;
+  cursor: pointer;
+  min-width: 95px;
+}
+
+.notif-save-btn {
+  font-size: 0.78rem !important;
+  font-weight: 700 !important;
+  padding: 0.45rem 0.85rem !important;
+  border-radius: 8px !important;
+}
+
 .profile-setting-divider {
   height: 1px;
   background: var(--color-border-subtle);

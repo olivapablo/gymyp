@@ -418,8 +418,11 @@ function renderCurrentExercise() {
           <!-- Labels Header: # | REPS | KG -->
           <div class="sets-header-row">
             <div class="sets-header-col-num">#</div>
-            <div class="sets-header-col-reps">REPS</div>
-            <div class="sets-header-col-kg">KG</div>
+            <div class="sets-header-inputs-wrap">
+              <div class="sets-header-col-reps">REPS</div>
+              <div class="sets-header-divider-space"></div>
+              <div class="sets-header-col-kg">KG</div>
+            </div>
             <div class="sets-header-col-check"></div>
           </div>
 

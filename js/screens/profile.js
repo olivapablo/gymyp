@@ -115,14 +115,14 @@ window.FITTRACK.screens.renderProfile = async function(container) {
         <div class="profile-setting-divider"></div>
 
         <!-- Workout Reminder (Native Local Notification) -->
-        <div class="profile-setting-row flex-col items-start gap-3" style="padding: 1rem 1.25rem;">
-          <div class="flex-row items-center justify-between w-full">
+        <div class="profile-setting-row-group">
+          <div class="profile-setting-row">
             <div class="flex-row items-center gap-3">
-              <div class="profile-setting-icon">
-                <i data-lucide="bell" style="width:18px;height:18px;color:var(--color-primary);"></i>
+              <div class="profile-setting-icon" style="background:rgba(183,243,74,0.12); color:var(--color-primary);">
+                <i data-lucide="bell" style="width:18px;height:18px;"></i>
               </div>
               <div>
-                <div class="font-medium" style="font-size:0.9rem;">Recordatorio diario</div>
+                <div class="font-medium" style="font-size:0.9rem; color:var(--color-text-1);">Recordatorio diario</div>
                 <div style="font-size:0.72rem;color:var(--color-text-3);">Aviso local para entrenar</div>
               </div>
             </div>
@@ -131,16 +131,16 @@ window.FITTRACK.screens.renderProfile = async function(container) {
             </div>
           </div>
 
-          <div id="notif-time-row" class="w-full ${notifEnabled ? '' : 'd-none'}" style="margin-top: 0.5rem; background: var(--color-surface-2); padding: 0.75rem 1rem; border-radius: var(--radius-lg); border: 1px solid var(--color-border-subtle); box-sizing: border-box;">
-            <div class="flex-row items-center justify-between gap-3 w-full" style="box-sizing: border-box;">
+          <!-- Drawer that appears BELOW the row when active -->
+          <div id="notif-time-row" class="notif-time-drawer ${notifEnabled ? '' : 'd-none'}">
+            <div class="notif-time-drawer-inner">
               <div class="flex-row items-center gap-2">
                 <i data-lucide="clock" style="width:16px;height:16px;color:var(--color-primary);flex-shrink:0;"></i>
                 <span style="font-size:0.85rem;font-weight:600;color:var(--color-text-1);">Horario:</span>
               </div>
               <div class="flex-row items-center gap-2">
-                <input type="time" id="notif-time-input" value="${timeValue}" 
-                  style="background: var(--color-surface); border: 1.5px solid var(--color-border); color: var(--color-text-1); padding: 0.45rem 0.65rem; border-radius: var(--radius-md); font-size: 0.95rem; font-weight: 700; font-family: inherit; outline: none; cursor: pointer; min-width: 95px;">
-                <button id="btn-save-notif-time" class="btn btn-primary btn-sm" style="font-size: 0.78rem; font-weight: 700; padding: 0.45rem 0.85rem; border-radius: var(--radius-md);">
+                <input type="time" id="notif-time-input" value="${timeValue}" class="notif-time-input">
+                <button id="btn-save-notif-time" class="btn btn-primary btn-sm notif-save-btn">
                   Guardar
                 </button>
               </div>

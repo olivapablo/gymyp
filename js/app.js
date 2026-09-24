@@ -64,6 +64,14 @@ function initRoutes() {
   window.FITTRACK.router.add('/progress', window.FITTRACK.screens.renderProgress);
   
   window.FITTRACK.router.add('/profile', window.FITTRACK.screens.renderProfile);
+
+  window.FITTRACK.router.add('/guide', () => {
+    if (window.FITTRACK.showGuide) {
+      window.FITTRACK.showGuide(() => {
+        window.history.back();
+      });
+    }
+  });
 }
 
 async function updateSidebarUserInfo(user) {

@@ -937,6 +937,7 @@ function startWorkoutTimer() {
 function startRestTimer(seconds) {
   restTotalSeconds = seconds || 90;
   restRemainingSeconds = restTotalSeconds;
+  if (window.FITTRACK.audio) window.FITTRACK.audio.playRestStartSound();
   updateDialDisplay();
 }
 

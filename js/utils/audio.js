@@ -176,17 +176,19 @@ window.FITTRACK = window.FITTRACK || {};
       this.playCountdownTick(freq, 0.12);
     },
 
-    // Rest finished: Whistle sound followed by boxing bell
+    // Rest started: Sports whistle signal to begin recovery
+    playRestStartSound() {
+      try {
+        this.playWhistle(0.42);
+      } catch (e) {
+        console.warn('Rest start audio error:', e);
+      }
+    },
+
+    // Rest finished: Double boxing bell signal to return to work ("DING! ... DING!")
     playRestFinishedSound() {
       try {
-        this.playWhistle(0.38);
-        const ctx = getAudioContext();
-        if (ctx) {
-          // Play boxing bell right after whistle to signal round resumption
-          setTimeout(() => {
-            this.playBoxingBell();
-          }, 320);
-        }
+        this.playBoxingBell();
       } catch (e) {
         console.warn('Rest finished audio error:', e);
       }

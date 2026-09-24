@@ -150,18 +150,21 @@ window.FITTRACK.screens.renderProfile = async function(container) {
 
         <div class="profile-setting-divider"></div>
 
-        <!-- Onboarding walkthrough replay -->
+        <!-- Guía de inicio interactiva -->
         <div class="profile-setting-row" id="row-replay-onboarding" style="cursor:pointer;">
           <div class="flex-row items-center gap-3">
-            <div class="profile-setting-icon">
-              <i data-lucide="help-circle" style="width:18px;height:18px;color:var(--color-text-2);"></i>
+            <div class="profile-setting-icon" style="background:rgba(183,243,74,0.12); color:var(--color-primary); display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:10px;">
+              <i data-lucide="book-open" style="width:18px;height:18px;"></i>
             </div>
             <div>
-              <div class="font-medium" style="font-size:0.9rem;">Guía de inicio</div>
-              <div style="font-size:0.72rem;color:var(--color-text-3);">Repetir tutorial de bienvenida</div>
+              <div class="font-medium" style="font-size:0.92rem; color:var(--color-text-1);">Guía de inicio</div>
+              <div style="font-size:0.75rem;color:var(--color-text-3);">Manual interactivo y tutorial de entrenamiento</div>
             </div>
           </div>
-          <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--color-text-3);"></i>
+          <div class="flex-row items-center gap-2">
+            <span style="background:rgba(183,243,74,0.15);color:var(--color-primary);font-size:0.68rem;font-weight:700;padding:3px 8px;border-radius:12px;border:1px solid rgba(183,243,74,0.3);letter-spacing:0.04em;">PRO</span>
+            <i data-lucide="chevron-right" style="width:16px;height:16px;color:var(--color-text-3);"></i>
+          </div>
         </div>
 
         <div class="profile-setting-divider"></div>
@@ -235,11 +238,13 @@ window.FITTRACK.screens.renderProfile = async function(container) {
       });
     }
 
-    // Replay onboarding
+    // Replay onboarding / Guía de inicio interactiva
     const rowReplay = document.getElementById('row-replay-onboarding');
     if (rowReplay) {
       rowReplay.addEventListener('click', () => {
-        if (window.FITTRACK.showOnboarding) {
+        if (window.FITTRACK.showGuide) {
+          window.FITTRACK.showGuide();
+        } else if (window.FITTRACK.showOnboarding) {
           window.FITTRACK.showOnboarding();
         }
       });

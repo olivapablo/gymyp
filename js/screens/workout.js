@@ -229,6 +229,7 @@ window.FITTRACK.screens.startRoutineWorkout = async function(routineId, clickedE
 };
 
 window.FITTRACK.screens.renderActiveWorkout = async function(container) {
+  document.body.classList.add('in-workout');
   if (!activeWorkoutState) {
     container.innerHTML = `
       <div class="flex-col items-center py-12"><div class="spinner"></div><p class="mt-4 text-color-2">Cargando entrenamiento...</p></div>
@@ -238,6 +239,7 @@ window.FITTRACK.screens.renderActiveWorkout = async function(container) {
 
   try {
     if (!activeWorkoutState) {
+      document.body.classList.remove('in-workout');
       window.location.hash = '#/workout';
       return;
     }
@@ -348,120 +350,128 @@ function renderCurrentExercise() {
   container.innerHTML = `
     <div class="card bg-surface px-5 py-6 rounded-3xl shadow-2xl relative overflow-hidden border border-color-border">
       
-      <!-- Progress indicator -->
-      <div class="flex-row justify-center items-center gap-1 mb-4">
-        ${activeWorkoutState.exercises.map((_, i) => `
-          <div style="
-            width: ${i === currentExIndex ? '20px' : '6px'};
-            height: 6px;
-            border-radius: 3px;
-            background: ${i === currentExIndex ? 'var(--color-primary)' : (i < currentExIndex ? 'rgba(183,243,74,0.35)' : 'var(--color-surface-3)')};
-            transition: all 0.3s ease;
-          "></div>
-        `).join('')}
-      </div>
-
-      <!-- Card Header: Nav + Title -->
-      <div class="flex-row justify-between items-center mb-3">
-        <button class="exercise-nav-btn" id="btn-prev-ex" ${!hasPrev ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
-          <i data-lucide="chevron-left" style="width:24px;height:24px;"></i>
-        </button>
-        
-        <div class="text-center flex-1 px-2">
-          <div class="text-xs font-bold text-color-3 uppercase tracking-widest mb-1">${currentExIndex + 1} de ${activeWorkoutState.exercises.length}</div>
-          <h2 class="text-xl font-black text-color-1 leading-tight tracking-tight uppercase">${ex.name}</h2>
-          <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 3} × ${ex.targetReps || '8-12'}</span></p>
-        </div>
-        
-        <button class="exercise-nav-btn" id="btn-next-ex" ${!hasNext ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
-          <i data-lucide="chevron-right" style="width:24px;height:24px;"></i>
-        </button>
-      </div>
-
-      <!-- Exercise Observations / Notes (Premium compact card) -->
-      ${ex.notes && ex.notes.trim() ? `
-        <div class="exercise-observation-card mb-3">
-          <svg class="obs-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-          <span class="obs-body">${ex.notes.trim()}</span>
-        </div>
-      ` : ''}
-
-      <!-- Central Circular Timer Dial Widget -->
-      <div class="workout-dial-container">
-        <div class="workout-dial-widget" id="workout-dial-widget" title="Temporizador">
-          <svg viewBox="0 0 170 170">
-            <circle class="dial-track-bg" cx="85" cy="85" r="75"></circle>
-            <circle class="dial-progress-fill" id="dial-progress-ring" cx="85" cy="85" r="75"></circle>
-          </svg>
-          <div class="dial-inner-disk">
-            <div class="dial-time" id="dial-time-display">${restRemainingSeconds > 0 ? formatTime(restRemainingSeconds) : formatTime(workoutDurationSeconds)}</div>
-            <div class="dial-label" id="dial-label-display">${restRemainingSeconds > 0 ? 'DESCANSO' : 'ENTRENANDO'}</div>
+      <div class="workout-card-content-grid">
+        <!-- Visual & Timer Column -->
+        <div class="workout-card-visual-col">
+          <!-- Progress indicator -->
+          <div class="flex-row justify-center items-center gap-1 mb-4 w-full">
+            ${activeWorkoutState.exercises.map((_, i) => `
+              <div style="
+                width: ${i === currentExIndex ? '20px' : '6px'};
+                height: 6px;
+                border-radius: 3px;
+                background: ${i === currentExIndex ? 'var(--color-primary)' : (i < currentExIndex ? 'rgba(183,243,74,0.35)' : 'var(--color-surface-3)')};
+                transition: all 0.3s ease;
+              "></div>
+            `).join('')}
           </div>
-        </div>
-        
-        <!-- Quick rest actions when resting -->
-        <div class="dial-rest-actions ${restRemainingSeconds > 0 ? '' : 'd-none'}" id="dial-rest-actions">
-          <button type="button" class="dial-action-btn" id="btn-dial-minus15">−15s</button>
-          <button type="button" class="dial-action-btn skip" id="btn-dial-skip">Saltar</button>
-          <button type="button" class="dial-action-btn" id="btn-dial-plus15">+15s</button>
-        </div>
-      </div>
 
-      <!-- Labels Header: # | REPS | KG -->
-      <div class="sets-header-row">
-        <div class="sets-header-col-num">#</div>
-        <div class="sets-header-col-reps">REPS</div>
-        <div class="sets-header-col-kg">KG</div>
-        <div class="sets-header-col-check"></div>
-      </div>
+          <!-- Card Header: Nav + Title -->
+          <div class="flex-row justify-between items-center mb-3 w-full">
+            <button class="exercise-nav-btn" id="btn-prev-ex" ${!hasPrev ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
+              <i data-lucide="chevron-left" style="width:24px;height:24px;"></i>
+            </button>
+            
+            <div class="text-center flex-1 px-2">
+              <div class="text-xs font-bold text-color-3 uppercase tracking-widest mb-1">${currentExIndex + 1} de ${activeWorkoutState.exercises.length}</div>
+              <h2 class="text-xl font-black text-color-1 leading-tight tracking-tight uppercase">${ex.name}</h2>
+              <p class="text-sm font-semibold text-primary mt-1 opacity-90">Objetivo: <span class="font-bold">${ex.targetSets || 3} × ${ex.targetReps || '8-12'}</span></p>
+            </div>
+            
+            <button class="exercise-nav-btn" id="btn-next-ex" ${!hasNext ? 'style="opacity:0.2; pointer-events:none;"' : ''}>
+              <i data-lucide="chevron-right" style="width:24px;height:24px;"></i>
+            </button>
+          </div>
 
-      <!-- Sets List -->
-      <div class="sets-container mb-4">
-        ${ex.sets.map((set, setIndex) => {
-          const prevSet = prevLogs[setIndex] || prevLogs[prevLogs.length - 1];
-          const prevReps = prevSet ? prevSet.reps : (ex.targetReps ? String(ex.targetReps).split('-')[0] : '8');
-          const prevKg = prevSet ? prevSet.kg : (ex.weight ? String(ex.weight) : '');
+          <!-- Exercise Observations / Notes (Premium compact card) -->
+          ${ex.notes && ex.notes.trim() ? `
+            <div class="exercise-observation-card mb-3 w-full">
+              <svg class="obs-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+              <span class="obs-body">${ex.notes.trim()}</span>
+            </div>
+          ` : ''}
 
-          return `
-            <div class="set-row-luxury ${set.completed ? 'completed' : ''}" data-set="${setIndex}">
-              <div class="set-badge cursor-pointer" data-set="${setIndex}" title="Serie ${setIndex + 1}">
-                ${setIndex + 1}
-              </div>
-              <div class="set-inputs-wrap">
-                <input type="number" inputmode="decimal" class="set-input-num" value="${set.reps !== undefined && set.reps !== null ? set.reps : ''}" placeholder="${prevReps || '8'}" data-set="${setIndex}" data-field="reps">
-                <div class="set-divider"></div>
-                <input type="number" inputmode="decimal" class="set-input-num" value="${set.kg !== undefined && set.kg !== null ? set.kg : ''}" placeholder="${prevKg || 'Kg'}" data-set="${setIndex}" data-field="kg">
-              </div>
-              <div class="set-check-btn ${set.completed ? 'completed' : 'pending'}" data-set="${setIndex}" title="${set.completed ? 'Completada' : 'Marcar como completada'}">
-                ${set.completed 
-                  ? `<svg class="set-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>` 
-                  : `<div class="set-check-ring"></div>`
-                }
+          <!-- Central Circular Timer Dial Widget -->
+          <div class="workout-dial-container">
+            <div class="workout-dial-widget" id="workout-dial-widget" title="Temporizador">
+              <svg viewBox="0 0 170 170">
+                <circle class="dial-track-bg" cx="85" cy="85" r="75"></circle>
+                <circle class="dial-progress-fill" id="dial-progress-ring" cx="85" cy="85" r="75"></circle>
+              </svg>
+              <div class="dial-inner-disk">
+                <div class="dial-time" id="dial-time-display">${restRemainingSeconds > 0 ? formatTime(restRemainingSeconds) : formatTime(workoutDurationSeconds)}</div>
+                <div class="dial-label" id="dial-label-display">${restRemainingSeconds > 0 ? 'DESCANSO' : 'ENTRENANDO'}</div>
               </div>
             </div>
-          `;
-        }).join('')}
-        
-        <!-- Add set button — pill shaped -->
-        <div class="flex-row justify-center">
-          <button type="button" class="btn-add-set-luxury" id="btn-add-set-mockup">
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            <span>Agregar serie</span>
-          </button>
+            
+            <!-- Quick rest actions when resting -->
+            <div class="dial-rest-actions ${restRemainingSeconds > 0 ? '' : 'd-none'}" id="dial-rest-actions">
+              <button type="button" class="dial-action-btn" id="btn-dial-minus15">−15s</button>
+              <button type="button" class="dial-action-btn skip" id="btn-dial-skip">Saltar</button>
+              <button type="button" class="dial-action-btn" id="btn-dial-plus15">+15s</button>
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Main Actions -->
-      <div class="workout-action-buttons">
-        <button class="btn btn-primary btn-block py-4 rounded-2xl text-lg shadow-glow" id="btn-guardar-serie">
-          <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i>
-          ${ex.sets.every(s => s.completed) ? 'Siguiente ejercicio' : 'Guardar serie'}
-        </button>
+        <!-- Sets & Actions Column -->
+        <div class="workout-card-sets-col">
+          <!-- Labels Header: # | REPS | KG -->
+          <div class="sets-header-row">
+            <div class="sets-header-col-num">#</div>
+            <div class="sets-header-col-reps">REPS</div>
+            <div class="sets-header-col-kg">KG</div>
+            <div class="sets-header-col-check"></div>
+          </div>
 
-        <button class="btn-finish-workout-luxury" id="btn-finish-workout-final">
-          <i data-lucide="flag" style="width:16px;height:16px;"></i>
-          Finalizar entrenamiento
-        </button>
+          <!-- Sets List -->
+          <div class="sets-container mb-4">
+            ${ex.sets.map((set, setIndex) => {
+              const prevSet = prevLogs[setIndex] || prevLogs[prevLogs.length - 1];
+              const prevReps = prevSet ? prevSet.reps : (ex.targetReps ? String(ex.targetReps).split('-')[0] : '8');
+              const prevKg = prevSet ? prevSet.kg : (ex.weight ? String(ex.weight) : '');
+
+              return `
+                <div class="set-row-luxury ${set.completed ? 'completed' : ''}" data-set="${setIndex}">
+                  <div class="set-badge cursor-pointer" data-set="${setIndex}" title="Serie ${setIndex + 1}">
+                    ${setIndex + 1}
+                  </div>
+                  <div class="set-inputs-wrap">
+                    <input type="number" inputmode="decimal" class="set-input-num" value="${set.reps !== undefined && set.reps !== null ? set.reps : ''}" placeholder="${prevReps || '8'}" data-set="${setIndex}" data-field="reps">
+                    <div class="set-divider"></div>
+                    <input type="number" inputmode="decimal" class="set-input-num" value="${set.kg !== undefined && set.kg !== null ? set.kg : ''}" placeholder="${prevKg || 'Kg'}" data-set="${setIndex}" data-field="kg">
+                  </div>
+                  <div class="set-check-btn ${set.completed ? 'completed' : 'pending'}" data-set="${setIndex}" title="${set.completed ? 'Completada' : 'Marcar como completada'}">
+                    ${set.completed 
+                      ? `<svg class="set-check-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>` 
+                      : `<div class="set-check-ring"></div>`
+                    }
+                  </div>
+                </div>
+              `;
+            }).join('')}
+            
+            <!-- Add set button — pill shaped -->
+            <div class="flex-row justify-center">
+              <button type="button" class="btn-add-set-luxury" id="btn-add-set-mockup">
+                <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <span>Agregar serie</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Main Actions -->
+          <div class="workout-action-buttons">
+            <button class="btn btn-primary btn-block py-4 rounded-2xl text-lg shadow-glow" id="btn-guardar-serie">
+              <i data-lucide="check-circle" style="margin-right:8px;width:22px;height:22px;"></i>
+              ${ex.sets.every(s => s.completed) ? 'Siguiente ejercicio' : 'Guardar serie'}
+            </button>
+
+            <button class="btn-finish-workout-luxury" id="btn-finish-workout-final">
+              <i data-lucide="flag" style="width:16px;height:16px;"></i>
+              Finalizar entrenamiento
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -950,6 +960,7 @@ function skipRest() {
 
 window.addEventListener('hashchange', () => {
   if (window.location.hash !== '#/workout/active') {
+    document.body.classList.remove('in-workout');
     if (workoutTimerInterval) clearInterval(workoutTimerInterval);
     workoutTimerInterval = null;
     restRemainingSeconds = 0;

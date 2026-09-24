@@ -7,7 +7,7 @@
   "id": "/",
   "display": "standalone",
   "display_override": ["standalone", "minimal-ui", "browser"],
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "theme_color": "#0B0D0F",
   "background_color": "#0B0D0F",
   "categories": ["fitness", "health", "sports"],

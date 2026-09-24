@@ -113,11 +113,24 @@ async function bootstrap() {
       showApp();
       updateSidebarUserInfo(user);
 
-      // Trigger Onboarding for first-time users
-      if (window.FITTRACK.isOnboardingDone && !window.FITTRACK.isOnboardingDone()) {
-        setTimeout(() => {
-          if (window.FITTRACK.showOnboarding) window.FITTRACK.showOnboarding();
-        }, 600);
+      // Trigger Guía de Inicio ONLY for new users who don't have any routines yet
+      try {
+        let routines = [];
+        if (window.FITTRACK.getRoutines) {
+          routines = await window.FITTRACK.getRoutines();
+        }
+        const hasRoutines = Array.isArray(routines) && routines.length > 0;
+
+        if (!hasRoutines && window.FITTRACK.isOnboardingDone && !window.FITTRACK.isOnboardingDone()) {
+          setTimeout(() => {
+            if (window.FITTRACK.showGuide) window.FITTRACK.showGuide();
+            else if (window.FITTRACK.showOnboarding) window.FITTRACK.showOnboarding();
+          }, 600);
+        } else if (hasRoutines && window.FITTRACK.markOnboardingDone) {
+          window.FITTRACK.markOnboardingDone();
+        }
+      } catch (e) {
+        console.warn('[App] Error checking routines for guide:', e);
       }
     } else {
       console.log('[App] No user signed in');

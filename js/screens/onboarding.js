@@ -1,9 +1,8 @@
 window.FITTRACK = window.FITTRACK || {};
 
 /**
- * FITTRACK — Guía de Inicio Ultra Premium & Onboarding
- * Interactive walkthrough explaining core mechanics, acoustic timer signals,
- * routine builder, volume tracking, and offline capabilities.
+ * POG TRAINING — Guía de Inicio
+ * Concise, theme-adaptive interactive guide.
  */
 
 const _OB_KEY = 'fittrack_onboarding_done';
@@ -17,153 +16,104 @@ window.FITTRACK.markOnboardingDone = function () {
 };
 
 window.FITTRACK.showGuide = function (onClose) {
-  // Remove any preexisting guide overlay
+  // Remove any preexisting overlay
   const existing = document.getElementById('guide-overlay') || document.getElementById('onboarding-overlay');
   if (existing) existing.remove();
 
   const slides = [
     {
-      badge: 'SISTEMA ULTRA PREMIUM',
-      badgeColor: '#B7FF3A',
-      badgeBg: 'rgba(183,255,58,0.12)',
       icon: 'zap',
-      title: 'Bienvenido a PSG TRAINING',
+      title: 'Bienvenido a POG TRAINING',
       subtitle: 'Disciplina hoy, resultados mañana',
-      desc: 'FITTRACK es tu central de alto rendimiento diseñada para maximizar cada segundo de entrenamiento mediante control métrico riguroso, sobrecarga progresiva y cero distracciones.',
+      desc: 'Tu central de entrenamiento para maximizar cada sesión con control métrico riguroso y cero distracciones.',
       features: [
         {
           icon: 'dumbbell',
-          title: 'Registro serie a serie en tiempo real',
-          desc: 'Anota kg levantados y repeticiones logradas con un solo toque ergonómico.'
+          title: 'Rutinas estructuradas',
+          desc: 'Diseña tu programa con series, repeticiones y descanso por ejercicio.'
         },
         {
           icon: 'volume-2',
-          title: 'Audio Coach acústico inteligente',
-          desc: 'Silbato al iniciar el descanso y doble campana al terminar para no mirar el móvil.'
+          title: 'Audio Coach acústico',
+          desc: 'Silbato al iniciar el descanso y doble campana al terminar.'
         },
         {
           icon: 'trending-up',
-          title: 'Cálculo automático de tonelaje',
-          desc: 'Mide el volumen de carga acumulado y el progreso real en cada grupo muscular.'
-        },
-        {
-          icon: 'wifi-off',
-          title: 'Arquitectura 100% Offline-First',
-          desc: 'Entrena sin cobertura en cualquier gimnasio; tus datos se sincronizan al salir.'
+          title: 'Cálculo de volumen',
+          desc: 'Tonelaje acumulado automático (kg × reps) e historial de cada sesión.'
         }
       ]
     },
     {
-      badge: 'MÓDULO 1 · PROGRAMACIÓN',
-      badgeColor: '#38BDF8',
-      badgeBg: 'rgba(56,189,248,0.12)',
       icon: 'clipboard-list',
-      title: 'Diseña tus Rutinas a Medida',
-      subtitle: 'Estructura inteligente para tus objetivos',
-      desc: 'Crea rutinas personalizadas adaptadas a tus días de entreno o activa planes predeterminados de fuerza e hipertrofia.',
+      title: 'Rutinas y Planificación',
+      subtitle: 'Estructura por días y objetivos',
+      desc: 'Organiza tus sesiones fácilmente o activa las plantillas predeterminadas de fuerza e hipertrofia.',
       features: [
         {
           icon: 'calendar',
           title: 'División flexible por días',
-          desc: 'Organiza tus sesiones semanales (Día 1: Empuje, Día 2: Tracción, Día 3: Pierna...).'
+          desc: 'Separa tus entrenamientos por días (Día 1, Día 2, etc.) o grupos musculares.'
         },
         {
           icon: 'sliders',
-          title: 'Series, repeticiones y descanso por ejercicio',
-          desc: 'Personaliza el número de series, objetivo de reps y el tiempo de recuperación exacto (ej. 60s, 90s, 120s).'
+          title: 'Variables precisas',
+          desc: 'Asigna el peso objetivo, rango de reps y segundos de recuperación a cada ejercicio.'
         },
         {
           icon: 'plus-circle',
-          title: 'Biblioteca de ejercicios amplia',
-          desc: 'Añade ejercicios de pectoral, espalda, piernas, hombros, brazos y core con indicaciones biomecánicas.'
+          title: 'Flexibilidad en la sala',
+          desc: 'Añade, edita o reordena ejercicios en cualquier momento según las máquinas disponibles.'
         }
       ]
     },
     {
-      badge: 'MÓDULO 2 · EN LA SALA',
-      badgeColor: '#B7FF3A',
-      badgeBg: 'rgba(183,255,58,0.15)',
       icon: 'bell',
-      title: 'Modo Sesión & Señales Acústicas',
-      subtitle: 'Tu árbitro y cronómetro acústico',
-      desc: 'El sistema acústico de FITTRACK te guía con señales de audio de alta penetración para que entrenes concentrado sin mirar la pantalla:',
-      hasSoundTester: true,
+      title: 'Entrenamiento en Vivo & Audio',
+      subtitle: 'Señales acústicas de alta penetración',
+      desc: 'El cronómetro te guía con sonidos claros para que entrenes concentrado sin mirar la pantalla:',
       features: [
         {
           icon: 'play',
-          title: 'Al iniciar el descanso 📣',
-          desc: 'Al marcar una serie completada, suena el silbato arbitral dando inicio a tu recuperación.',
+          title: 'Al Iniciar Descanso 📣',
+          desc: 'Suena el silbato arbitral marcando el inicio de tu recuperación.',
           soundType: 'whistle',
-          soundLabel: 'Probar Silbato (Inicio)'
-        },
-        {
-          icon: 'clock',
-          title: 'Últimos 5 segundos ⏱️',
-          desc: 'Pulsos rítmicos de cuenta regresiva (ticks) para volver a la máquina o barra y tomar posición.'
+          soundLabel: 'Probar Silbato'
         },
         {
           icon: 'award',
-          title: 'Al terminar el descanso 🔔',
-          desc: 'Suena la doble campana de boxeo ("DING! DING!") indicando el comienzo inmediato de tu próxima serie.',
+          title: 'Al Terminar Descanso 🔔',
+          desc: 'Suena la doble campana ("DING! DING!") indicando la siguiente serie.',
           soundType: 'bell',
-          soundLabel: 'Probar Doble Campana (Fin)'
+          soundLabel: 'Probar Doble Campana'
         },
         {
           icon: 'rotate-cw',
-          title: 'Dial táctil interactivo',
-          desc: 'Ajusta el tiempo de descanso con los botones +15s / -15s o pulsa "Saltar" si ya estás listo.'
+          title: 'Dial táctil de descanso',
+          desc: 'Ajusta con +15s / -15s o pulsa "Saltar" si ya estás listo. (Ticks rítmicos en los últimos 5s).'
         }
       ]
     },
     {
-      badge: 'MÓDULO 3 · RESULTADOS',
-      badgeColor: '#FFC857',
-      badgeBg: 'rgba(255,200,87,0.12)',
-      icon: 'bar-chart-2',
-      title: 'Métricas de Carga & Progreso',
-      subtitle: 'Lo que se mide, se mejora',
-      desc: 'El crecimiento físico responde a datos objetivos. Analiza tu consistencia con métricas profesionales:',
+      icon: 'smartphone',
+      title: 'Métricas & Modo Offline',
+      subtitle: 'Sin cortes y disponible donde sea',
+      desc: 'Diseñada con tecnología PWA para rendir al máximo incluso en sótanos de gimnasios sin señal.',
       features: [
         {
           icon: 'layers',
-          title: 'Tonelaje total acumulado',
-          desc: 'Multiplicamos tus kilogramos levantados por cada repetición para darte el tonelaje exacto movido en la sesión y el mes.'
+          title: 'Tonelaje total y racha',
+          desc: 'Monitorea tu volumen de carga acumulado y mantén la racha semanal en el Dashboard.'
         },
-        {
-          icon: 'flame',
-          title: 'Racha semanal en el Dashboard',
-          desc: 'Monitorea tus días de entrenamiento cumplidos cada semana para forjar disciplina inquebrantable.'
-        },
-        {
-          icon: 'history',
-          title: 'Historial detallado e inmutable',
-          desc: 'Revisa fecha, duración, desglose de series y pesos históricos para asegurar sobrecarga progresiva.'
-        }
-      ]
-    },
-    {
-      badge: 'MÓDULO 4 · SIN LÍMITES',
-      badgeColor: '#4ADE80',
-      badgeBg: 'rgba(74,222,128,0.12)',
-      icon: 'smartphone',
-      title: 'App Nativa y Modo Offline',
-      subtitle: 'Tu entrenamiento siempre disponible',
-      desc: 'Diseñada con tecnología Progressive Web App (PWA) para garantizar máximo rendimiento sin depender de señal móvil ni tiendas lentas:',
-      features: [
         {
           icon: 'wifi-off',
-          title: 'Cero interrupciones por falta de señal',
-          desc: 'Entrena en sótanos o zonas sin cobertura. La app almacena las series localmente y las sincroniza en la nube al reconectarte.'
+          title: '100% Offline-First',
+          desc: 'Registra sin conexión; tus series se sincronizan en la nube automáticamente al reconectar.'
         },
         {
           icon: 'download',
           title: 'Instalar en Pantalla de Inicio',
-          desc: 'Instálala desde la sección Perfil o el menú del navegador para disfrutar de pantalla completa como una app nativa.'
-        },
-        {
-          icon: 'bell-ring',
-          title: 'Recordatorio diario personalizado',
-          desc: 'Define la hora exacta a la que deseas recibir el aviso para entrenar y nunca romper el hábito.'
+          desc: 'Instala la app desde el Perfil o menú del navegador para una experiencia en pantalla completa.'
         }
       ]
     }
@@ -171,13 +121,12 @@ window.FITTRACK.showGuide = function (onClose) {
 
   let current = 0;
 
-  // Create overlay element and attach to body immediately
+  // Create and append overlay immediately
   const overlay = document.createElement('div');
   overlay.id = 'guide-overlay';
   overlay.className = 'guide-overlay';
   document.body.appendChild(overlay);
 
-  // Keyboard navigation
   const handleKeydown = (e) => {
     if (e.key === 'Escape') closeGuide();
     else if (e.key === 'ArrowRight' && current < slides.length - 1) {
@@ -197,7 +146,7 @@ window.FITTRACK.showGuide = function (onClose) {
     setTimeout(() => {
       overlay.remove();
       if (typeof onClose === 'function') onClose();
-    }, 280);
+    }, 240);
   }
 
   function renderSlide(idx) {
@@ -207,74 +156,70 @@ window.FITTRACK.showGuide = function (onClose) {
 
     overlay.innerHTML = `
       <div class="guide-modal-container">
-        <!-- Top bar: Logo + Step Indicator + Close button -->
+        <!-- Top bar: Clean brand + Steps (1..4) + Close -->
         <div class="guide-top-bar">
-          <div class="guide-brand-chip">
-            <span class="guide-badge" style="background:${s.badgeBg}; color:${s.badgeColor}; border:1px solid ${s.badgeColor}40;">
-              ${s.badge}
-            </span>
+          <div class="guide-brand-wrap">
+            <span class="guide-brand-name">POG TRAINING</span>
+            <span class="guide-brand-sub">GUÍA</span>
           </div>
 
-          <!-- Step navigation pills (Clickable) -->
-          <div class="guide-step-indicators" title="Haz clic en cualquier paso">
-            ${slides.map((slide, i) => `
-              <button class="guide-step-pill ${i === idx ? 'active' : ''} ${i < idx ? 'completed' : ''}" data-step="${i}" aria-label="Ir al paso ${i+1}">
-                <span class="guide-step-number">${i + 1}</span>
+          <div class="guide-step-indicators">
+            ${slides.map((_, i) => `
+              <button class="guide-step-pill ${i === idx ? 'active' : ''} ${i < idx ? 'completed' : ''}" data-step="${i}" aria-label="Paso ${i+1}">
+                <span>${i + 1}</span>
               </button>
             `).join('')}
           </div>
 
-          <button class="guide-close-btn" id="btn-guide-close" aria-label="Cerrar guía">
+          <button class="guide-close-btn" id="btn-guide-close" aria-label="Cerrar">
             <i data-lucide="x" style="width:18px;height:18px;"></i>
           </button>
         </div>
 
-        <!-- Scrollable Slide Body -->
+        <!-- Slide Body with enter animation -->
         <div class="guide-slide-body">
-          <!-- Slide Header -->
-          <div class="guide-slide-header">
-            <div class="guide-icon-halo" style="background:${s.badgeBg}; color:${s.badgeColor}; box-shadow: 0 0 28px ${s.badgeColor}33; border: 1.5px solid ${s.badgeColor}4D;">
-              <i data-lucide="${s.icon}" style="width:34px;height:34px;"></i>
-            </div>
-            <div class="guide-header-text">
-              <span class="guide-step-label">${idx + 1} de ${slides.length}</span>
-              <h2 class="guide-title">${s.title}</h2>
-              <p class="guide-subtitle">${s.subtitle}</p>
-            </div>
-          </div>
-
-          <!-- Slide Description -->
-          <p class="guide-lead-desc">${s.desc}</p>
-
-          <!-- Interactive Feature Cards -->
-          <div class="guide-features-list">
-            ${s.features.map(f => `
-              <div class="guide-feature-card ${f.soundType ? 'guide-feature-sound' : ''}">
-                <div class="guide-feat-icon-wrap" style="color:${s.badgeColor};">
-                  <i data-lucide="${f.icon}" style="width:20px;height:20px;"></i>
-                </div>
-                <div class="guide-feat-content">
-                  <div class="guide-feat-title">${f.title}</div>
-                  <div class="guide-feat-desc">${f.desc}</div>
-                  ${f.soundType ? `
-                    <button class="btn btn-sm guide-sound-test-btn" data-sound="${f.soundType}" style="border: 1px solid ${s.badgeColor}66; background: ${s.badgeBg}; color: ${s.badgeColor};">
-                      <i data-lucide="volume-2" style="width:14px;height:14px;"></i>
-                      <span>${f.soundLabel}</span>
-                    </button>
-                  ` : ''}
-                </div>
+          <div class="guide-slide-content">
+            <div class="guide-slide-header">
+              <div class="guide-icon-halo">
+                <i data-lucide="${s.icon}" style="width:28px;height:28px;"></i>
               </div>
-            `).join('')}
+              <div class="guide-header-text">
+                <h2 class="guide-title">${s.title}</h2>
+                <p class="guide-subtitle">${s.subtitle}</p>
+              </div>
+            </div>
+
+            <p class="guide-lead-desc">${s.desc}</p>
+
+            <div class="guide-features-list">
+              ${s.features.map(f => `
+                <div class="guide-feature-card ${f.soundType ? 'guide-feature-sound' : ''}">
+                  <div class="guide-feat-icon-wrap">
+                    <i data-lucide="${f.icon}" style="width:18px;height:18px;"></i>
+                  </div>
+                  <div class="guide-feat-content">
+                    <div class="guide-feat-title">${f.title}</div>
+                    <div class="guide-feat-desc">${f.desc}</div>
+                    ${f.soundType ? `
+                      <button class="guide-sound-test-btn" data-sound="${f.soundType}">
+                        <i data-lucide="volume-2" style="width:14px;height:14px;"></i>
+                        <span>${f.soundLabel}</span>
+                      </button>
+                    ` : ''}
+                  </div>
+                </div>
+              `).join('')}
+            </div>
           </div>
         </div>
 
-        <!-- Footer Actions -->
+        <!-- Footer -->
         <div class="guide-footer">
           <div class="guide-footer-row">
             ${!isFirst ? `
-              <button class="btn guide-btn-prev" id="btn-guide-prev">
+              <button class="guide-btn-prev" id="btn-guide-prev">
                 <i data-lucide="chevron-left" style="width:16px;height:16px;"></i>
-                Anterior
+                <span>Anterior</span>
               </button>
             ` : `
               <button class="guide-skip-link" id="btn-guide-skip">
@@ -282,8 +227,8 @@ window.FITTRACK.showGuide = function (onClose) {
               </button>
             `}
 
-            <button class="btn btn-primary guide-btn-next" id="btn-guide-next">
-              <span>${isLast ? '¡Comenzar a Entrenar!' : 'Siguiente'}</span>
+            <button class="guide-btn-next" id="btn-guide-next">
+              <span>${isLast ? '¡Comenzar!' : 'Siguiente'}</span>
               <i data-lucide="${isLast ? 'zap' : 'chevron-right'}" style="width:18px;height:18px;"></i>
             </button>
           </div>
@@ -291,10 +236,9 @@ window.FITTRACK.showGuide = function (onClose) {
       </div>
     `;
 
-    // Render Lucide icons
     if (window.lucide) lucide.createIcons();
 
-    // Event Listeners (scoped to overlay for 100% reliability)
+    // Event listeners
     const closeBtn = overlay.querySelector('#btn-guide-close');
     if (closeBtn) closeBtn.addEventListener('click', closeGuide);
 
@@ -314,16 +258,14 @@ window.FITTRACK.showGuide = function (onClose) {
     const nextBtn = overlay.querySelector('#btn-guide-next');
     if (nextBtn) {
       nextBtn.addEventListener('click', () => {
-        if (isLast) {
-          closeGuide();
-        } else {
+        if (isLast) closeGuide();
+        else {
           current++;
           renderSlide(current);
         }
       });
     }
 
-    // Step pill indicators (clickable)
     overlay.querySelectorAll('.guide-step-pill').forEach(pill => {
       pill.addEventListener('click', (e) => {
         const step = parseInt(e.currentTarget.getAttribute('data-step'), 10);
@@ -334,7 +276,6 @@ window.FITTRACK.showGuide = function (onClose) {
       });
     });
 
-    // Sound test buttons
     overlay.querySelectorAll('.guide-sound-test-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -342,25 +283,22 @@ window.FITTRACK.showGuide = function (onClose) {
         if (type === 'whistle' && window.FITTRACK.audio) {
           window.FITTRACK.audio.playRestStartSound();
           btn.classList.add('pulse-active');
-          setTimeout(() => btn.classList.remove('pulse-active'), 500);
+          setTimeout(() => btn.classList.remove('pulse-active'), 400);
         } else if (type === 'bell' && window.FITTRACK.audio) {
           window.FITTRACK.audio.playBoxingBell();
           btn.classList.add('pulse-active');
-          setTimeout(() => btn.classList.remove('pulse-active'), 500);
+          setTimeout(() => btn.classList.remove('pulse-active'), 400);
         }
       });
     });
 
-    // Auto-scroll modal body to top on slide change
     const bodyEl = overlay.querySelector('.guide-slide-body');
     if (bodyEl) bodyEl.scrollTop = 0;
   }
 
-  // Render initial slide
   renderSlide(0);
 };
 
-// Backwards compatibility alias for showOnboarding
 window.FITTRACK.showOnboarding = function () {
   window.FITTRACK.showGuide();
 };

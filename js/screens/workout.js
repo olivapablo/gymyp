@@ -72,24 +72,26 @@ window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
       });
 
       selectionEl.innerHTML = routines.map(r => {
-        const isPartner = checkIsPartner(r);
-        const cardStyle = isPartner ? 'border: 1px solid var(--color-info); background-color: var(--color-info-dim);' : '';
-        const titleColor = isPartner ? 'color: var(--color-info);' : '';
-        const iconColor = isPartner ? 'var(--color-info)' : 'var(--color-primary)';
+        const isPartner = r.owner_id === 'partner' || r.isShared;
+        const color = isPartner ? '#DB2777' : '#2563EB';
+        const label = isPartner ? 'RUTINA DE MI PAREJA' : 'MI RUTINA';
+        const badgeBg = isPartner ? 'rgba(219, 39, 119, 0.15)' : 'rgba(37, 99, 235, 0.15)';
+        const cardStyle = `border: 1px solid ${color}; border-left: 5px solid ${color}; background-color: var(--color-surface);`;
+        const titleColor = `color: ${color};`;
+        const iconColor = color;
 
         return `
           <div class="card card-interactive flex-row justify-between items-center" onclick="window.FITTRACK.screens.startRoutineWorkout('${r.id}', this)" style="${cardStyle}">
             <div class="flex-col gap-1">
               <div class="flex-row items-center gap-2 flex-wrap">
-                <h4 class="font-semibold text-lg" style="${titleColor}">${r.name}</h4>
-                ${isPartner 
-                  ? `<span class="badge" style="background-color: var(--color-info); color: #fff; font-size:0.65rem; padding: 2px 7px;"><i data-lucide="user" style="width:10px;height:10px;margin-right:3px;"></i> Rutina de Pareja</span>` 
-                  : `<span class="badge badge-primary" style="font-size:0.65rem; padding: 2px 7px;"><i data-lucide="check" style="width:10px;height:10px;margin-right:3px;"></i> Mi Rutina</span>`
-                }
+                <span class="badge" style="background-color: ${badgeBg}; color: ${color}; font-size:0.65rem; font-weight: 800; padding: 2px 7px; border-radius: 5px;">
+                  <i data-lucide="${isPartner ? 'heart' : 'user'}" style="width:10px;height:10px;margin-right:3px;"></i> ${label}
+                </span>
+                <h4 class="font-bold text-lg" style="${titleColor}">${r.name}</h4>
               </div>
-              <p class="text-color-2 text-sm">${r.exercises ? r.exercises.length : 0} ejercicios</p>
+              <p class="text-color-2 text-sm">${r.exercises ? r.exercises.length : 0} ejercicios • Día ${r.day_order || 1}</p>
             </div>
-            <i data-lucide="play-circle" style="width: 26px; height: 26px; color: ${iconColor};"></i>
+            <i data-lucide="play-circle" style="width: 28px; height: 28px; color: ${iconColor};"></i>
           </div>
         `;
       }).join('');
@@ -546,8 +548,20 @@ function bindCurrentExerciseEvents() {
         newlyCompletedBtn.classList.add('set-completed-pulse');
       }
 
-      const restTime = parseInt(ex.rest) || 90;
-      startRestTimer(restTime);
+      // Only start rest timer if there are still incomplete sets remaining in this exercise
+      const hasRemainingSets = ex.sets.some((s, idx) => idx !== setIdx && !s.completed);
+      if (hasRemainingSets) {
+        const restTime = parseInt(ex.rest || ex.rest_seconds) || 90;
+        startRestTimer(restTime);
+      } else {
+        // Last set completed for this exercise: no auto rest
+        if (window.FITTRACK.audio) {
+          window.FITTRACK.audio.playRestFinishedSound();
+        }
+        if (window.FITTRACK.toast) {
+          window.FITTRACK.toast('¡Ejercicio completado! Podés pasar al siguiente.');
+        }
+      }
     }
   };
 

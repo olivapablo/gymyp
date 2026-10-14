@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fittrack-v15';
+const CACHE_NAME = 'fittrack-v17';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -14,6 +14,7 @@ const ASSETS_TO_CACHE = [
   './js/theme.js',
   './js/router.js',
   './js/firebase-config.js',
+  './js/data/official-routines.js',
   './js/db/profiles.js',
   './js/db/routines.js',
   './js/db/workouts.js',

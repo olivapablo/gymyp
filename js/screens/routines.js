@@ -333,37 +333,35 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
       });
 
       routinesListEl.innerHTML = routines.map(r => {
-        const isPartner = checkIsPartner(r);
-                          
-        const cardStyle = isPartner ? 'border: 1px solid var(--color-info); background-color: var(--color-info-dim);' : '';
-        const titleColor = isPartner ? 'color: var(--color-info);' : '';
+        const isPartner = r.owner_id === 'partner' || r.isShared;
+        const color = isPartner ? '#DB2777' : '#2563EB';
+        const label = isPartner ? 'RUTINA DE MI PAREJA' : 'MI RUTINA';
+        const badgeBg = isPartner ? 'rgba(219, 39, 119, 0.15)' : 'rgba(37, 99, 235, 0.15)';
+        const cardStyle = `border: 1px solid ${color}; border-left: 5px solid ${color}; background-color: var(--color-surface);`;
+        const titleColor = `color: ${color};`;
         
         return `
         <div class="card card-interactive" onclick="window.location.hash='#/routine/view/${r.id}'" style="${cardStyle}">
           <div class="flex-row justify-between items-start mb-2">
             <div class="flex-col gap-1">
-              <h3 class="text-lg font-bold" style="${titleColor}">${r.name}</h3>
-              ${r.isShared ? `<span class="badge badge-primary" style="font-size:0.68rem; padding: 2px 8px;"><i data-lucide="share-2" style="width:10px;height:10px;margin-right:4px;"></i> Enviada por ${r.senderName || r.senderEmail}</span>` : ''}
-              ${isPartner ? `<span class="badge" style="background-color: var(--color-info); color: #fff; font-size:0.68rem; padding: 2px 8px; margin-top: 4px;"><i data-lucide="user" style="width:10px;height:10px;margin-right:4px;"></i> Rutina de Pareja</span>` : ''}
+              <span class="badge" style="background-color: ${badgeBg}; color: ${color}; font-size:0.68rem; font-weight: 800; letter-spacing: 0.05em; padding: 3px 8px; border-radius: 6px;">
+                <i data-lucide="${isPartner ? 'heart' : 'user'}" style="width:11px;height:11px;margin-right:4px;"></i> ${label}
+              </span>
+              <h3 class="text-xl font-black mt-1" style="${titleColor}">${r.name}</h3>
             </div>
             <div class="flex-row items-center gap-2" onclick="event.stopPropagation();">
-              <button class="btn-icon text-error btn-delete-routine-quick" data-id="${r.id}" title="Eliminar rutina" style="padding:4px;">
-                <i data-lucide="trash-2" style="width:16px;height:16px;"></i>
-              </button>
               <i data-lucide="chevron-right" class="text-color-3"></i>
             </div>
           </div>
-          <p class="text-color-2 text-sm mb-3">${r.description || 'Sin descripción'}</p>
+          <p class="text-color-2 text-sm mb-3">${r.description || ''}</p>
           <div class="flex-row gap-2 flex-wrap items-center justify-between">
-            <span class="badge">
-              <i data-lucide="dumbbell" style="width: 12px; height: 12px; margin-right: 4px;"></i>
+            <span class="badge" style="background: var(--color-surface-2);">
+              <i data-lucide="dumbbell" style="width: 12px; height: 12px; margin-right: 4px; color: ${color};"></i>
               ${r.exercises ? r.exercises.length : 0} ejercicios
             </span>
-            ${r.isShared ? `
-              <button class="btn btn-secondary btn-sm btn-import-shared" data-id="${r.id}" onclick="event.stopPropagation();" style="padding:0.25rem 0.6rem; font-size:0.75rem;">
-                <i data-lucide="download" style="width:12px;height:12px;"></i> Importar
-              </button>
-            ` : ''}
+            <span class="text-xs font-semibold" style="color: ${color};">
+              Día ${r.day_order || 1}
+            </span>
           </div>
         </div>
       `}).join('');
@@ -558,6 +556,10 @@ window.FITTRACK.screens.renderRoutineView = async function(container, routineId)
   try {
     const routine = await window.FITTRACK.getRoutine(routineId);
     
+    const isPartner = routine.owner_id === 'partner' || routine.isShared;
+    const routineColor = isPartner ? '#DB2777' : '#2563EB';
+    const ownerLabel = isPartner ? 'RUTINA DE MI PAREJA' : 'MI RUTINA';
+
     container.innerHTML = `
       <div class="flex-row justify-between items-start mb-6">
         <div class="flex-col gap-1">
@@ -565,63 +567,64 @@ window.FITTRACK.screens.renderRoutineView = async function(container, routineId)
             <button class="btn-icon text-color-2" onclick="window.history.back()">
               <i data-lucide="arrow-left"></i>
             </button>
-            <h1 class="text-2xl font-bold">${routine.name}</h1>
+            <div class="flex-col">
+              <span class="badge" style="background-color: ${isPartner ? 'rgba(219,39,119,0.15)' : 'rgba(37,99,235,0.15)'}; color: ${routineColor}; font-size:0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; width: fit-content; margin-bottom: 4px;">
+                ${ownerLabel}
+              </span>
+              <h1 class="text-2xl font-black" style="color: ${routineColor};">${routine.name}</h1>
+            </div>
           </div>
-          <p class="text-color-2 pl-10">${routine.description || ''}</p>
+          <p class="text-color-2 pl-10 text-sm">${routine.description || ''}</p>
         </div>
-        <button id="btn-edit-routine" class="btn-icon" style="color: var(--color-primary);">
-          <i data-lucide="edit-2"></i>
-        </button>
       </div>
 
       <div class="mb-8">
         <div class="flex-row gap-3 mb-6">
-          <button class="btn btn-primary flex-1" onclick="window.location.hash='#/workout'">
-            <i data-lucide="play"></i> Iniciar
-          </button>
-          <button id="btn-share-routine" class="btn btn-secondary flex-1">
-            <i data-lucide="share-2"></i> Enviar a Pareja
+          <button class="btn btn-primary flex-1 py-3 text-base font-bold shadow-glow" onclick="window.FITTRACK.screens.startRoutineWorkout('${routine.id}')">
+            <i data-lucide="play"></i> Iniciar Entrenamiento
           </button>
         </div>
 
-        <h3 class="text-lg font-bold mb-4" style="border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem;">Ejercicios</h3>
+        <h3 class="text-lg font-bold mb-4" style="border-bottom: 1px solid var(--color-border); padding-bottom: 0.5rem;">Ejercicios (${routine.exercises ? routine.exercises.length : 0})</h3>
         
         <div class="flex-col gap-3" id="routine-exercises-list">
           ${routine.exercises && routine.exercises.length > 0 
-            ? routine.exercises.map((ex, i) => `
-                <div class="card p-4">
-                  <div class="flex-row justify-between items-center mb-2">
+            ? routine.exercises.map((ex, i) => {
+                const restSec = parseInt(ex.rest || ex.rest_seconds) || 90;
+                const restMin = Math.floor(restSec / 60);
+                const restRemainder = restSec % 60;
+                const restFormatted = `${restMin}:${restRemainder < 10 ? '0' : ''}${restRemainder}`;
+                
+                return `
+                <div class="card p-4" style="border-left: 3px solid ${routineColor};">
+                  <div class="flex-row justify-between items-start mb-2">
                     <div class="flex-col gap-1">
-                      <span class="font-semibold text-lg">${i + 1}. ${ex.name}</span>
-                      <span class="text-xs" style="color: var(--color-primary); font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">${ex.type === 'fuerza' ? 'Fuerza' : ex.type === 'cinta' ? 'Cinta' : 'Aeróbico'}</span>
+                      <span class="font-bold text-lg text-color-1">${i + 1}. ${ex.name}</span>
                     </div>
-                    <button class="btn-icon text-color-3 btn-edit-ex" data-index="${i}" style="font-size:0.8rem;">
-                      <i data-lucide="edit-2" style="width:16px;height:16px"></i>
-                    </button>
                   </div>
-                  <div class="flex-row gap-6 text-color-2 text-sm flex-wrap">
-                    ${ex.type === 'fuerza' ? `
-                      ${ex.sets ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Series</span><span class="font-medium" style="color:var(--color-text-1)">${ex.sets}</span></div>` : ''}
-                      ${ex.reps ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Reps</span><span class="font-medium" style="color:var(--color-text-1)">${ex.reps}</span></div>` : ''}
-                      ${ex.weight ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Carga</span><span class="font-medium" style="color:var(--color-text-1)">${ex.weight} kg</span></div>` : ''}
-                      ${ex.rest ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Descanso</span><span class="font-medium" style="color:var(--color-text-1)">${ex.rest}s</span></div>` : ''}
-                      ${ex.rir ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">RIR</span><span class="font-medium" style="color:var(--color-text-1)">${ex.rir}</span></div>` : ''}
-                    ` : ''}
-                    ${ex.type === 'cinta' ? `
-                      ${ex.time ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Tiempo</span><span class="font-medium" style="color:var(--color-text-1)">${ex.time} min</span></div>` : ''}
-                      ${ex.distance ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Distancia</span><span class="font-medium" style="color:var(--color-text-1)">${ex.distance} km</span></div>` : ''}
-                      ${ex.speed ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Velocidad</span><span class="font-medium" style="color:var(--color-text-1)">${ex.speed} km/h</span></div>` : ''}
-                      ${ex.incline ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Inclinación</span><span class="font-medium" style="color:var(--color-text-1)">${ex.incline}%</span></div>` : ''}
-                    ` : ''}
-                    ${ex.type === 'aerobico' ? `
-                      <div style="width:100%;"><span class="text-sm" style="color:var(--color-text-2)">${ex.modality || ''}</span></div>
-                      ${ex.sets ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Series</span><span class="font-medium" style="color:var(--color-text-1)">${ex.sets}</span></div>` : ''}
-                      ${ex.reps ? `<div class="flex-col"><span class="text-xs uppercase" style="letter-spacing:.08em;color:var(--color-text-3)">Reps</span><span class="font-medium" style="color:var(--color-text-1)">${ex.reps}</span></div>` : ''}
+                  <div class="flex-row gap-4 text-color-2 text-sm flex-wrap mt-2">
+                    <div class="flex-col">
+                      <span class="text-xs uppercase font-bold" style="letter-spacing:.08em;color:var(--color-text-3)">Series</span>
+                      <span class="font-bold text-color-1 text-base">${ex.sets}</span>
+                    </div>
+                    <div class="flex-col">
+                      <span class="text-xs uppercase font-bold" style="letter-spacing:.08em;color:var(--color-text-3)">Reps</span>
+                      <span class="font-bold text-color-1 text-base">${ex.reps}</span>
+                    </div>
+                    <div class="flex-col">
+                      <span class="text-xs uppercase font-bold" style="letter-spacing:.08em;color:var(--color-text-3)">Descanso</span>
+                      <span class="font-bold text-base" style="color: ${routineColor};">${restFormatted} (${restSec}s)</span>
+                    </div>
+                    ${ex.weight ? `
+                      <div class="flex-col">
+                        <span class="text-xs uppercase font-bold" style="letter-spacing:.08em;color:var(--color-text-3)">Última carga</span>
+                        <span class="font-bold text-color-1 text-base">${ex.weight} kg</span>
+                      </div>
                     ` : ''}
                   </div>
-                  ${ex.notes ? `<p class="text-sm mt-2" style="color:var(--color-text-3); font-style:italic;">${ex.notes}</p>` : ''}
+                  ${ex.notes ? `<p class="text-xs mt-3 p-2 rounded-lg bg-surface-2 text-color-2" style="font-style:italic; border-left: 2px solid var(--color-warning);">Nota: ${ex.notes}</p>` : ''}
                 </div>
-              `).join('')
+              `}).join('')
             : '<p class="text-color-3">No hay ejercicios en esta rutina.</p>'
           }
         </div>

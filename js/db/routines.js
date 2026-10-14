@@ -32,11 +32,16 @@ window.FITTRACK.getRoutines = async function() {
       }
     }
 
-    // Build the 10 official routines
+    const currentUserEmail = (user.email || '').toLowerCase().trim();
+    const isMarLoggedIn = currentUserEmail.includes('mar.armando');
+
+    // Build the 10 official routines tailored to the logged in user
     const officialRoutines = spec.routines.map(r => {
-      const isPartner = (r.owner_id === 'partner');
-      const routineColor = r.color || (isPartner ? '#DB2777' : '#2563EB');
-      const ownerLabel = r.owner_label || (isPartner ? 'Rutina de mi pareja' : 'Mi rutina');
+      const isPartnerRoutine = (r.owner_id === 'partner');
+      const isMyOwnRoutine = isMarLoggedIn ? isPartnerRoutine : !isPartnerRoutine;
+      
+      const routineColor = r.color || (isPartnerRoutine ? '#DB2777' : '#2563EB');
+      const ownerLabel = r.owner_label || (isPartnerRoutine ? 'Rutina de mi pareja' : 'Mi rutina');
 
       const mappedExercises = r.exercises.map((ex, idx) => {
         const exKey = (ex.name || '').trim().toLowerCase();
@@ -68,12 +73,37 @@ window.FITTRACK.getRoutines = async function() {
         day_order: r.day_order,
         description: `Sesión de ${r.name} — ${ownerLabel}`,
         exercises: mappedExercises,
-        isShared: isPartner,
-        owner: isPartner ? 'partner' : 'me',
-        senderName: isPartner ? 'Mar' : '',
-        senderEmail: isPartner ? 'mar.armando1997@gmail.com' : ''
+        isShared: !isMyOwnRoutine,
+        owner: isPartnerRoutine ? 'partner' : 'me',
+        senderName: isPartnerRoutine ? 'Mar' : 'Pablo',
+        senderEmail: isPartnerRoutine ? 'mar.armando1997@gmail.com' : 'pabloliva1999@gmail.com',
+        assignedEmail: isPartnerRoutine ? 'mar.armando1997@gmail.com' : ''
       };
     });
+
+    // Also sync partner routines to Firestore 'shared_routines' in background so they are persisted for mar.armando1997@gmail.com
+    try {
+      if (window.FITTRACK.db && !isMarLoggedIn) {
+        spec.routines.filter(r => r.owner_id === 'partner').forEach(async pr => {
+          try {
+            const sharedRef = window.FITTRACK.db.collection('shared_routines').doc(`shared_${pr.id}`);
+            await sharedRef.set({
+              name: pr.name,
+              description: `Sesión de ${pr.name} — Rutina de mi pareja`,
+              exercises: pr.exercises,
+              senderUid: user.uid,
+              senderEmail: user.email || 'pabloliva1999@gmail.com',
+              senderName: user.displayName || 'Pablo',
+              targetEmail: 'mar.armando1997@gmail.com',
+              color: '#DB2777',
+              day_order: pr.day_order,
+              owner_id: 'partner',
+              updatedAt: window.FITTRACK.FieldValue.serverTimestamp()
+            }, { merge: true });
+          } catch (_) {}
+        });
+      }
+    } catch (_) {}
 
     // Also fetch any custom user-created routines from Firestore to ensure zero data loss
     try {
@@ -81,7 +111,6 @@ window.FITTRACK.getRoutines = async function() {
       if (customSnap.docs && customSnap.docs.length > 0) {
         customSnap.docs.forEach(doc => {
           const d = doc.data();
-          // Avoid duplicate IDs
           if (!officialRoutines.some(o => o.id === doc.id)) {
             officialRoutines.push({
               id: doc.id,
@@ -94,11 +123,11 @@ window.FITTRACK.getRoutines = async function() {
       }
     } catch (_) {}
 
-    // Sort: 5 for "Mi rutina" (1 to 5), then 5 for "Rutina de mi pareja" (1 to 5)
+    // Sort: user's primary routines first (1 to 5), then partner's routines (1 to 5)
     officialRoutines.sort((a, b) => {
-      const orderA = a.owner_id === 'partner' ? 1 : 0;
-      const orderB = b.owner_id === 'partner' ? 1 : 0;
-      if (orderA !== orderB) return orderA - orderB;
+      const aIsOwn = !a.isShared ? 0 : 1;
+      const bIsOwn = !b.isShared ? 0 : 1;
+      if (aIsOwn !== bIsOwn) return aIsOwn - bIsOwn;
       return (a.day_order || 0) - (b.day_order || 0);
     });
 

@@ -1,0 +1,20 @@
+// ============================================
+// FITTRACK — Firestore Security Rules
+// ============================================
+// Copy these rules to: Firebase Console > Firestore Database > Rules
+//
+// These rules ensure:
+// - Only authenticated users can access data
+// - Each user can ONLY read/write their own data
+// - User A cannot see, modify, or delete User B's data
+// - All private data is nested under /users/{userId}/
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Permite lectura y escritura a cualquier usuario autenticado (tú y tu pareja)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

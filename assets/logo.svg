@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 60" fill="none" role="img" aria-label="FITTRACK">
+  <!-- FF Mark -->
+  <g>
+    <!-- Left F (larger, primary) — italic slanted parallelogram shapes -->
+    <!-- Vertical stroke left F -->
+    <polygon points="6,48 14,12 22,12 14,48" fill="#B7FF3A"/>
+    <!-- Top bar left F -->
+    <polygon points="14,12 38,12 36,19 12,19" fill="#B7FF3A"/>
+    <!-- Middle bar left F -->
+    <polygon points="11,29 32,29 30,36 9,36" fill="#B7FF3A"/>
+
+    <!-- Right F (smaller, offset down-right) -->
+    <!-- Vertical stroke right F -->
+    <polygon points="28,48 34,20 41,20 35,48" fill="#B7FF3A"/>
+    <!-- Top bar right F -->
+    <polygon points="34,20 52,20 50,27 32,27" fill="#B7FF3A"/>
+    <!-- Middle bar right F -->
+    <polygon points="31,36 48,36 46,42 29,42" fill="#B7FF3A"/>
+  </g>
+
+  <!-- Wordmark: FITTRACK -->
+  <text x="62" y="42" font-family="Inter, Arial, sans-serif" font-weight="800" font-size="26" letter-spacing="2" fill="#FFFFFF">FITTRACK</text>
+</svg>

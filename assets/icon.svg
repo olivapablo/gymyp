@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none" role="img" aria-label="FITTRACK icon">
+  <!-- Dark rounded square background -->
+  <rect width="200" height="200" rx="44" fill="#0B0F0D"/>
+  <!-- FF Monogram, centered and scaled -->
+  <g transform="translate(32, 38) scale(2.75)">
+    <!-- Left F (larger) -->
+    <polygon points="6,48 14,12 22,12 14,48" fill="#B7FF3A"/>
+    <polygon points="14,12 38,12 36,19 12,19" fill="#B7FF3A"/>
+    <polygon points="11,29 32,29 30,36 9,36" fill="#B7FF3A"/>
+    <!-- Right F (smaller, offset) -->
+    <polygon points="28,48 34,20 41,20 35,48" fill="#B7FF3A"/>
+    <polygon points="34,20 52,20 50,27 32,27" fill="#B7FF3A"/>
+    <polygon points="31,36 48,36 46,42 29,42" fill="#B7FF3A"/>
+  </g>
+</svg>

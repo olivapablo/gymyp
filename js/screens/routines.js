@@ -284,7 +284,7 @@ window.FITTRACK.openExerciseModal = openExerciseModal;
 window.FITTRACK.screens.renderRoutines = async function(container) {
   container.innerHTML = `
     <div class="flex-row justify-between items-center mb-6">
-      <h1 class="text-3xl font-bold">Mis Rutinas</h1>
+      <h1 class="text-3xl font-black" style="color: var(--color-primary); letter-spacing: -0.02em;">Mis Rutinas</h1>
       <button id="btn-new-routine" class="btn btn-primary btn-icon" aria-label="Nueva Rutina">
         <i data-lucide="plus"></i>
       </button>
@@ -673,21 +673,27 @@ window.FITTRACK.screens.renderRoutineView = async function(container, routineId)
       });
     });
 
-    document.getElementById('btn-edit-routine').addEventListener('click', () => {
-      window.location.hash = '#/routine/edit/' + routineId;
-    });
+    const btnEdit = document.getElementById('btn-edit-routine');
+    if (btnEdit) {
+      btnEdit.addEventListener('click', () => {
+        window.location.hash = '#/routine/edit/' + routineId;
+      });
+    }
 
-    document.getElementById('btn-delete-routine').addEventListener('click', async () => {
-      const ok = await window.FITTRACK.confirm('¿Estás seguro de eliminar esta rutina?', 'Eliminar Rutina', 'Eliminar', 'Cancelar');
-      if (ok) {
-        try {
-          await window.FITTRACK.deleteRoutine(routineId);
-          window.location.hash = '#/routines';
-        } catch (err) {
-          await window.FITTRACK.alert('Error al eliminar rutina: ' + err.message, 'Error');
+    const btnDelete = document.getElementById('btn-delete-routine');
+    if (btnDelete) {
+      btnDelete.addEventListener('click', async () => {
+        const ok = await window.FITTRACK.confirm('¿Estás seguro de eliminar esta rutina?', 'Eliminar Rutina', 'Eliminar', 'Cancelar');
+        if (ok) {
+          try {
+            await window.FITTRACK.deleteRoutine(routineId);
+            window.location.hash = '#/routines';
+          } catch (err) {
+            await window.FITTRACK.alert('Error al eliminar rutina: ' + err.message, 'Error');
+          }
         }
-      }
-    });
+      });
+    }
 
   } catch (err) {
     container.innerHTML = `

@@ -334,9 +334,9 @@ window.FITTRACK.screens.renderRoutines = async function(container) {
 
       routinesListEl.innerHTML = routines.map(r => {
         const isPartner = r.owner_id === 'partner' || r.isShared;
-        const color = isPartner ? '#DB2777' : '#2563EB';
+        const color = isPartner ? '#DB2777' : '#B7F34A';
         const label = isPartner ? 'RUTINA DE MI PAREJA' : 'MI RUTINA';
-        const badgeBg = isPartner ? 'rgba(219, 39, 119, 0.15)' : 'rgba(37, 99, 235, 0.15)';
+        const badgeBg = isPartner ? 'rgba(219, 39, 119, 0.15)' : 'rgba(183, 243, 74, 0.15)';
         const cardStyle = `border: 1px solid ${color}; border-left: 5px solid ${color}; background-color: var(--color-surface);`;
         const titleColor = `color: ${color};`;
         
@@ -557,7 +557,7 @@ window.FITTRACK.screens.renderRoutineView = async function(container, routineId)
     const routine = await window.FITTRACK.getRoutine(routineId);
     
     const isPartner = routine.owner_id === 'partner' || routine.isShared;
-    const routineColor = isPartner ? '#DB2777' : '#2563EB';
+    const routineColor = isPartner ? '#DB2777' : '#B7F34A';
     const ownerLabel = isPartner ? 'RUTINA DE MI PAREJA' : 'MI RUTINA';
 
     container.innerHTML = `
@@ -568,7 +568,7 @@ window.FITTRACK.screens.renderRoutineView = async function(container, routineId)
               <i data-lucide="arrow-left"></i>
             </button>
             <div class="flex-col">
-              <span class="badge" style="background-color: ${isPartner ? 'rgba(219,39,119,0.15)' : 'rgba(37,99,235,0.15)'}; color: ${routineColor}; font-size:0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; width: fit-content; margin-bottom: 4px;">
+              <span class="badge" style="background-color: ${isPartner ? 'rgba(219,39,119,0.15)' : 'rgba(183,243,74,0.15)'}; color: ${routineColor}; font-size:0.68rem; font-weight: 800; padding: 2px 8px; border-radius: 6px; width: fit-content; margin-bottom: 4px;">
                 ${ownerLabel}
               </span>
               <h1 class="text-2xl font-black" style="color: ${routineColor};">${routine.name}</h1>

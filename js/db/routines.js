@@ -40,7 +40,7 @@ window.FITTRACK.getRoutines = async function() {
       const isPartnerRoutine = (r.owner_id === 'partner');
       const isMyOwnRoutine = isMarLoggedIn ? isPartnerRoutine : !isPartnerRoutine;
       
-      const routineColor = r.color || (isPartnerRoutine ? '#DB2777' : '#2563EB');
+      const routineColor = r.color || (isPartnerRoutine ? '#DB2777' : '#B7F34A');
       const ownerLabel = r.owner_label || (isPartnerRoutine ? 'Rutina de mi pareja' : 'Mi rutina');
 
       const mappedExercises = r.exercises.map((ex, idx) => {
@@ -115,7 +115,7 @@ window.FITTRACK.getRoutines = async function() {
             officialRoutines.push({
               id: doc.id,
               ...d,
-              color: d.isShared ? '#DB2777' : '#2563EB',
+              color: d.isShared ? '#DB2777' : '#B7F34A',
               isShared: !!d.isShared
             });
           }

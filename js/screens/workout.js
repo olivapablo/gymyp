@@ -73,9 +73,9 @@ window.FITTRACK.screens.renderWorkoutSelector = async function(container) {
 
       selectionEl.innerHTML = routines.map(r => {
         const isPartner = r.owner_id === 'partner' || r.isShared;
-        const color = isPartner ? '#DB2777' : '#2563EB';
+        const color = isPartner ? '#DB2777' : '#B7F34A';
         const label = isPartner ? 'RUTINA DE MI PAREJA' : 'MI RUTINA';
-        const badgeBg = isPartner ? 'rgba(219, 39, 119, 0.15)' : 'rgba(37, 99, 235, 0.15)';
+        const badgeBg = isPartner ? 'rgba(219, 39, 119, 0.15)' : 'rgba(183, 243, 74, 0.15)';
         const cardStyle = `border: 1px solid ${color}; border-left: 5px solid ${color}; background-color: var(--color-surface);`;
         const titleColor = `color: ${color};`;
         const iconColor = color;
